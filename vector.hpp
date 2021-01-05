@@ -6,7 +6,7 @@
 /*   By: heleneherin <heleneherin@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/04 12:58:14 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/05 17:11:29 by heleneherin      ###   ########.fr       */
+/*   Updated: 2021/01/05 18:32:32 by heleneherin      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,8 @@
 
 # include <iostream>
 # include <memory>
+# include <exception>
+# include <iterator> //is_iterator
 
 namespace ft
 {
@@ -67,7 +69,9 @@ namespace ft
 			//Default constructor
 			explicit vector (const allocator_type& alloc = allocator_type())
 				: _vecSize(0), _vecCapacity(_vecSize + 10), _myAlloc(alloc)
-			{ _vector = _myAlloc.allocate(_vecCapacity);}
+			{
+				_vector = _myAlloc.allocate(_vecCapacity);
+			}
 
 			//Fill constructor with n elements
 			explicit vector(size_type n, const value_type &value = value_type(), const allocator_type &alloc = allocator_type())
@@ -128,7 +132,7 @@ namespace ft
 			// ** @param sz: new container size (unsigned int)
 			// ** @param c: object copy in the added element
 			// */
-			void		resize(size_type sz, const value_type& c = value_type());
+			void		resize(size_type sz, const value_type &c = value_type());
 
 			// // Returns the size of the storage space currrently allocated for the vector (in terme of elements)
 			size_type	capacity() const { return _vecCapacity; }
@@ -148,7 +152,7 @@ namespace ft
 			//====================================Element access====================================
 			// Returns a reference to the element at position n in container
 			reference			operator[](size_type n) { return (_vector[n]); }
-			// const_reference		operator[](size_type n) const;
+			const_reference		operator[](size_type n) const { return (_vector[n]); }
 
 			// // Same as operator[] but check if n is within the bounds of valid element or throw an exception
 			// reference			at(size_type n);
@@ -221,14 +225,14 @@ namespace ft
 			// // Removed all element from the vector. new size container = 0
 			// void	clear();
 
-			// // exchange the content of the vector with the content of an other object
-			// void	swap(vector &sVec)
-			// {
-			// 	std::swap(this->_vecSize, sVec._vecSize);
-			// 	std::swap(this->_vecCapacity, sVec._vecCapacity);
-			// 	std::swap(this->_myAlloc, sVec._myAlloc);
-			// 	std::swap(this->_vector, sVec._vector);
-			// }
+			// exchange the content of the vector with the content of an other object
+			void	swap(vector &sVec)
+			{
+				std::swap(this->_vecSize, sVec._vecSize);
+				std::swap(this->_vecCapacity, sVec._vecCapacity);
+				std::swap(this->_myAlloc, sVec._myAlloc);
+				std::swap(this->_vector, sVec._vector);
+			}
 
 		private:
 			unsigned int	_vecSize;
@@ -238,8 +242,8 @@ namespace ft
 
 			void resizeIfNeeded()
 			{
-				if (_vecSize == _vecCapacity){
-					pointer newVec = _myAlloc.allocate(_vecCapacity + 10);
+				if (_vecSize >= _vecCapacity){
+					pointer newVec = _myAlloc.allocate(_vecCapacity);
 					for (unsigned int i = 0; i < _vecSize; i++)
 						newVec[i] = _vector[i];
 					_myAlloc.deallocate(_vector, _vecCapacity);
@@ -247,7 +251,6 @@ namespace ft
 					_vecCapacity += 10;
 				}
 			}
-
 	};
 }
 #endif
