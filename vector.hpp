@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/04 12:58:14 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/07 10:30:02 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/07 17:17:55 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,9 @@
 # include <memory>
 # include <exception>
 # include "traits.hpp"
+# include "iterator.hpp"
+
+# define EXTRA_MEM 10
 
 namespace ft
 {
@@ -32,51 +35,22 @@ namespace ft
 			typedef typename allocator_type::difference_type	difference_type;
 			typedef typename allocator_type::pointer			pointer;
 			typedef typename allocator_type::const_pointer		const_pointer;
-
-			class iterator
-			{
-				public:
-					typedef typename Alloc::difference_type difference_type;
-					typedef typename Alloc::value_type value_type;
-					typedef typename Alloc::reference reference;
-					typedef typename Alloc::pointer pointer;
-					typedef std::random_access_iterator_tag iterator_category;
-
-					iterator(pointer val) : _current(val){}
-					iterator(iterator const &cp) : _current(cp._current){}
-					iterator operator=(iterator const &cp)
-					{
-						if (this != &cp)
-							_current = cp._current;
-						return *this;
-					}
-					~iterator(){}
-					//pre incrementation
-					iterator operator++(){ _current++; return *this; }
-					//post incrementation
-					iterator operator++(value_type){ iterator tmp = *this; ++(*this); return tmp; }
-					reference operator*() { return *_current; }
-					pointer operator->() { return _current; }
-					friend bool operator==(const iterator& a, const iterator& b) { return a._current == b._current; };
-					friend bool operator!=(const iterator& a, const iterator& b) { return a._current != b._current; };
-
-				private:
-					pointer _current;
-			};
+			typedef typename ft::random_iter<T, Alloc>			iterator;
+			typedef typename ft::const_random_iter<T, Alloc>	const_iterator;
 
 
 			//=======================================Coplien Class=======================================
 			//allocatorawarecontainer copy cpp reference
 			//Default constructor
 			explicit vector (const allocator_type& alloc = allocator_type())
-				: _vecSize(0), _vecCapacity(_vecSize + 10), _myAlloc(alloc)
+				: _vecSize(0), _vecCapacity(_vecSize + EXTRA_MEM), _myAlloc(alloc)
 			{
 				_vector = _myAlloc.allocate(_vecCapacity);
 			}
 
 			//Fill constructor with n elements
 			explicit vector(size_type n, const value_type &value = value_type(), const allocator_type &alloc = allocator_type())
-				: _vecSize(0), _vecCapacity(_vecSize + 10), _myAlloc(alloc)
+				: _vecSize(0), _vecCapacity(_vecSize + EXTRA_MEM), _myAlloc(alloc)
 			{
 				_vector = _myAlloc.allocate(_vecCapacity);
 				for (size_type i = 0; i < n; i++)
@@ -87,8 +61,10 @@ namespace ft
 			// Fill constructor with a range between the first to the last elements of an other vector
 			template <class InputIterator>
 			vector(InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type(), typename ft::enable_if<!ft::is_integer<InputIterator>::value, InputIterator >::type* = 0)
-				: _vecSize(0), _vecCapacity(_vecSize + 10), _myAlloc(alloc)
+				: _myAlloc(alloc)
 			{
+				_vecSize = last - first;
+				_vecCapacity = _vecSize + EXTRA_MEM;
 				_vector = _myAlloc.allocate(_vecCapacity);
 				while (first != last){
 					push_back(*first);
@@ -98,21 +74,25 @@ namespace ft
 
 			// Copy constructor
 			vector(const vector &x)
+				:_vecSize(x._vecSize), _vecCapacity(x._vecCapacity), _myAlloc(x._myAlloc)
 			{
-				_vecSize = x._vecSize;
-				_vecCapacity = x._vecCapacity;
-				_myAlloc = x._myAlloc;
 				_vector = _myAlloc.allocate(_vecCapacity);
-				for (size_type i = 0; i < _vecSize; i++)
-					std::swap(_vector[i], x._vector[i]);
+				for (std::pair<iterator, const_iterator> it(begin(), x.begin()); it.first != end(); it.first++, it.second++)
+					*it.first = *it.second;
 			}
 
 			vector& operator=(const vector& x)
 			{
 				if (this == &x)
 					return *this;
-				_myAlloc.deallocate(_vector);
-				swap(x);
+				_myAlloc.deallocate(_vector, _vecCapacity);
+				_vecSize = x._vecSize;
+				_vecCapacity = x._vecCapacity;
+				_myAlloc = x._myAlloc;
+				_vector = _myAlloc.allocate(_vecCapacity);
+				for (size_type i = 0; i < _vecSize; i++){
+					std::swap(_vector[i], x._vector[i]);
+				}
 				return *this;
 			}
 
@@ -124,9 +104,9 @@ namespace ft
 
 			//=======================================Iterators=======================================
 			iterator				begin(){ return iterator(_vector); }
-			// const_iterator			begin() const { return Iterator(_vector[0]); }
+			const_iterator			begin() const { return const_iterator(_vector); }
 			iterator				end() { return iterator(_vector + _vecSize); }
-			// const_iterator			end() const { return Iterator(_vector[_vecSize]); }
+			const_iterator			end() const { return const_iterator(_vector + _vecSize); }
 			// reverse_iterator		rbegin();
 			// const_reverse_iterator	rbegin() const;
 			// reverse_iterator		rend();
@@ -244,8 +224,8 @@ namespace ft
 			void	clear()
 			{
 				_myAlloc.deallocate(_vector, _vecCapacity);
-				_vector = _myAlloc.allocate(10);
-				_vecCapacity = 10;
+				_vector = _myAlloc.allocate(EXTRA_MEM);
+				_vecCapacity = EXTRA_MEM;
 				_vecSize = 0;
 			}
 
@@ -254,6 +234,11 @@ namespace ft
 			{
 				std::swap(this->_vecSize, sVec._vecSize);
 				std::swap(this->_vecCapacity, sVec._vecCapacity);
+				if (_vecSize != sVec._vecSize)
+				{
+					vector tmp;
+					
+				}
 				std::swap(this->_myAlloc, sVec._myAlloc);
 				std::swap(this->_vector, sVec._vector);
 			}
@@ -272,7 +257,7 @@ namespace ft
 						newVec[i] = _vector[i];
 					_myAlloc.deallocate(_vector, _vecCapacity);
 					_vector = newVec;
-					_vecCapacity += 10;
+					_vecCapacity += EXTRA_MEM;
 				}
 			}
 	};
