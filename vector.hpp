@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   vector.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: heleneherin <heleneherin@student.42.fr>    +#+  +:+       +#+        */
+/*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/04 12:58:14 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/05 18:32:32 by heleneherin      ###   ########.fr       */
+/*   Updated: 2021/01/07 10:30:02 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 # include <iostream>
 # include <memory>
 # include <exception>
-# include <iterator> //is_iterator
+# include "traits.hpp"
 
 namespace ft
 {
@@ -47,7 +47,7 @@ namespace ft
 					iterator operator=(iterator const &cp)
 					{
 						if (this != &cp)
-							_val(cp._val);
+							_current = cp._current;
 						return *this;
 					}
 					~iterator(){}
@@ -66,6 +66,7 @@ namespace ft
 
 
 			//=======================================Coplien Class=======================================
+			//allocatorawarecontainer copy cpp reference
 			//Default constructor
 			explicit vector (const allocator_type& alloc = allocator_type())
 				: _vecSize(0), _vecCapacity(_vecSize + 10), _myAlloc(alloc)
@@ -82,9 +83,10 @@ namespace ft
 					push_back(value);
 			}
 
+																											// if inputs are pointer segfault, std::vector throw an exception
 			// Fill constructor with a range between the first to the last elements of an other vector
 			template <class InputIterator>
-			vector(InputIterator first, InputIterator last, const allocator_type& alloc= allocator_type())
+			vector(InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type(), typename ft::enable_if<!ft::is_integer<InputIterator>::value, InputIterator >::type* = 0)
 				: _vecSize(0), _vecCapacity(_vecSize + 10), _myAlloc(alloc)
 			{
 				_vector = _myAlloc.allocate(_vecCapacity);
@@ -95,12 +97,28 @@ namespace ft
 			}
 
 			// Copy constructor
-			vector(const vector& x);
+			vector(const vector &x)
+			{
+				_vecSize = x._vecSize;
+				_vecCapacity = x._vecCapacity;
+				_myAlloc = x._myAlloc;
+				_vector = _myAlloc.allocate(_vecCapacity);
+				for (size_type i = 0; i < _vecSize; i++)
+					std::swap(_vector[i], x._vector[i]);
+			}
 
-			vector& operator=(const vector& x);
+			vector& operator=(const vector& x)
+			{
+				if (this == &x)
+					return *this;
+				_myAlloc.deallocate(_vector);
+				swap(x);
+				return *this;
+			}
 
 			~vector()
 			{
+				std::cout << "deallocate\n";
 				_myAlloc.deallocate(_vector, _vecCapacity);
 			}
 
@@ -223,9 +241,15 @@ namespace ft
 			// iterator	erase(const_iterator first, const_iterator last);
 
 			// // Removed all element from the vector. new size container = 0
-			// void	clear();
+			void	clear()
+			{
+				_myAlloc.deallocate(_vector, _vecCapacity);
+				_vector = _myAlloc.allocate(10);
+				_vecCapacity = 10;
+				_vecSize = 0;
+			}
 
-			// exchange the content of the vector with the content of an other object
+			// exchange the content of the vector with the content of sVec
 			void	swap(vector &sVec)
 			{
 				std::swap(this->_vecSize, sVec._vecSize);
