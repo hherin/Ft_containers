@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/05 10:14:05 by heleneherin       #+#    #+#             */
-/*   Updated: 2021/01/07 17:58:22 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/08 13:14:53 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ int main()
 	// 	std::cout << *it2 << " ";
 	// 	it2++;
 	// }
-	// std::cout << "\nnewSize: " << vec2.size() << "\t";
+	//std::cout << "\nnewSize: " << vec2.size() << "\t";
 	// std::cout << "newCapacity: " << vec2.capacity() << std::endl;
 
 	
@@ -82,7 +82,8 @@ int main()
 
 	std::cout << "\n==============ITERATORS OVERLOAD==========\n";
 	it = base.begin();
-	std::cout << *(it + 2) << std::endl;
+	int nb = 2;
+	std::cout << *(it + nb) << std::endl;
 
 	// std::cout << "\n============= DESTRUCTORS=============\n";
 	//check les leaks a revoir

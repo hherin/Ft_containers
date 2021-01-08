@@ -20,6 +20,10 @@ ${NAME}	:	${OBJS}
 
 ${OBJS}	:	${HDRS}
 
+test	: 
+			${GCC} ${FLAGS} -o main_it.o -c main_it.cpp
+			${GCC} ${FLAGS} -o test main_it.o
+
 clean	:
 			rm -rf ${OBJS}
 

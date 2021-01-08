@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/04 12:58:14 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/07 17:17:55 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/08 16:36:11 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,8 @@
 # include <iostream>
 # include <memory>
 # include <exception>
-# include "traits.hpp"
-# include "iterator.hpp"
+# include "utils/traits.hpp"
+# include "utils/random_iter.hpp"
 
 # define EXTRA_MEM 10
 
@@ -35,8 +35,8 @@ namespace ft
 			typedef typename allocator_type::difference_type	difference_type;
 			typedef typename allocator_type::pointer			pointer;
 			typedef typename allocator_type::const_pointer		const_pointer;
-			typedef typename ft::random_iter<T, Alloc>			iterator;
-			typedef typename ft::const_random_iter<T, Alloc>	const_iterator;
+			typedef typename ft::random_iter<T, true, Alloc>	iterator;
+			typedef typename ft::random_iter<T, false, Alloc>	const_iterator;
 
 
 			//=======================================Coplien Class=======================================
@@ -98,13 +98,12 @@ namespace ft
 
 			~vector()
 			{
-				std::cout << "deallocate\n";
 				_myAlloc.deallocate(_vector, _vecCapacity);
 			}
 
 			//=======================================Iterators=======================================
-			iterator				begin(){ return iterator(_vector); }
 			const_iterator			begin() const { return const_iterator(_vector); }
+			iterator				begin() { return iterator(_vector); }
 			iterator				end() { return iterator(_vector + _vecSize); }
 			const_iterator			end() const { return const_iterator(_vector + _vecSize); }
 			// reverse_iterator		rbegin();

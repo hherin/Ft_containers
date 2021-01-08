@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/06 15:35:44 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/07 15:57:11 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/08 13:19:02 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,20 @@ namespace ft
 	struct is_integer<int>
 	{
 		static const bool value = true;
+	};
+
+	template< bool B, typename isConst, typename notConst >
+	struct chooseIf
+	{};
+	template< typename isConst, typename notConst >
+	struct chooseIf<true, isConst, notConst>
+	{
+		typedef notConst type;
+	};
+	template< typename isConst, typename notConst >
+	struct chooseIf<false, isConst, notConst>
+	{
+		typedef const isConst type;
 	};
 }
 #endif
