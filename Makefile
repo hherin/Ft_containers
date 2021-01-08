@@ -8,7 +8,7 @@ FLAGS	=	-Werror -Wextra -Wall -std=c++98
 
 OBJS	=	${SRCS:.cpp=.o}
 
-HDRS	=	vector.hpp iterator.hpp
+HDRS	=	vector.hpp
 
 all		:	${NAME}
 
