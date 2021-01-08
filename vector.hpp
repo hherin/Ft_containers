@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/04 12:58:14 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/08 18:03:14 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/08 18:05:56 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,8 +142,7 @@ namespace ft
 			** Reverve at least n unitialized elements in vector
 			** if n > current capacity: rallocation storage to size n or more
 			** no effect on vector size
-			**
-			** @param n minimum capacity for the vector
+			** @param n Minimum capacity for the vector
 			*/
 			// void reserve(size_type n);
 
