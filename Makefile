@@ -8,7 +8,7 @@ FLAGS	=	-Werror -Wextra -Wall -std=c++98
 
 OBJS	=	${SRCS:.cpp=.o}
 
-HDRS	=	containers/vector.hpp utils/*
+HDRS	=	containers/* utils/*
 
 all		:	${NAME}
 

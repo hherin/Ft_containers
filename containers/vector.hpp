@@ -6,7 +6,7 @@
 /*   By: heleneherin <heleneherin@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/04 12:58:14 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/10 22:19:40 by heleneherin      ###   ########.fr       */
+/*   Updated: 2021/01/10 22:35:18 by heleneherin      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,7 +131,16 @@ namespace ft
 			// ** @param sz New container size (unsigned int)
 			// ** @param c Object copied in the added element
 			// */
-			void		resize(size_type sz, const value_type &c = value_type());
+			void		resize(size_type sz, const value_type &c = value_type())
+			{
+				if (sz < _size){
+					_size -= _size - sz;
+				}
+				else{
+					for (size_t i = _size; i < sz; i++)
+						push_back(c);
+				}
+			}
 
 			// // Returns the size of the storage space currrently allocated for the vector (in terme of elements)
 			size_type	capacity() const { return _capacity; }

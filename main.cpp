@@ -6,7 +6,7 @@
 /*   By: heleneherin <heleneherin@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/05 10:14:05 by heleneherin       #+#    #+#             */
-/*   Updated: 2021/01/10 22:19:13 by heleneherin      ###   ########.fr       */
+/*   Updated: 2021/01/10 22:37:04 by heleneherin      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,12 +85,26 @@ int main()
 	int nb = 2;
 	std::cout << *(it + nb) << std::endl;
 
+	std::cout << "\n=================== CAPACITY ==================\n";
+	std::cout << "Size base vector " << base.size() << std::endl;
+	std::cout << "Capacity base vector " << base.capacity() << std::endl;
+	std::cout << "max size vector " << base.max_size() << std::endl;
+	std::cout << "RESIZE \n";
+	base.resize(4, 10);
+	std::cout << "New_size " << base.size() << std::endl;
+	base.resize(10, 11);
+	std::cout << "New_size2 " << base.size() << std::endl;
+	it = base.begin();
+	while (it != base.end()){
+		std::cout << *it << " ";
+		it++;
+	}
+	std::cout << std::endl;
 	std::cout << "\n===================== SWAP ====================\n";
 	ft::vector<int>vec3;
 	std::cout << "vec3: ";
 	for (size_t i = 0; i < 12; i++)
 		vec3.push_back(i);
-	std::cout << vec3.size() << std::endl;
 	for (ft::vector<int>::iterator it1 = vec3.begin(); it1 != vec3.end(); it1++)
 		std::cout << *it1 << " | ";
 
