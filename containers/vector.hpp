@@ -6,7 +6,7 @@
 /*   By: heleneherin <heleneherin@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/04 12:58:14 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/10 21:45:18 by heleneherin      ###   ########.fr       */
+/*   Updated: 2021/01/10 22:19:40 by heleneherin      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,9 @@
 # include <iostream>
 # include <memory>
 # include <exception>
-# include "utils/traits.hpp"
-# include "utils/random_iter.hpp"
-# include "utils/algo.hpp"
+# include "../utils/traits.hpp"
+# include "../utils/random_iter.hpp"
+# include "../utils/algo.hpp"
 
 # define EXTRA_MEM 10
 
@@ -98,6 +98,8 @@ namespace ft
 
 			~vector()
 			{
+				for (size_t i = 0; i < _size; i++)
+					_vector[i].~T();
 				_myAlloc.deallocate(_vector, _capacity);
 			}
 
@@ -126,10 +128,10 @@ namespace ft
 			// ** if sz > size() : expand container size (automatic reallocation) +
 			// ** complete elements with copy of c or default value until reach a size of sz
 			// **
-			// ** @param sz: new container size (unsigned int)
-			// ** @param c: object copy in the added element
+			// ** @param sz New container size (unsigned int)
+			// ** @param c Object copied in the added element
 			// */
-			// void		resize(size_type sz, const value_type &c = value_type());
+			void		resize(size_type sz, const value_type &c = value_type());
 
 			// // Returns the size of the storage space currrently allocated for the vector (in terme of elements)
 			size_type	capacity() const { return _capacity; }
@@ -192,8 +194,12 @@ namespace ft
 			//If a reallocation happens,the storage needed is allocated using the internal allocator.
 
 			// Range version. new elements constructed in the range between first and last
-			// template <class InputIterator>
-			// void	assign(InputIterator first, InputIterator last);
+			template <class InputIterator>
+			void	assign(InputIterator first, InputIterator last)
+			{
+				while (first != last)
+					push_back(*first);
+			}
 
 			// /*
 			// ** New container with n element initialized to a copy of val
@@ -216,7 +222,11 @@ namespace ft
 			}
 
 			// // Removes the last element in the vector + reduce container size
-			// void	pop_back();
+			void	pop_back()
+			{
+				_vector[_size - 1].~T();
+				_size--;
+			}
 
 			/*
 			** Insert the new element before the element at the specified position

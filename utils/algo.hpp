@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   algo.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: heleneherin <heleneherin@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/08 16:49:30 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/08 18:04:30 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/10 22:19:53 by heleneherin      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef ALGO_HPP
 # define ALGO_HPP
 
-#include "../vector.hpp"
+#include "../containers/vector.hpp"
 
 namespace ft
 {
