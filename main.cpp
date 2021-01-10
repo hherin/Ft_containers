@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: heleneherin <heleneherin@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/05 10:14:05 by heleneherin       #+#    #+#             */
-/*   Updated: 2021/01/08 18:03:56 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/10 21:44:29 by heleneherin      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,13 +20,13 @@
 
 int main()
 {
-	std::cout << "============= BASE VECTOR ================\n";
+	std::cout << "================== BASE VECTOR ==================\n";
 	ft::vector<int>base(0);
 	std::cout << "\nSize: " << base.size() << "\t";
 	std::cout << "Capacity: " << base.capacity() << std::endl;
 	for (unsigned int i = 0; i < 10; i++)
 		base.push_back(i);
-	
+
 	std::cout << "Vector base ";
 	ft::vector<int>::iterator it = base.begin();
 	while (it != base.end()){
@@ -36,7 +36,7 @@ int main()
 	std::cout << "\nSize: " << base.size() << "\t";
 	std::cout << "Capacity: " << base.capacity() << std::endl;
 
-	std::cout << "\n============= COPY CONSTR ================\n";
+	std::cout << "\n================= COPY CONSTR =================\n";
 	ft::vector<int>vec2(base);
 	ft::vector<int>::iterator it2 = vec2.begin();
 	std::cout << "Vector vec2 ";
@@ -57,8 +57,8 @@ int main()
 	std::cout << "\nnewSize: " << vec2.size() << "\t";
 	std::cout << "newCapacity: " << vec2.capacity() << std::endl;
 
-	
-	std::cout << "\n============= OPERATOR= ================\n";
+
+	std::cout << "\n================== OPERATOR= ==================\n";
 	ft::vector<int>vec1;
 	vec1 = base;
 	ft::vector<int>::iterator it1 = vec1.begin();
@@ -80,38 +80,53 @@ int main()
 	std::cout << "\nnewSize: " << vec1.size() << "\t";
 	std::cout << "newCapacity: " << vec1.capacity() << std::endl;
 
-	std::cout << "\n==============ITERATORS OVERLOAD==========\n";
+	std::cout << "\n===============ITERATORS OVERLOAD==============\n";
 	it = base.begin();
 	int nb = 2;
 	std::cout << *(it + nb) << std::endl;
 
-	std::cout << "\n=================SWAP=============\n";
-	ft::vector<int>Vec1;
-	std::cout << "vec1: ";
+	std::cout << "\n===================== SWAP ====================\n";
+	ft::vector<int>vec3;
+	std::cout << "vec3: ";
 	for (size_t i = 0; i < 12; i++)
-		Vec1.push_back(i);
-	for (ft::vector<int>::iterator it1 = Vec1.begin(); it1 != Vec1.end(); it1++)
+		vec3.push_back(i);
+	std::cout << vec3.size() << std::endl;
+	for (ft::vector<int>::iterator it1 = vec3.begin(); it1 != vec3.end(); it1++)
 		std::cout << *it1 << " | ";
-	std::cout << "\nvec2: ";
-	ft::vector<int>Vec2;
+
+	std::cout << "\nvec4: ";
+	ft::vector<int>vec4;
 	for (size_t i = 0; i < 10; i++)
-		Vec2.push_back(i + 20);
-	for(ft::vector<int>::iterator it2 = Vec2.begin(); it2 != Vec2.end(); it2++)
+		vec4.push_back(i + 20);
+	for(ft::vector<int>::iterator it2 = vec4.begin(); it2 != vec4.end(); it2++)
 		std::cout << *it2 << " | ";
-	
-	std::cout <<"\n\nnew vec1: ";
-	Vec1.swap(Vec2);
-	for (ft::vector<int>::iterator it1 = Vec1.begin(); it1 != Vec1.end(); it1++)
+
+	vec3.swap(vec4);
+	std::cout <<"\n\nnew vec3: ";
+	for (ft::vector<int>::iterator it1 = vec3.begin(); it1 != vec3.end(); it1++)
 		std::cout << *it1 << " | ";
-	std::cout << "\nnew vec2: ";
-	for(ft::vector<int>::iterator it2 = Vec2.begin(); it2 != Vec2.end(); it2++)
+	std::cout << "\nnew vec4: ";
+	for(ft::vector<int>::iterator it2 = vec4.begin(); it2 != vec4.end(); it2++)
 		std::cout << *it2 << " | ";
-	std::cout << "\n============= DESTRUCTORS=============\n";
+
+	std::cout << "\n=============== ELEMENTS ACCESS ===============\n";
+	std::cout << "vec4[2] = " << vec4[2] << std::endl;
+	std::cout << "at[2] = " << vec4.at(2) << std::endl;
+	try{
+		vec4.at(100);
+	}
+	catch (ft::vector<int>::exceptionOutOfRange const &e) {
+		std::cout << e.what();
+	}
+	std::cout << "front = " << vec4.front() << std::endl;
+	std::cout << "back = " << vec4.back() << std::endl;
+
+	std::cout << "\n================== DESTRUCTORS=================\n";
 	//check les leaks a revoir
 // {
 // 	char* str = strdup("salut");
 // 	std::cout << str;
-	
+
 // 	int* tab = new int[4];
 // 	tab[0] = 0;
 // }

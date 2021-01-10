@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   vector.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: heleneherin <heleneherin@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/04 12:58:14 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/08 18:05:56 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/10 21:45:18 by heleneherin      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ namespace ft
 			typedef typename allocator_type::const_pointer		const_pointer;
 			typedef typename ft::random_iter<T, true, Alloc>	iterator;
 			typedef typename ft::random_iter<T, false, Alloc>	const_iterator;
-
+			class exceptionOutOfRange;
 
 			//=======================================Coplien Class=======================================
 			//allocatorawarecontainer copy cpp reference
@@ -77,7 +77,6 @@ namespace ft
 			vector(const vector &x)
 				:_size(x._size), _capacity(x._capacity), _myAlloc(x._myAlloc)
 			{
-				// std::cout << "COPY\n";
 				_vector = _myAlloc.allocate(_capacity);
 				for (std::pair<iterator, const_iterator> it(begin(), x.begin()); it.first != end(); it.first++, it.second++)
 					*it.first = *it.second;
@@ -118,7 +117,7 @@ namespace ft
 			size_type	size() const { return _size; }
 
 			// // Returns the maximum number of elements the vector can hold (depend of OS or library implementation limitations)
-			// size_type	max_size() const;
+			size_type	max_size() const { return _myAlloc.max_size(); }
 
 			// /*
 			// ** Resize a container with n elements
@@ -130,7 +129,7 @@ namespace ft
 			// ** @param sz: new container size (unsigned int)
 			// ** @param c: object copy in the added element
 			// */
-			void		resize(size_type sz, const value_type &c = value_type());
+			// void		resize(size_type sz, const value_type &c = value_type());
 
 			// // Returns the size of the storage space currrently allocated for the vector (in terme of elements)
 			size_type	capacity() const { return _capacity; }
@@ -144,7 +143,17 @@ namespace ft
 			** no effect on vector size
 			** @param n Minimum capacity for the vector
 			*/
-			// void reserve(size_type n);
+			void reserve(size_type n)
+			{
+				if (n <= _capacity)
+					return ;
+				vector tmp = _myAlloc.allocate(n);
+				for (iterator it = begin(); it < end(); it++)
+					push_back(*it);
+				_myAlloc.deallocate(_vector, _capacity);
+				_capacity = n;
+				_vector = tmp;
+			}
 
 			//====================================Element access====================================
 			// Returns a reference to the element at position n in container
@@ -152,20 +161,32 @@ namespace ft
 			const_reference		operator[](size_type n) const { return (_vector[n]); }
 
 			// // Same as operator[] but check if n is within the bounds of valid element or throw an exception
-			// reference			at(size_type n);
-			// const_reference		at(size_type n) const;
+			reference			at(size_type n)
+			{
+				if (n >= _size)
+					throw exceptionOutOfRange();
+				return (_vector[n]);
+			}
 
-			// // Returns a ref to the first element in the vector
-			// reference			front();
-			// const_reference		front() const;
+			const_reference		at(size_type n) const
+			{
+				if (n >= _size)
+					throw exceptionOutOfRange();
+				return (_vector[n]);
+			}
 
-			// // Returns a ref to the last element in the vector
-			// reference			back();
-			// const_reference		back() const;
+			// Returns a ref to the first element in the vector
+			reference			front() { return _vector[0]; }
+			const_reference		front() const { return _vector[0]; }
+
+			// Returns a ref to the last element in the vector
+			reference			back() { return _vector[_size - 1] ; }
+			const_reference		back() const { return _vector[_size - 1] ; }
 
 			// // Returns a direct pointer to the memory array used by vector to store its elements
-			// value_type*			data();
-			// const value_type*	data() const;
+			value_type*			data() { return _vector; }
+
+			const value_type*	data() const { return _vector; }
 
 			//=======================================Modifiers=======================================
 			//If a reallocation happens,the storage needed is allocated using the internal allocator.
@@ -265,6 +286,14 @@ namespace ft
 					*it.first = *it.second;
 				min._capacity = max._capacity;
 			}
+	};
+
+	template <class T, class Alloc >
+	class vector<T, Alloc>::exceptionOutOfRange
+	{
+		public:
+			exceptionOutOfRange(){}
+			const char* what() const throw() { return "Input out of range.\n";}
 	};
 }
 #endif
