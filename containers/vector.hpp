@@ -6,7 +6,7 @@
 /*   By: heleneherin <heleneherin@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/04 12:58:14 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/11 12:25:38 by heleneherin      ###   ########.fr       */
+/*   Updated: 2021/01/11 13:59:53 by heleneherin      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -253,35 +253,31 @@ namespace ft
 			*/
 			iterator	insert(const_iterator pos, const value_type& x)
 			{
-				difference_type rang = end() - 1 - iterator(pos);
-				if (_size + 1 > _capacity)
-					reserve(_size + 1 + EXTRA_MEM);
-				iterator it = end() - 1;
-				while (rang--){
-					std::swap(*it, *(it + 1));
-					it--;
-				}
-				std::swap(*it, *(it + 1));
-				*it = x;
-				_size++;
-				return it;
+				return insert(pos, (size_type)1, x);
 			}
 
 			iterator	insert(const_iterator pos, size_type n, const value_type& x)
 			{
-				difference_type rang = end() - n - iterator(pos);
-				if (_size + n > _capacity)
+				difference_type addX = iterator(pos) - begin() + 1; // position for added value x
+				difference_type tmp = end() - 1 - iterator(pos) + n; // how many time we have to swap the vector
+				iterator it;
+				if (_size + n > _capacity) // check if there is enought place in vector
 					reserve(_size + n + EXTRA_MEM);
-				iterator it = end() - n;
-				while (rang-- > n){
-					std::swap(*it, *(it + 1));
-					it--;
+				for (size_type i = n; i > 0; i--){ // loop where the swap begin in vector
+					it = end() - 1 + i;
+					for (difference_type j = 0; j < tmp; j++){ // loop for how many time it will swap
+						std::swap(*it, *(it + 1));
+						it--;
+					}
+					tmp--;
 				}
-				std::swap(*it, *(it + 1));
-				for (size_type i = 0; i < n; i++)
-					*it-- = x;
-				_size++;
-				return it;
+				it = begin() + addX;
+				_size += n;
+				while (n--){
+					*it = x;
+					it++;
+				}
+				return iterator(pos);
 			}
 
 			template <class InputIterator>
