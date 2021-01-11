@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   random_iter.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: heleneherin <heleneherin@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/08 16:30:56 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/08 16:35:09 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/11 11:37:45 by heleneherin      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 
 namespace ft
 {
-    template <class T, bool B, class Alloc = std::allocator<T> > class random_iter 
+    template <class T, bool B, class Alloc = std::allocator<T> > class random_iter
 			: public virtual ft::bidirect_iter<T, B, Alloc>
 	{
 		public:
@@ -30,54 +30,54 @@ namespace ft
 
 			typedef typename ft::chooseIf<B,  typename Alloc::const_reference, typename Alloc::reference>::type reference;
 			typedef typename ft::chooseIf<B,  typename Alloc::const_pointer, typename Alloc::pointer>::type pointer;
-			
+
 			typedef typename Alloc::pointer nonConst_pointer;
-			
+
 			random_iter(nonConst_pointer val = 0) : ft::bidirect_iter<T, B, Alloc>(val){}
 			random_iter(random_iter<T, true, Alloc> const &cp) : ft::bidirect_iter<T, B, Alloc>(cp) {}
 			random_iter(random_iter<T, false, Alloc> const &cp) : ft::bidirect_iter<T, B, Alloc>(cp) {}
 
- 
+
 			random_iter operator=(random_iter const &cp)
 			{
 				if (this != &cp)
 					this->_current = cp._current;
 				return *this;
 			}
-			
+
 			~random_iter(){}
-			
-			difference_type	operator-(random_iter const &it) { return (this->_current - it._current); }
-			
-			random_iter operator+(int n) 
+
+			friend difference_type	operator-(random_iter const &it, random_iter const &rhs) { return (it._current - rhs._current); }
+
+			random_iter operator+(int n)
 			{
 				random_iter ret(*this);
 				for (int i = 0; i < n; i++)
 					ret++;
-				return ret; 
+				return ret;
 			}
-			
-			friend random_iter operator+(random_iter const &rhs, int n) 
+
+			friend random_iter operator+(random_iter const &rhs, int n)
 			{
 				random_iter ret(rhs);
-				return ret + n; 
+				return ret + n;
 			}
 
 			// it - n  	| n - it
-			random_iter operator-(int n) 
+			random_iter operator-(int n)
 			{
 				random_iter ret(*this);
 				for (int i = 0; i < n; i++)
 					ret--;
-				return ret; 
+				return ret;
 			}
-			
-			friend random_iter operator-(int n, random_iter &rhs) 
-			{ 
+
+			friend random_iter operator-(int n, random_iter &rhs)
+			{
 				random_iter ret(rhs);
-				return ret - n; 
+				return ret - n;
 			}
-			
+
 			// Inequality comparisons
 			friend bool operator>(random_iter &x, random_iter &y) { return (*x > *y); }
 			friend bool operator>=(random_iter &x, random_iter &y) { return (*x >= *y); }
