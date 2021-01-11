@@ -6,7 +6,7 @@
 /*   By: heleneherin <heleneherin@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/05 10:14:05 by heleneherin       #+#    #+#             */
-/*   Updated: 2021/01/10 22:37:04 by heleneherin      ###   ########.fr       */
+/*   Updated: 2021/01/11 11:37:04 by heleneherin      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,21 +38,21 @@ int main()
 
 	std::cout << "\n================= COPY CONSTR =================\n";
 	ft::vector<int>vec2(base);
-	ft::vector<int>::iterator it2 = vec2.begin();
+	it = vec2.begin();
 	std::cout << "Vector vec2 ";
-	while (it2 != vec2.end()){
-		std::cout << *it2 << " ";
-		it2++;
+	while (it != vec2.end()){
+		std::cout << *it << " ";
+		it++;
 	}
 	std::cout << "\nSize: " << vec2.size() << "\t";
 	std::cout << "Capacity: " << vec2.capacity() << std::endl;
 	for (unsigned int i = 0; i < 7; i++)
 		vec2.push_back(30);
 	std::cout << "newVector ";
-	it2 = vec2.begin();
-	while (it2 != vec2.end()){
-		std::cout << *it2 << " ";
-		it2++;
+	it = vec2.begin();
+	while (it != vec2.end()){
+		std::cout << *it << " ";
+		it++;
 	}
 	std::cout << "\nnewSize: " << vec2.size() << "\t";
 	std::cout << "newCapacity: " << vec2.capacity() << std::endl;
@@ -61,21 +61,21 @@ int main()
 	std::cout << "\n================== OPERATOR= ==================\n";
 	ft::vector<int>vec1;
 	vec1 = base;
-	ft::vector<int>::iterator it1 = vec1.begin();
+	it = vec1.begin();
 	std::cout << "Vector vec1 ";
-	while (it1 != vec1.end()){
-		std::cout << *it1 << " ";
-		it1++;
+	while (it != vec1.end()){
+		std::cout << *it << " ";
+		it++;
 	}
 	std::cout << "\nSize: " << vec1.size() << "\t";
 	std::cout << "Capacity: " << vec1.capacity() << std::endl;
 	for (unsigned int i = 0; i < 7; i++)
 		vec1.push_back(30);
 	std::cout << "newVector ";
-	it1 = vec1.begin();
-	while (it1 != vec1.end()){
-		std::cout << *it1 << " ";
-		it1++;
+	it = vec1.begin();
+	while (it != vec1.end()){
+		std::cout << *it << " ";
+		it++;
 	}
 	std::cout << "\nnewSize: " << vec1.size() << "\t";
 	std::cout << "newCapacity: " << vec1.capacity() << std::endl;
@@ -122,6 +122,7 @@ int main()
 	std::cout << "\nnew vec4: ";
 	for(ft::vector<int>::iterator it2 = vec4.begin(); it2 != vec4.end(); it2++)
 		std::cout << *it2 << " | ";
+	std::cout << std::endl;
 
 	std::cout << "\n=============== ELEMENTS ACCESS ===============\n";
 	std::cout << "vec4[2] = " << vec4[2] << std::endl;
@@ -134,6 +135,14 @@ int main()
 	}
 	std::cout << "front = " << vec4.front() << std::endl;
 	std::cout << "back = " << vec4.back() << std::endl;
+
+	std::cout << "\n==================== INSERT ===================\n";
+	it = vec4.begin();
+	it++; it++; it++; it++;
+	vec4.insert(it, 10);
+	for(ft::vector<int>::iterator it2 = vec4.begin(); it2 != vec4.end(); it2++)
+		std::cout << *it2 << " | ";
+	std::cout << std::endl;
 
 	std::cout << "\n================== DESTRUCTORS=================\n";
 	//check les leaks a revoir
