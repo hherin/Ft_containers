@@ -6,7 +6,7 @@
 /*   By: heleneherin <heleneherin@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/04 12:58:14 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/11 16:10:45 by heleneherin      ###   ########.fr       */
+/*   Updated: 2021/01/11 16:25:09 by heleneherin      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,8 +98,8 @@ namespace ft
 
 			~vector()
 			{
-				for (size_t i = 0; i < _size; i++)
-					_vector[i].~T();
+				for (size_type i = 0; i _size; i++)
+					_myAlloc.destroy(_vector[i]);
 				_myAlloc.deallocate(_vector, _capacity);
 			}
 
@@ -134,7 +134,8 @@ namespace ft
 			void		resize(size_type sz, const value_type &c = value_type())
 			{
 				if (sz < _size){
-					_size -= _size - sz;
+					for (size_type i = 0; i < _size - sz; i++)
+						pop_back();
 				}
 				else{
 					for (size_t i = _size; i < sz; i++)
@@ -239,7 +240,7 @@ namespace ft
 			// // Removes the last element in the vector + reduce container size
 			void	pop_back()
 			{
-				_vector[_size - 1].~T();
+				_myAlloc.destroy(_vector[_size - 1]);
 				_size--;
 			}
 
@@ -299,13 +300,15 @@ namespace ft
 			** Container end if it's empty
 			*/
 			iterator	erase(const_iterator position);
-			
+
 			iterator	erase(const_iterator first, const_iterator last);
 
 			// // Removed all element from the vector. new size container = 0
 			void	clear()
 			{
 				_myAlloc.deallocate(_vector, _capacity);
+				for (size_type i = 0; i < _size; i++)
+					_myAlloc.destroy(_vector[i]);
 				_vector = _myAlloc.allocate(EXTRA_MEM);
 				_capacity = EXTRA_MEM;
 				_size = 0;
@@ -332,6 +335,8 @@ namespace ft
 					for (unsigned int i = 0; i < _size; i++)
 						newVec[i] = _vector[i];
 					_myAlloc.deallocate(_vector, _capacity);
+					for (unsigned int i = 0; i < _size; i++)
+						_myAlloc.destroy(_vector[i]);
 					_vector = newVec;
 					_capacity += EXTRA_MEM;
 				}
