@@ -6,11 +6,11 @@
 /*   By: heleneherin <heleneherin@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/05 10:14:05 by heleneherin       #+#    #+#             */
-/*   Updated: 2021/01/11 11:37:04 by heleneherin      ###   ########.fr       */
+/*   Updated: 2021/01/11 12:25:03 by heleneherin      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <iterator>
+// #include <iterator>
 #include <vector>
 #include <iostream>
 #include "containers/vector.hpp"
@@ -139,7 +139,7 @@ int main()
 	std::cout << "\n==================== INSERT ===================\n";
 	it = vec4.begin();
 	it++; it++; it++; it++;
-	vec4.insert(it, 10);
+	vec4.insert(it, 5, 10);
 	for(ft::vector<int>::iterator it2 = vec4.begin(); it2 != vec4.end(); it2++)
 		std::cout << *it2 << " | ";
 	std::cout << std::endl;

@@ -6,7 +6,7 @@
 /*   By: heleneherin <heleneherin@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/04 12:58:14 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/10 22:35:18 by heleneherin      ###   ########.fr       */
+/*   Updated: 2021/01/11 12:25:38 by heleneherin      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -158,9 +158,9 @@ namespace ft
 			{
 				if (n <= _capacity)
 					return ;
-				vector tmp = _myAlloc.allocate(n);
-				for (iterator it = begin(); it < end(); it++)
-					push_back(*it);
+				pointer tmp = _myAlloc.allocate(n);
+				for (std::pair<iterator, int> it (begin(), 0); it.first != end(); it.first++, it.second++)
+					tmp[it.second] = *it.first;
 				_myAlloc.deallocate(_vector, _capacity);
 				_capacity = n;
 				_vector = tmp;
@@ -206,8 +206,9 @@ namespace ft
 			template <class InputIterator>
 			void	assign(InputIterator first, InputIterator last)
 			{
+				clear();
 				while (first != last)
-					push_back(*first);
+					push_back(*first++);
 			}
 
 			// /*
@@ -216,7 +217,12 @@ namespace ft
 			// ** @param n: new size of container
 			// ** @param val: value to fill the container with
 			// */
-			// void	assign(size_type n, const value_type& val);
+			void	assign(size_type n, const value_type& val)
+			{
+				clear();
+				for (size_type i = 0; i < n; i++)
+					push_back(val);
+			}
 
 			/*
 			** Add a new element at the end of the vector
@@ -241,14 +247,45 @@ namespace ft
 			** Insert the new element before the element at the specified position
 			** increase the container size (may realloc the vector capacity)
 			**
-			** @param pos: position where the new element shoud be insert
-			** @param x: value to be copied
-			** @param first/last: Copies of elements in this range are inserted at pos
+			** @param pos Position where the new element shoud be insert
+			** @param x Value to be copied
+			** @param first/last Copies of elements in this range are inserted at pos
 			*/
-			// iterator	insert(const_iterator pos, const value_type& x);
-			// iterator	insert(const_iterator pos, size_type n, const value_type& x);
-			// template <class InputIterator>
-			// iterator	insert(const_iterator pos, InputIterator first, InputIterator last);
+			iterator	insert(const_iterator pos, const value_type& x)
+			{
+				difference_type rang = end() - 1 - iterator(pos);
+				if (_size + 1 > _capacity)
+					reserve(_size + 1 + EXTRA_MEM);
+				iterator it = end() - 1;
+				while (rang--){
+					std::swap(*it, *(it + 1));
+					it--;
+				}
+				std::swap(*it, *(it + 1));
+				*it = x;
+				_size++;
+				return it;
+			}
+
+			iterator	insert(const_iterator pos, size_type n, const value_type& x)
+			{
+				difference_type rang = end() - n - iterator(pos);
+				if (_size + n > _capacity)
+					reserve(_size + n + EXTRA_MEM);
+				iterator it = end() - n;
+				while (rang-- > n){
+					std::swap(*it, *(it + 1));
+					it--;
+				}
+				std::swap(*it, *(it + 1));
+				for (size_type i = 0; i < n; i++)
+					*it-- = x;
+				_size++;
+				return it;
+			}
+
+			template <class InputIterator>
+			iterator	insert(const_iterator pos, InputIterator first, InputIterator last);
 
 			/*
 			** Removes one or a range of elements. Reduce the size of container
