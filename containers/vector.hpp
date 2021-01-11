@@ -6,7 +6,7 @@
 /*   By: heleneherin <heleneherin@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/04 12:58:14 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/11 18:15:34 by heleneherin      ###   ########.fr       */
+/*   Updated: 2021/01/11 18:33:05 by heleneherin      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 # include "../utils/traits.hpp"
 # include "../utils/random_iter.hpp"
 # include "../utils/algo.hpp"
+# include "../utils/reverse_random_iter.hpp"
 
 # define EXTRA_MEM 10
 
@@ -39,6 +40,8 @@ namespace ft
 			typedef typename allocator_type::const_pointer		const_pointer;
 			typedef typename ft::random_iter<T, true, Alloc>	iterator;
 			typedef typename ft::random_iter<T, false, Alloc>	const_iterator;
+			typedef typename ft::reverse_random_iter<T, true, Alloc>	reverse_iterator;
+			typedef typename ft::reverse_random_iter<T, false, Alloc>	const_reverse_iterator;
 			class exceptionOutOfRange;
 
 			//=======================================Coplien Class=======================================
@@ -109,10 +112,10 @@ namespace ft
 			iterator				begin() { return iterator(_vector); }
 			iterator				end() { return iterator(_vector + _size); }
 			const_iterator			end() const { return const_iterator(_vector + _size); }
-			// reverse_iterator		rbegin();
-			// const_reverse_iterator	rbegin() const;
-			// reverse_iterator		rend();
-			// const_reverse_iterator	rend() const;
+			reverse_iterator		rbegin() { return reverse_iterator(_vector + _size - 1); }
+			const_reverse_iterator	rbegin() const { return reverse_iterator(_vector + _size - 1); }
+			reverse_iterator		rend() { return reverse_iterator(_vector - 1); }
+			const_reverse_iterator	rend() const { return reverse_iterator(_vector - 1); }
 
 
 			//=======================================Capacity=======================================
