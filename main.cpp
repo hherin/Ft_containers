@@ -6,7 +6,7 @@
 /*   By: heleneherin <heleneherin@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/05 10:14:05 by heleneherin       #+#    #+#             */
-/*   Updated: 2021/01/11 18:36:19 by heleneherin      ###   ########.fr       */
+/*   Updated: 2021/01/11 19:47:22 by heleneherin      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,8 +86,8 @@ int main()
 	std::cout << *(it + nb) << std::endl;
 
 	ft::vector<int>::reverse_iterator rit = base.rbegin();
-	while (rit++ != base.rend())
-		std::cout << *rit << " | ";
+	while (rit != base.rend())
+		std::cout << *rit++ << " | ";
 
 	std::cout << "\n=================== CAPACITY ==================\n";
 	std::cout << "Size base vector " << base.size() << std::endl;
