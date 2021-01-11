@@ -6,7 +6,7 @@
 /*   By: heleneherin <heleneherin@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/04 12:58:14 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/11 16:25:09 by heleneherin      ###   ########.fr       */
+/*   Updated: 2021/01/11 16:27:31 by heleneherin      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,8 +98,8 @@ namespace ft
 
 			~vector()
 			{
-				for (size_type i = 0; i _size; i++)
-					_myAlloc.destroy(_vector[i]);
+				for (size_type i = 0; i < _size; i++)
+					pop_back();
 				_myAlloc.deallocate(_vector, _capacity);
 			}
 
@@ -240,7 +240,7 @@ namespace ft
 			// // Removes the last element in the vector + reduce container size
 			void	pop_back()
 			{
-				_myAlloc.destroy(_vector[_size - 1]);
+				_myAlloc.destroy(&_vector[_size - 1]);
 				_size--;
 			}
 
@@ -336,7 +336,7 @@ namespace ft
 						newVec[i] = _vector[i];
 					_myAlloc.deallocate(_vector, _capacity);
 					for (unsigned int i = 0; i < _size; i++)
-						_myAlloc.destroy(_vector[i]);
+						_myAlloc.destroy(&_vector[i]);
 					_vector = newVec;
 					_capacity += EXTRA_MEM;
 				}
