@@ -6,7 +6,7 @@
 /*   By: heleneherin <heleneherin@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/04 12:58:14 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/11 16:27:31 by heleneherin      ###   ########.fr       */
+/*   Updated: 2021/01/11 18:15:34 by heleneherin      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 # include <iostream>
 # include <memory>
 # include <exception>
+# include <cmath>
 # include "../utils/traits.hpp"
 # include "../utils/random_iter.hpp"
 # include "../utils/algo.hpp"
@@ -252,10 +253,7 @@ namespace ft
 			** @param x Value to be copied
 			** @param first/last Copies of elements in this range are inserted at pos
 			*/
-			iterator	insert(const_iterator pos, const value_type& x)
-			{
-				return insert(pos, (size_type)1, x);
-			}
+			iterator	insert(const_iterator pos, const value_type& x) { return insert(pos, (size_type)1, x); }
 
 			iterator	insert(const_iterator pos, size_type n, const value_type& x)
 			{
@@ -299,11 +297,26 @@ namespace ft
 			** element erased by the function call
 			** Container end if it's empty
 			*/
-			iterator	erase(const_iterator position);
+			iterator	erase(const_iterator position) { return erase(position, position); }
 
-			iterator	erase(const_iterator first, const_iterator last);
+			iterator	erase(const_iterator first, const_iterator last)
+			{
+				pointer tmp;
+				size_type era = last - first + 1; // number of element to be destroyed
+				tmp = _myAlloc.allocate(_capacity - era);
+				for (std::pair<size_type, size_type> i(0, 0); i.first < _size; i.first++){
+					if (i.first < static_cast<size_type>(iterator(first) - begin()) ||
+					 i.first >= static_cast<size_type>(iterator(first) - begin()) + era)
+						tmp[i.second++] = _vector[i.first];
+					_myAlloc.destroy(&_vector[i.first]);
+				}
+				_size -= era;
+				_capacity -= era;
+				_vector = tmp;
+				return iterator(last + 1);
+			}
 
-			// // Removed all element from the vector. new size container = 0
+			// Removed all element from the vector. new size container = 0
 			void	clear()
 			{
 				_myAlloc.deallocate(_vector, _capacity);

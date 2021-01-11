@@ -6,7 +6,7 @@
 /*   By: heleneherin <heleneherin@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/05 10:14:05 by heleneherin       #+#    #+#             */
-/*   Updated: 2021/01/11 16:11:20 by heleneherin      ###   ########.fr       */
+/*   Updated: 2021/01/11 18:14:54 by heleneherin      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,6 +144,13 @@ int main()
 	for(ft::vector<int>::iterator it2 = vec4.begin(); it2 != vec4.end(); it2++)
 		std::cout << *it2 << " | ";
 	std::cout << std::endl;
+
+	std::cout << "\n===================== ERASE ===================\n";
+	vec4.erase(vec4.begin() + 2);
+	for(ft::vector<int>::iterator it2 = vec4.begin(); it2 != vec4.end(); it2++)
+		std::cout << *it2 << " | ";
+	std::cout << std::endl;
+
 	std::cout << "\n================== DESTRUCTORS=================\n";
 	//check les leaks a revoir
 // {
