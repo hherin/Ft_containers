@@ -6,7 +6,7 @@
 /*   By: heleneherin <heleneherin@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/04 12:58:14 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/11 13:59:53 by heleneherin      ###   ########.fr       */
+/*   Updated: 2021/01/11 16:10:45 by heleneherin      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -260,16 +260,17 @@ namespace ft
 			{
 				difference_type addX = iterator(pos) - begin() + 1; // position for added value x
 				difference_type tmp = end() - 1 - iterator(pos) + n; // how many time we have to swap the vector
+
 				iterator it;
 				if (_size + n > _capacity) // check if there is enought place in vector
 					reserve(_size + n + EXTRA_MEM);
-				for (size_type i = n; i > 0; i--){ // loop where the swap begin in vector
-					it = end() - 1 + i;
-					for (difference_type j = 0; j < tmp; j++){ // loop for how many time it will swap
-						std::swap(*it, *(it + 1));
+				for (size_type i = n; i > 0; i--){ // how many times the vector is swap
+					it = end() - 1 + n;
+					for (difference_type j = 0; j < tmp; j++){ // loop for how many time it will be swapped
+						std::swap(*(it), *(it + 1));
 						it--;
 					}
-					tmp--;
+					tmp --;
 				}
 				it = begin() + addX;
 				_size += n;
@@ -281,7 +282,15 @@ namespace ft
 			}
 
 			template <class InputIterator>
-			iterator	insert(const_iterator pos, InputIterator first, InputIterator last);
+			iterator	insert(const_iterator pos, InputIterator first, InputIterator last, typename ft::enable_if<!ft::is_integer<InputIterator>::value, InputIterator >::type* = 0)
+			{
+				size_type index = iterator(pos) - begin() + 1;
+				insert(pos, last - first, 0);
+				iterator it = begin() + index;
+				while (first != last)
+					*(it++) = *(first++);
+				return iterator(pos);
+			}
 
 			/*
 			** Removes one or a range of elements. Reduce the size of container
@@ -289,8 +298,9 @@ namespace ft
 			** element erased by the function call
 			** Container end if it's empty
 			*/
-			// iterator	erase(const_iterator position);
-			// iterator	erase(const_iterator first, const_iterator last);
+			iterator	erase(const_iterator position);
+			
+			iterator	erase(const_iterator first, const_iterator last);
 
 			// // Removed all element from the vector. new size container = 0
 			void	clear()
