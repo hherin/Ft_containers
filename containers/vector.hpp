@@ -6,7 +6,7 @@
 /*   By: heleneherin <heleneherin@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/04 12:58:14 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/11 18:33:05 by heleneherin      ###   ########.fr       */
+/*   Updated: 2021/01/11 23:24:35 by heleneherin      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,6 @@
 # include <iostream>
 # include <memory>
 # include <exception>
-# include <cmath>
 # include "../utils/traits.hpp"
 # include "../utils/random_iter.hpp"
 # include "../utils/algo.hpp"
@@ -42,20 +41,25 @@ namespace ft
 			typedef typename ft::random_iter<T, false, Alloc>	const_iterator;
 			typedef typename ft::reverse_random_iter<T, true, Alloc>	reverse_iterator;
 			typedef typename ft::reverse_random_iter<T, false, Alloc>	const_reverse_iterator;
-			class exceptionOutOfRange;
+			class exceptionOutOfRange
+			{
+				public:
+					exceptionOutOfRange(){}
+					const char* what() const throw() { return "Input out of range.\n";}
+			};
 
 			//=======================================Coplien Class=======================================
 			//allocatorawarecontainer copy cpp reference
 			//Default constructor
 			explicit vector (const allocator_type& alloc = allocator_type())
-				: _size(0), _capacity(_size + EXTRA_MEM), _myAlloc(alloc)
+				: _size(0), _capacity(0), _myAlloc(alloc)
 			{
 				_vector = _myAlloc.allocate(_capacity);
 			}
 
 			//Fill constructor with n elements
 			explicit vector(size_type n, const value_type &value = value_type(), const allocator_type &alloc = allocator_type())
-				: _size(0), _capacity(_size + EXTRA_MEM), _myAlloc(alloc)
+				: _size(0), _capacity(0), _myAlloc(alloc)
 			{
 				_vector = _myAlloc.allocate(_capacity);
 				for (size_type i = 0; i < n; i++)
@@ -82,15 +86,20 @@ namespace ft
 				:_size(x._size), _capacity(x._capacity), _myAlloc(x._myAlloc)
 			{
 				_vector = _myAlloc.allocate(_capacity);
-				for (std::pair<iterator, const_iterator> it(begin(), x.begin()); it.first != end(); it.first++, it.second++)
-					*it.first = *it.second;
+				for (size_type i = 0; i < _size; i++){
+					std::cout << x._vector[i] << std::endl;
+				for (size_type i = 0; i < _size; i++){
+					_vector[i] = x._vector[i];
+					}
+				// for (std::pair<iterator, iterator> copy(begin(), iterator(x.begin())); copy.second != iterator(x.end()); copy.first++, copy.second++)
+				// 	*copy.first = *copy.second;
 			}
 
 			vector& operator=(const vector& x)
 			{
 				if (this == &x)
 					return *this;
-				_myAlloc.deallocate(_vector, _capacity);
+				clear();
 				_size = x._size;
 				_capacity = x._capacity;
 				_myAlloc = std::allocator_traits<allocator_type>::select_on_container_copy_construction(x._myAlloc);
@@ -138,7 +147,8 @@ namespace ft
 			void		resize(size_type sz, const value_type &c = value_type())
 			{
 				if (sz < _size){
-					for (size_type i = 0; i < _size - sz; i++)
+					size_t rem = _size - sz;
+					for (size_type i = 0; i < rem; i++)
 						pop_back();
 				}
 				else{
@@ -260,8 +270,8 @@ namespace ft
 
 			iterator	insert(const_iterator pos, size_type n, const value_type& x)
 			{
-				difference_type addX = iterator(pos) - begin() + 1; // position for added value x
-				difference_type tmp = end() - 1 - iterator(pos) + n; // how many time we have to swap the vector
+				difference_type addX = iterator(pos) - begin(); // position for added value x
+				difference_type tmp = end() - iterator(pos) + n; // how many time we have to swap the vector
 
 				iterator it;
 				if (_size + n > _capacity) // check if there is enought place in vector
@@ -286,7 +296,7 @@ namespace ft
 			template <class InputIterator>
 			iterator	insert(const_iterator pos, InputIterator first, InputIterator last, typename ft::enable_if<!ft::is_integer<InputIterator>::value, InputIterator >::type* = 0)
 			{
-				size_type index = iterator(pos) - begin() + 1;
+				size_type index = iterator(pos) - begin();
 				insert(pos, last - first, 0);
 				iterator it = begin() + index;
 				while (first != last)
@@ -369,14 +379,6 @@ namespace ft
 					*it.first = *it.second;
 				min._capacity = max._capacity;
 			}
-	};
-
-	template <class T, class Alloc >
-	class vector<T, Alloc>::exceptionOutOfRange
-	{
-		public:
-			exceptionOutOfRange(){}
-			const char* what() const throw() { return "Input out of range.\n";}
 	};
 }
 #endif
