@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: heleneherin <heleneherin@student.42.fr>    +#+  +:+       +#+        */
+/*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/05 10:14:05 by heleneherin       #+#    #+#             */
-/*   Updated: 2021/01/11 19:47:22 by heleneherin      ###   ########.fr       */
+/*   Updated: 2021/01/12 17:54:26 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,13 +17,12 @@
 #include <cstring>
 #include <cstdlib>
 #include <iterator>
+#include "cchudant-test/Test.hpp"
 
 int main()
 {
 	std::cout << "================== BASE VECTOR ==================\n";
-	ft::vector<int>base(0);
-	std::cout << "\nSize: " << base.size() << "\t";
-	std::cout << "Capacity: " << base.capacity() << std::endl;
+	ft::vector<int>base;
 	for (unsigned int i = 0; i < 10; i++)
 		base.push_back(i);
 
@@ -33,8 +32,8 @@ int main()
 		std::cout << *it << " ";
 		it++;
 	}
-	std::cout << "\nSize: " << base.size() << "\t";
-	std::cout << "Capacity: " << base.capacity() << std::endl;
+	// std::cout << "\nSize: " << base.size() << "\t";
+	// std::cout << "Capacity: " << base.capacity() << std::endl;
 
 	std::cout << "\n================= COPY CONSTR =================\n";
 	ft::vector<int>vec2(base);
@@ -44,8 +43,8 @@ int main()
 		std::cout << *it << " ";
 		it++;
 	}
-	std::cout << "\nSize: " << vec2.size() << "\t";
-	std::cout << "Capacity: " << vec2.capacity() << std::endl;
+	// std::cout << "\nSize: " << vec2.size() << "\t";
+	// std::cout << "Capacity: " << vec2.capacity() << std::endl;
 	for (unsigned int i = 0; i < 7; i++)
 		vec2.push_back(30);
 	std::cout << "newVector ";
@@ -54,8 +53,8 @@ int main()
 		std::cout << *it << " ";
 		it++;
 	}
-	std::cout << "\nnewSize: " << vec2.size() << "\t";
-	std::cout << "newCapacity: " << vec2.capacity() << std::endl;
+	// std::cout << "\nnewSize: " << vec2.size() << "\t";
+	// std::cout << "newCapacity: " << vec2.capacity() << std::endl;
 
 
 	std::cout << "\n================== OPERATOR= ==================\n";
@@ -77,8 +76,8 @@ int main()
 		std::cout << *it << " ";
 		it++;
 	}
-	std::cout << "\nnewSize: " << vec1.size() << "\t";
-	std::cout << "newCapacity: " << vec1.capacity() << std::endl;
+	// std::cout << "\nnewSize: " << vec1.size() << "\t";
+	// std::cout << "newCapacity: " << vec1.capacity() << std::endl;
 
 	std::cout << "\n===============ITERATORS OVERLOAD==============\n";
 	it = base.begin();
@@ -92,7 +91,7 @@ int main()
 	std::cout << "\n=================== CAPACITY ==================\n";
 	std::cout << "Size base vector " << base.size() << std::endl;
 	std::cout << "Capacity base vector " << base.capacity() << std::endl;
-	std::cout << "max size vector " << base.max_size() << std::endl;
+	// std::cout << "max size vector " << base.max_size() << std::endl;
 	std::cout << "RESIZE \n";
 	base.resize(4, 10);
 	std::cout << "New_size " << base.size() << std::endl;
@@ -140,6 +139,20 @@ int main()
 	std::cout << "front = " << vec4.front() << std::endl;
 	std::cout << "back = " << vec4.back() << std::endl;
 
+	std::cout << "\n==================== ASSIGN ===================\n";
+	
+	std::vector<int>vec5;
+	vec5.assign(vec4.begin() + 2, vec4.begin() + 6);
+	for(std::vector<int>::iterator it = vec5.begin(); it != vec5.end(); it++)
+		std::cout << *it << " | ";
+	std::cout << std::endl;
+	
+	ft::vector<int>Vec5;
+	Vec5.assign(vec4.begin() + 2, vec4.begin() + 6);
+	for(ft::vector<int>::iterator it = Vec5.begin(); it != Vec5.end(); it++)
+		std::cout << *it << " | ";
+	std::cout << std::endl;
+
 	std::cout << "\n==================== INSERT ===================\n";
 	it = vec4.begin();
 	it++; it++; it++; it++;
@@ -150,8 +163,13 @@ int main()
 	std::cout << std::endl;
 
 	std::cout << "\n===================== ERASE ===================\n";
-	vec4.erase(vec4.begin() + 2);
-	for(ft::vector<int>::iterator it2 = vec4.begin(); it2 != vec4.end(); it2++)
+	std::cout << "home return " << *vec5.erase(vec5.begin()) << "\n";
+	for(std::vector<int>::iterator it2 = vec5.begin(); it2 != vec5.end(); it2++)
+		std::cout << *it2 << " | ";
+	std::cout << std::endl;
+
+	std::cout << "home return " << *Vec5.erase(Vec5.begin()) << "\n";
+	for(ft::vector<int>::iterator it2 = Vec5.begin(); it2 != Vec5.end(); it2++)
 		std::cout << *it2 << " | ";
 	std::cout << std::endl;
 
