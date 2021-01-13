@@ -1,23 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
+/*   main_vector.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/05 10:14:05 by heleneherin       #+#    #+#             */
-/*   Updated: 2021/01/13 13:53:46 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/13 15:10:14 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <iterator>
 #include <vector>
 #include <iostream>
-#include "containers/vector.hpp"
+#include "../containers/vector.hpp"
 #include <cstring>
 #include <cstdlib>
 #include <iterator>
-#include ".cchudant-test/Test.hpp"
+#include "../.cchudant-test/Test.hpp"
 
 int main()
 {
