@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/04 12:58:14 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/12 18:01:57 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/13 12:27:12 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,7 +97,7 @@ namespace ft
 			{
 				if (this == &x)
 					return *this;
-				clear();
+				delete[] _vector;
 				_size = x._size;
 				_capacity = x._capacity;
 				_vector = new T[_capacity];
@@ -316,6 +316,7 @@ namespace ft
 
 			iterator	erase(const_iterator first, const_iterator last)
 			{
+				bool add = (first == last) ? 1 : 0; // booleen for erase with 1 element
 				size_type era = last - first + 1; // number of element to be destroyed
 				if (_size == era){
 					clear();
@@ -324,14 +325,14 @@ namespace ft
 				pointer tmp;
 				iterator ret(last + 1);
 				tmp = new T[_capacity - era]();
-				for (std::pair<size_type, size_type> i(0, 0); i.first < _size; i.first++){
-					if (i.first < static_cast<size_type>(iterator(first) - begin()) ||
-					 i.first >= static_cast<size_type>(iterator(first) - begin()) + era)
-						tmp[i.second++] = _vector[i.first];
-					// _myAlloc.destroy(&_vector[i.first]);
+				size_type j = 0;
+				for (size_type i = 0; i < _size; i++){
+					if (i < (size_type)(iterator(first) - begin()) || i >= (size_type)(iterator(last) - begin()) + add)
+						tmp[j++] = _vector[i];
 				}
-				_size -= era;
-				_capacity -= era;
+				_size -= era - 1 + add;
+				_capacity -= era - 1 + add;
+				delete [] _vector;
 				_vector = tmp;
 				return ret;
 			}
@@ -344,7 +345,7 @@ namespace ft
 				// 	_myAlloc.destroy(&_vector[i]);
 				// _vector = _myAlloc.allocate(EXTRA_MEM);
 				_vector = new T[EXTRA_MEM]();
-				_capacity = EXTRA_MEM;
+				_capacity = 0;
 				_size = 0;
 			}
 
@@ -380,7 +381,6 @@ namespace ft
 				for (std::pair< vector::iterator, vector::iterator > it(max.begin(), min.begin()); it.second != min.end(); it.first++, it.second++)
 					*it.first = *it.second;
 				delete [] min._vector;
-				// min._myAlloc.deallocate(min._vector, min._capacity);
 				min._vector = new T[_capacity];
 				for (std::pair< vector::iterator, vector::iterator > it(min.begin(), tmp.begin()); it.second != tmp.end(); it.first++, it.second++)
 					*it.first = *it.second;
