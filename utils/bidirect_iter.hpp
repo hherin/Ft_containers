@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/08 16:31:57 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/13 15:24:09 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/13 16:35:12 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 # include <iostream>
 # include <memory>
+# include "../utils/traits.hpp"
 
 namespace ft
 {

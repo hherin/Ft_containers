@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 19:55:49 by heleneherin       #+#    #+#             */
-/*   Updated: 2021/01/13 14:18:23 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/13 17:04:42 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,16 +14,11 @@
 # define LIST_HPP
 
 # include <memory>
+# include "../utils/bidirect_iter.hpp"
+# include "../utils/reverse_bidirect_iter.hpp"
 
 namespace ft
-{
-	template <class T>
-	struct Node {
-		T data;
-		Node<T> *next;
-		Node<T> *prev;
-	};
-				
+{			
 	template <class T, class Alloc = std::allocator<T> >
 	class list
 	{
@@ -36,30 +31,38 @@ namespace ft
 			typedef typename allocator_type::difference_type	difference_type;
 			typedef typename allocator_type::pointer			pointer;
 			typedef typename allocator_type::const_pointer		const_pointer;
-			// typedef typename ft::random_iter<T, true, Alloc>	iterator;
-			// typedef typename ft::random_iter<T, false, Alloc>	const_iterator;
-			// typedef typename ft::reverse_random_iter<T, true, Alloc>	reverse_iterator;
-			// typedef typename ft::reverse_random_iter<T, false, Alloc>	const_reverse_iterator;
+			typedef typename ft::list_bidirect_iter<T, true, Alloc>		iterator;
+			typedef typename ft::list_bidirect_iter<T, false, Alloc>	const_iterator;
+			typedef typename ft::list_reverse_bidirect_iter<T, true, Alloc>	reverse_iterator;
+			typedef typename ft::list_reverse_bidirect_iter<T, false, Alloc>	const_reverse_iterator;
 
 			// =================== Member Functions ===================
-			// Default
+			// Default constructor
 			explicit list (const allocator_type& alloc = allocator_type())
-				: _myAlloc(alloc), _size(0); _llist(0)
-			{}
-
-			// fill (2)
-			explicit list (size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type())
-				: _myAlloc(alloc), _size(n); _llist(0)
+				: _endList(nullptr), _size(0)
 			{
-				Node *tmp = _llist;
-				for (size_type i = 0; i < n; i++){
-					tmp = _myAlloc.allocate(1);
-				}
+				(void)alloc;
+				_endList = new Node;
+				_endList->next = nullptr;
+				_endList->prev = nullptr;
 			}
 
-			// range (3)
-			template <class InputIterator>
-			list (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type());
+			// Fill constructor
+			// remind : value_type() appelle le constructeur par defaut de T
+			explicit list (size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type())
+				: _endList(nullptr), _size(0)
+			{
+				(void)alloc;
+				_endList = new Node;
+				_endList->next = nullptr;
+				_endList->prev = nullptr;
+				for (size_type i = 0; i < n; i++)
+					push_back(val);
+			}
+
+			// Range constructor 
+			// template <class InputIterator>
+			// list (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type());
 
 			// copy (4)
 			list (const list& x);
@@ -69,8 +72,8 @@ namespace ft
 			list& operator= (const list& x);
 
 			// ====================== Iterators =======================
-			iterator begin();
-			iterator end();
+			iterator begin() { return iterator(_endList->next);}
+			iterator end() { return iterator(_endList);}
 			const_iterator begin() const;
 			const_iterator end() const;
 			reverse_iterator rbegin();
@@ -80,7 +83,7 @@ namespace ft
 
 			// ======================= Capacity =======================
 			bool empty() const;
-			size_type size() const;
+			size_type size() const { return _size; }
 			size_type max_size() const;
 
 			// ===================== Element access ===================
@@ -94,8 +97,27 @@ namespace ft
 			void assign (InputIterator first, InputIterator last);
 			// fill (2)
 			void assign (size_type n, const value_type& val);
-			void push_front (const value_type& val);
-			void push_back (const value_type& val);
+			
+			void push_front (const value_type& val)
+			{
+				Node *node = new Node;
+				node->data = val;
+				node->prev = _endList;
+				node->next = (!_size) ? _endList : _endList->next;
+				_endList->next = node;
+				_size++;
+			}
+			
+			void push_back (const value_type& val)
+			{
+				Node *node = new Node;
+				node->data = val;
+				node->next = _endList;
+				node->prev = _endList->prev;
+				_endList->prev = node;
+				_size++;
+			}
+			
 			void pop_front();
 			void pop_back();
 			// single element (1)
@@ -133,8 +155,15 @@ namespace ft
 			void reverse();
 
 			private :
-				allocator_type		_myAlloc;
-				Node				*_llist;
+			struct Node 
+			{
+				T data;
+				Node *next;
+				Node *prev;
+			};
+				// allocator_type		_myAlloc;
+				Node			*_endList;
+				size_type		_size;
 	};
 }
 
