@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   list.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: heleneherin <heleneherin@student.42.fr>    +#+  +:+       +#+        */
+/*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 19:55:49 by heleneherin       #+#    #+#             */
-/*   Updated: 2021/01/11 22:28:52 by heleneherin      ###   ########.fr       */
+/*   Updated: 2021/01/13 14:18:23 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,13 @@
 
 namespace ft
 {
+	template <class T>
+	struct Node {
+		T data;
+		Node<T> *next;
+		Node<T> *prev;
+	};
+				
 	template <class T, class Alloc = std::allocator<T> >
 	class list
 	{
@@ -126,15 +133,7 @@ namespace ft
 			void reverse();
 
 			private :
-				template <class T>
-				struct Node {
-					T data;
-					int index;
-					Node<T> *next;
-					Node<T> *prev;
-				};
 				allocator_type		_myAlloc;
-				size_type			_size;
 				Node				*_llist;
 	};
 }

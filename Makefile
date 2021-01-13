@@ -25,7 +25,7 @@ test	:
 			${GCC} ${FLAGS} -o test main_it.o
 
 clean	:
-			rm -rf ${OBJS}
+			rm -rf *.o
 
 fclean	:	clean
 			rm -rf ${NAME}
