@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/04 12:58:14 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/13 12:27:12 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/13 14:03:45 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -251,13 +251,7 @@ namespace ft
 			}
 
 			// Removes the last element in the vector + reduce container size
-			void	pop_back()
-			{
-				// pointer p = &_vector[_size - 1];
-				// (p)->~value_type();
-				// _myAlloc.destroy(&_vector[_size - 1]);
-				_size--;
-			}
+			void	pop_back() { _size--; }
 
 			/*
 			** Insert the new element before the element at the specified position
@@ -323,7 +317,7 @@ namespace ft
 					return NULL;
 				}
 				pointer tmp;
-				iterator ret(last + 1);
+				size_t ret = iterator(last) - begin();
 				tmp = new T[_capacity - era]();
 				size_type j = 0;
 				for (size_type i = 0; i < _size; i++){
@@ -331,19 +325,16 @@ namespace ft
 						tmp[j++] = _vector[i];
 				}
 				_size -= era - 1 + add;
-				_capacity -= era - 1 + add;
+				_capacity -= era;
 				delete [] _vector;
 				_vector = tmp;
-				return ret;
+				return iterator(begin() + ret);
 			}
 
 			// Removed all element from the vector. new size container = 0
 			void	clear()
 			{
 				delete [] _vector;
-				// for (size_type i = 0; i < _size; i++)
-				// 	_myAlloc.destroy(&_vector[i]);
-				// _vector = _myAlloc.allocate(EXTRA_MEM);
 				_vector = new T[EXTRA_MEM]();
 				_capacity = 0;
 				_size = 0;
@@ -386,33 +377,30 @@ namespace ft
 					*it.first = *it.second;
 				min._capacity = max._capacity;
 			}
+			
+		//================================= Non Members function ========================================
+		friend bool operator==(const vector<T, Alloc> &lhs, const vector<T, Alloc> &rhs )
+				{
+					if (lhs._size != rhs._size)
+						return false;
+					for (size_t i = 0; i < lhs._size; i++){
+						if (lhs[i] != rhs[i])
+							return false;
+					}
+					return true;
+				}
+		friend bool operator!=(const vector<T, Alloc> &lhs, const vector<T, Alloc> &rhs ) { return !(operator==(lhs, rhs)); }
+				
+		friend bool operator<(const vector<T, Alloc> &lhs, const vector<T, Alloc> &rhs ) { return ft::lexicographical_compare<typename ft::vector<T, Alloc>::iterator, typename ft::vector<T, Alloc>::iterator>(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()); }
+		
+		friend bool operator<=(const vector<T, Alloc> &lhs, const vector<T, Alloc> &rhs ) { if (lhs == rhs || lhs < rhs) return true; return false; }
+		
+		friend bool operator>( const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs ) { if (!operator==(lhs, rhs) && !operator<(lhs, rhs)) return true; return false; }
+
+		friend bool operator>=( const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs ) { if (lhs == rhs || lhs > rhs) return true; return false;}
+
+		friend void swap (vector<T,Alloc>& x, vector<T,Alloc>& y) { x.swap(y); }
 	};
 
-	//================================= Overload ========================================
-	template <class T, class Alloc>
-	bool operator==(const vector<T, Alloc> &lhs, const vector<T, Alloc> &rhs )
-			{
-				if (lhs.size() != rhs.size())
-					return false;
-				for (size_t i = 0; i < lhs.size(); i++){
-					if (lhs[i] != rhs[i])
-						return false;
-				}
-				return true;
-			}
-	template <class T, class Alloc>
-	bool operator!=(const vector<T, Alloc> &lhs, const vector<T, Alloc> &rhs ) { return !(operator==(lhs, rhs)); }
-			
-	template <class T, class Alloc>
-	bool operator<(const vector<T, Alloc> &lhs, const vector<T, Alloc> &rhs ) { return ft::lexicographical_compare<typename ft::vector<T, Alloc>::iterator, typename ft::vector<T, Alloc>::iterator>(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()); }
-	
-	template <class T, class Alloc>
-	bool operator<=(const vector<T, Alloc> &lhs, const vector<T, Alloc> &rhs ) { if (lhs == rhs || lhs < rhs) return true; return false; }
-	
-	template< class T, class Alloc >
-	bool operator>( const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs ) { if (!operator==(lhs, rhs) && !operator<(lhs, rhs)) return true; return false; }
-
-	template< class T, class Alloc >
-	bool operator>=( const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs ) { if (lhs == rhs || lhs > rhs) return true; return false;}
 }
 #endif

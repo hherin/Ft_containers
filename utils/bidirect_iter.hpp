@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/08 16:31:57 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/12 13:16:12 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/13 13:50:07 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,8 +48,8 @@ namespace ft
 			bidirect_iter		operator--(int){ bidirect_iter tmp = *this; --(*this); return tmp; }
 			reference			operator*() const { return *_current; }
 			pointer				operator->() { return _current; }
-			friend bool			operator==(const bidirect_iter& a, const bidirect_iter& b) { return a._current == b._current; }
-			friend bool			operator!=(const bidirect_iter& a, const bidirect_iter& b) { return a._current != b._current; }
+			bool				operator==(const bidirect_iter& b) { return this->_current == b._current; }
+			bool				operator!=(const bidirect_iter& b) { return this->_current != b._current; }
 			nonConst_pointer	getCurrent() const {return _current;}
 			
 		protected:

@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/05 10:14:05 by heleneherin       #+#    #+#             */
-/*   Updated: 2021/01/12 17:54:26 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/13 13:53:46 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <iterator>
-#include "cchudant-test/Test.hpp"
+#include ".cchudant-test/Test.hpp"
 
 int main()
 {
@@ -56,7 +56,7 @@ int main()
 	// std::cout << "\nnewSize: " << vec2.size() << "\t";
 	// std::cout << "newCapacity: " << vec2.capacity() << std::endl;
 
-
+	
 	std::cout << "\n================== OPERATOR= ==================\n";
 	ft::vector<int>vec1;
 	vec1 = base;
@@ -163,16 +163,26 @@ int main()
 	std::cout << std::endl;
 
 	std::cout << "\n===================== ERASE ===================\n";
-	std::cout << "home return " << *vec5.erase(vec5.begin()) << "\n";
+	vec5.clear();
+	for (size_t i = 0; i < 5; i++)
+		vec5.push_back(i);
+	vec5.erase(vec5.begin());
 	for(std::vector<int>::iterator it2 = vec5.begin(); it2 != vec5.end(); it2++)
 		std::cout << *it2 << " | ";
 	std::cout << std::endl;
 
-	std::cout << "home return " << *Vec5.erase(Vec5.begin()) << "\n";
+	Vec5.clear();
+	for (size_t i = 0; i < 5; i++)
+		Vec5.push_back(i);
+	ft::vector<int>::iterator IT2 = Vec5.erase(Vec5.begin());
 	for(ft::vector<int>::iterator it2 = Vec5.begin(); it2 != Vec5.end(); it2++)
 		std::cout << *it2 << " | ";
 	std::cout << std::endl;
-
+	
+	std::cout << "return * " << *IT2;
+	std::cout << "begin " << *Vec5.begin() << std::endl;
+	std::cout << "equal " << (IT2 == Vec5.begin()) << std::endl;
+	
 	std::cout << "\n================== DESTRUCTORS=================\n";
 	//check les leaks a revoir
 // {
