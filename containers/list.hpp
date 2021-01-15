@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 19:55:49 by heleneherin       #+#    #+#             */
-/*   Updated: 2021/01/15 17:38:21 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/15 18:11:52 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -212,14 +212,34 @@ namespace ft
 			}
 
 			
+			/*
+			** Insert new elements before the element at the specified position
+			** 
+			** @param pos Position in the container where the new elements are inserted
+			** @param n Number of elements to insert (initialize with a copy of val)
+			** @param val Value to be copied (or moved)
+			** @param first,last Iterators specifying a range of elements, last excluded
+			*/
 			// single element (1)
-			iterator insert (iterator position, const value_type& val);
+			iterator insert (iterator pos, const value_type& val);
+			
 			// fill (2)
-			void insert (iterator position, size_type n, const value_type& val);
+			void insert (iterator pos, size_type n, const value_type& val);
+			{
+				Node *save_back = back();
+				Node *save_front = front();
+				_endList->prev = pos->prev;
+				_endList->next = pos;
+				for (size_type i = 0; i < n; i++)
+					ajouter les elements ;
+			}
+			
 			// range (3)
 			template <class InputIterator>
-			void insert (iterator position, InputIterator first, InputIterator last);
-			iterator erase (iterator position);
+			void insert (iterator pos, InputIterator first, InputIterator last);
+
+			
+			iterator erase (iterator pos);
 			iterator erase (iterator first, iterator last);
 			void swap (list& x);
 			void resize (size_type n, value_type val = value_type());
