@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 19:55:49 by heleneherin       #+#    #+#             */
-/*   Updated: 2021/01/13 17:04:42 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/15 17:38:21 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,8 @@
 # include "../utils/reverse_bidirect_iter.hpp"
 
 namespace ft
-{			
+{	
+	
 	template <class T, class Alloc = std::allocator<T> >
 	class list
 	{
@@ -31,8 +32,20 @@ namespace ft
 			typedef typename allocator_type::difference_type	difference_type;
 			typedef typename allocator_type::pointer			pointer;
 			typedef typename allocator_type::const_pointer		const_pointer;
-			typedef typename ft::list_bidirect_iter<T, true, Alloc>		iterator;
-			typedef typename ft::list_bidirect_iter<T, false, Alloc>	const_iterator;
+			
+		protected :
+			struct Node 
+			{
+				T data;
+				Node *next;
+				Node *prev;
+			};
+			Node			*_endList;
+			size_type		_size;
+				
+		public:
+			typedef typename ft::list_bidirect_iter<T, true, Node, Alloc>		iterator;
+			typedef typename ft::list_bidirect_iter<T, false, Node, Alloc>	const_iterator;
 			typedef typename ft::list_reverse_bidirect_iter<T, true, Alloc>	reverse_iterator;
 			typedef typename ft::list_reverse_bidirect_iter<T, false, Alloc>	const_reverse_iterator;
 
@@ -42,9 +55,7 @@ namespace ft
 				: _endList(nullptr), _size(0)
 			{
 				(void)alloc;
-				_endList = new Node;
-				_endList->next = nullptr;
-				_endList->prev = nullptr;
+				createNewList();
 			}
 
 			// Fill constructor
@@ -53,73 +64,154 @@ namespace ft
 				: _endList(nullptr), _size(0)
 			{
 				(void)alloc;
-				_endList = new Node;
-				_endList->next = nullptr;
-				_endList->prev = nullptr;
+				createNewList();
 				for (size_type i = 0; i < n; i++)
 					push_back(val);
 			}
 
 			// Range constructor 
-			// template <class InputIterator>
-			// list (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type());
+			template <class InputIterator>
+			list (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type(), typename ft::isIterator< InputIterator, Node, Alloc>::type* = 0)
+			{
+				(void)alloc;
+				createNewList();
+				_size = 0;
+				while (first != last)
+					push_back(*first++);
+			}
 
-			// copy (4)
-			list (const list& x);
+			// Copy constructor
+			list (const list& x) { *this = x; }
 
-			~list(){}
+			~list() { clear(); }
 
-			list& operator= (const list& x);
+			list& operator= (const list& x)
+			{
+				if (this == &x)
+					return *this;
+				_size = 0;
+				createNewList();
+				for (iterator it(x.begin()); it != iterator(x.end()); it++)
+					push_back(*it);
+				return *this;
+			}
 
 			// ====================== Iterators =======================
+
+			// begin() Returns an iterator pointing to the first element in the list container.
+			// end() Returns an iterator pointing to the last element in the list container.
 			iterator begin() { return iterator(_endList->next);}
-			iterator end() { return iterator(_endList);}
-			const_iterator begin() const;
-			const_iterator end() const;
+			iterator end() { return iterator(_endList); }
+			const_iterator begin() const { return iterator(_endList->next);}
+			const_iterator end() const { return iterator(_endList);}
+			
 			reverse_iterator rbegin();
 			const_reverse_iterator rbegin() const;
 			reverse_iterator rend();
 			const_reverse_iterator rend() const;
 
 			// ======================= Capacity =======================
-			bool empty() const;
+			
+			// Returns whether the list container is empty
+			bool empty() const { return (_size == 0); }
+
+			// Returns the size of the list container
 			size_type size() const { return _size; }
+
+			// Returns the maximum number of elements that the list container can hold
 			size_type max_size() const;
 
 			// ===================== Element access ===================
-			reference front();
-			reference back();
-			const_reference front() const;
-			const_reference back() const;
+			// front() Returns a reference to the first element in the list container.
+			// back() Returns a reference to the last element in the list container.
+			reference front() { return _endList->next; }
+			reference back() { return _endList->prev; }
+			const_reference front() const { return _endList->next; }
+			const_reference back() const { return _endList->prev; }
 
 			// ======================= Modifiers ======================
-			template <class InputIterator>
-			void assign (InputIterator first, InputIterator last);
-			// fill (2)
-			void assign (size_type n, const value_type& val);
 			
+			/*
+			** Assigns new contents to the list container, replacing its current contents, and modifying its size accordingly.
+			**
+			** @param first, last Input iterators to the initial and final positions in a sequence. last exclueded. 
+			** @param n New size of the container
+			** @param val Value to fill the container with
+			*/
+			template <class InputIterator>
+			void assign (InputIterator first, InputIterator last)
+			{
+				clear();
+				createNewList();
+				while (first != last)
+					push_back(*first++);
+			}
+			
+			void assign (size_type n, const value_type& val)
+			{
+				clear();
+				createNewList();
+				for (size_type i = 0; i < n; i++)
+					push_back(val);
+			}
+			
+			// Inserts a new element at the beginning of the list with the copy of val
 			void push_front (const value_type& val)
 			{
 				Node *node = new Node;
 				node->data = val;
+				if (!_size){
+					node->next = _endList;
+					_endList->prev = node;
+				}
+				else{
+					node->next = _endList->next;
+					_endList->next->prev = node;
+				}
 				node->prev = _endList;
-				node->next = (!_size) ? _endList : _endList->next;
 				_endList->next = node;
 				_size++;
 			}
 			
+			// nserts a new element at the end of the list with the copy of val 
 			void push_back (const value_type& val)
 			{
 				Node *node = new Node;
 				node->data = val;
+				if (!_size){
+					node->prev = _endList;
+					_endList->next = node;
+				}
+				else{
+					node->prev = _endList->prev;
+					_endList->prev->next = node;
+				}
 				node->next = _endList;
-				node->prev = _endList->prev;
 				_endList->prev = node;
 				_size++;
 			}
 			
-			void pop_front();
-			void pop_back();
+			// Removes the first element in the list container, effectively reducing its size by one.
+			void pop_front()
+			{
+				Node *destr = _endList->next;		// save elem to be destroyed
+				_endList->next = destr->next;		// _endlist point to second elem => becomes first of the list
+				destr->next->prev = _endList;		// first elem point to _endList
+				delete destr;
+				_size--;
+			}
+			
+			// Removes the last element in the list container, effectively reducing the container size by one.
+			void pop_back()
+			{
+				Node *destr = _endList->prev;		// save elem to be destroyed
+				_endList->prev = destr->prev;		// end of the list changed
+				destr->prev->next = _endList;		// new last elem point to _endList
+				delete destr;
+				_size--;
+			}
+
+			
 			// single element (1)
 			iterator insert (iterator position, const value_type& val);
 			// fill (2)
@@ -131,7 +223,18 @@ namespace ft
 			iterator erase (iterator first, iterator last);
 			void swap (list& x);
 			void resize (size_type n, value_type val = value_type());
-			void clear();
+			
+			// Removes all elements from the list container, and leaving the container with a size of 0.
+			void clear()
+			{
+				Node *tmp;
+				for (size_type i = 0; i < _size; i++){
+					tmp = _endList;
+					_endList = _endList->next;
+					delete tmp;
+				}
+				_size = 0;
+			}
 
 			// ======================= Operations =====================
 			// entire list (1)
@@ -154,16 +257,14 @@ namespace ft
 			void sort (Compare comp);
 			void reverse();
 
-			private :
-			struct Node 
-			{
-				T data;
-				Node *next;
-				Node *prev;
-			};
-				// allocator_type		_myAlloc;
-				Node			*_endList;
-				size_type		_size;
+			protected:
+				void createNewList()
+				{
+					_endList = new Node;
+					_endList->next = nullptr;
+					_endList->prev = nullptr;
+				}
+
 	};
 }
 

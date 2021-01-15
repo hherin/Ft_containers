@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/08 16:31:57 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/13 16:35:12 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/15 16:01:55 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ namespace ft
 			nonConst_pointer _current;
 	};
 
-	template <class T, bool B, class Alloc = std::allocator<T> > class list_bidirect_iter
+	template <typename T, bool B, typename D, class Alloc = std::allocator<T> > class list_bidirect_iter
 	{
 		public:
 			typedef typename Alloc::difference_type difference_type;
@@ -66,12 +66,12 @@ namespace ft
 			typedef typename ft::chooseIf<B,  typename Alloc::const_reference, typename Alloc::reference>::type reference;
 			typedef typename ft::chooseIf<B,  typename Alloc::const_pointer, typename Alloc::pointer>::type pointer;
 			
-			typedef typename Alloc::pointer nonConst_pointer;
+			typedef D* listelem_pointer;
 			typedef std::bidirectional_iterator_tag iterator_category;
 			
-			list_bidirect_iter(nonConst_pointer val = 0) : _current(val){}
-			list_bidirect_iter(list_bidirect_iter<T, true, Alloc> const &cp) {_current = cp.getCurrent();}
-			list_bidirect_iter(list_bidirect_iter<T, false, Alloc> const &cp) {_current = cp.getCurrent();}
+			list_bidirect_iter(listelem_pointer val = 0) : _current(val){}
+			list_bidirect_iter(list_bidirect_iter<T, true, D, Alloc> const &cp) {_current = cp.getCurrent();}
+			list_bidirect_iter(list_bidirect_iter<T, false, D, Alloc> const &cp) {_current = cp.getCurrent();}
 			list_bidirect_iter operator=(list_bidirect_iter const &cp)
 			{
 				if (this != &cp)
@@ -85,14 +85,14 @@ namespace ft
 			list_bidirect_iter		operator++(int){ list_bidirect_iter tmp = *this; ++(*this); return tmp; } //post incrementation
 			list_bidirect_iter		operator--(){ _current = _current->prev; return *this; }
 			list_bidirect_iter		operator--(int){ list_bidirect_iter tmp = *this; --(*this); return tmp; }
-			reference			operator*() const { return *_current; }
+			reference			operator*() const { return _current->data; }
 			pointer				operator->() { return _current; }
 			bool				operator==(const list_bidirect_iter& b) { return this->_current == b._current; }
 			bool				operator!=(const list_bidirect_iter& b) { return this->_current != b._current; }
-			nonConst_pointer	getCurrent() const {return _current;}
+			listelem_pointer	getCurrent() const {return _current;}					// two types of iterators (const and non const)
 			
 		protected:
-			nonConst_pointer _current;
+			listelem_pointer _current;
 	};
 }
 
