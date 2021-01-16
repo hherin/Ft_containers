@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 19:55:49 by heleneherin       #+#    #+#             */
-/*   Updated: 2021/01/16 14:07:09 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/16 15:14:31 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,10 @@
 # include <memory>
 # include "../utils/bidirect_iter.hpp"
 # include "../utils/reverse_bidirect_iter.hpp"
+// # include "../utils/algo.hpp"
 
 namespace ft
 {	
-	
 	template <class T, class Alloc = std::allocator<T> >
 	class list
 	{
@@ -211,7 +211,6 @@ namespace ft
 				_size--;
 			}
 
-			
 			/*
 			** Insert new elements before the element at the specified position
 			** 
@@ -241,17 +240,54 @@ namespace ft
 			template <class InputIterator>
 			void insert (iterator pos, InputIterator first, InputIterator last, typename ft::isIterator< InputIterator, Node, Alloc>::type* = 0)
 			{
-				while (first != last){
-					addLink(pos, first++);
-					pos = pos->prev;
-				}
+				while (first != last)
+					addLink(pos, *first++);
 			}
-
 			
-			iterator erase (iterator pos);
-			iterator erase (iterator first, iterator last);
-			void swap (list& x);
-			void resize (size_type n, value_type val = value_type());
+			/*
+			** Removes from the vector either a single element (position) or a range of elements ([first,last))
+			** Return : An iterator pointing to the new location of the element that followed the last element 
+			** 			erased by the function call
+			*/
+			iterator erase (iterator pos)
+			{
+				iterator ret;
+				pos->prev->next = pos->next;
+				pos->next->prev = pos->prev;
+				ret = iterator(pos->next);
+				delete pos.getCurrent();
+				_size--;
+				return ret;
+			}
+			
+			iterator erase (iterator first, iterator last)
+			{
+				iterator ret;
+				while (first != last)
+					ret = erase(first++);
+				return ret;
+			}
+			
+			// Exchanges the content of the container by the content of x, which is another vector object of the same type. Sizes may differ.
+			void swap (list& x)
+			{
+				mySwap<size_type>(_size, x._size);
+				Node *tmp = _endList;
+				_endList = x._endList;
+				x._endList = tmp;
+			}
+			
+			/*
+			** Resizes the container so that it contains n elements.
+			** reduce or expand the size of the list
+			*/
+			void resize (size_type n, value_type val = value_type())
+			{
+				while (n > _size)
+					pop_back();
+				while (n < _size)
+					push_back();
+			}
 			
 			// Removes all elements from the list container, and leaving the container with a size of 0.
 			void clear()
@@ -308,8 +344,16 @@ namespace ft
 					pos->prev = nod;
 					
 					nod->data = val;
+					_size++;
 				}
 
+				template <class H>
+				void	mySwap(H& a, H&b)
+				{
+					H& tmp = a;
+					a = b;
+					b = tmp;
+				}
 	};
 }
 

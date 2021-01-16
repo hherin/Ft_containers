@@ -8,7 +8,7 @@ FLAGS	=	-Werror -Wextra -Wall -std=c++98 -g3 -fsanitize=address
 
 OBJS	=	${SRCS:.cpp=.o}
 
-HDRS	=	containers/*.hpp utils/*.hpp
+HDRS	=	containers/*.hpp utils/*.hpp test_list.hpp
 
 all		:	${NAME}
 
