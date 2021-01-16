@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 19:55:49 by heleneherin       #+#    #+#             */
-/*   Updated: 2021/01/15 18:11:52 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/16 14:07:09 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,12 +122,12 @@ namespace ft
 			size_type max_size() const;
 
 			// ===================== Element access ===================
-			// front() Returns a reference to the first element in the list container.
-			// back() Returns a reference to the last element in the list container.
-			reference front() { return _endList->next; }
-			reference back() { return _endList->prev; }
-			const_reference front() const { return _endList->next; }
-			const_reference back() const { return _endList->prev; }
+			// front() Returns a reference to the first data element in the list container.
+			// back() Returns a reference to the last data element in the list container.
+			reference front() { return _endList->next->data; }
+			reference back() { return _endList->prev->data; }
+			const_reference front() const { return _endList->next->data; }
+			const_reference back() const { return _endList->prev->data; }
 
 			// ======================= Modifiers ======================
 			
@@ -139,7 +139,7 @@ namespace ft
 			** @param val Value to fill the container with
 			*/
 			template <class InputIterator>
-			void assign (InputIterator first, InputIterator last)
+			void assign (InputIterator first, InputIterator last, typename ft::isIterator< InputIterator, Node, Alloc>::type* = 0)
 			{
 				clear();
 				createNewList();
@@ -221,22 +221,31 @@ namespace ft
 			** @param first,last Iterators specifying a range of elements, last excluded
 			*/
 			// single element (1)
-			iterator insert (iterator pos, const value_type& val);
+			iterator insert (iterator pos, const value_type& val) 
+			{
+				iterator *Cpos = pos;
+				insert(pos, 1, val);
+				return Cpos++;
+			}
 			
 			// fill (2)
-			void insert (iterator pos, size_type n, const value_type& val);
+			void insert (iterator pos, size_type n, const value_type& val)
 			{
-				Node *save_back = back();
-				Node *save_front = front();
-				_endList->prev = pos->prev;
-				_endList->next = pos;
-				for (size_type i = 0; i < n; i++)
-					ajouter les elements ;
+				for (size_type i = 0; i < n; i++){
+					addLink(pos, val);
+					pos = pos->prev;
+				}
 			}
 			
 			// range (3)
 			template <class InputIterator>
-			void insert (iterator pos, InputIterator first, InputIterator last);
+			void insert (iterator pos, InputIterator first, InputIterator last, typename ft::isIterator< InputIterator, Node, Alloc>::type* = 0)
+			{
+				while (first != last){
+					addLink(pos, first++);
+					pos = pos->prev;
+				}
+			}
 
 			
 			iterator erase (iterator pos);
@@ -283,6 +292,22 @@ namespace ft
 					_endList = new Node;
 					_endList->next = nullptr;
 					_endList->prev = nullptr;
+				}
+				
+				void addLink(iterator pos, const value_type &val)
+				{
+					Node *Cpos = pos.getCurrent();	// get pointer of pos
+					Node *nod = new Node();
+					
+					// insert nod in the list
+					nod->next = Cpos;			
+					nod->prev = pos->prev;
+					
+					// change list pointer to close the list
+					pos->prev->next = nod;
+					pos->prev = nod;
+					
+					nod->data = val;
 				}
 
 	};

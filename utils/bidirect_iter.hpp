@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/08 16:31:57 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/15 16:01:55 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/16 13:19:26 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,7 @@ namespace ft
 			list_bidirect_iter		operator--(){ _current = _current->prev; return *this; }
 			list_bidirect_iter		operator--(int){ list_bidirect_iter tmp = *this; --(*this); return tmp; }
 			reference			operator*() const { return _current->data; }
-			pointer				operator->() { return _current; }
+			listelem_pointer				operator->() { return _current; }
 			bool				operator==(const list_bidirect_iter& b) { return this->_current == b._current; }
 			bool				operator!=(const list_bidirect_iter& b) { return this->_current != b._current; }
 			listelem_pointer	getCurrent() const {return _current;}					// two types of iterators (const and non const)

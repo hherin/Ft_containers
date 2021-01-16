@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/15 14:35:17 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/15 17:38:46 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/16 13:29:33 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,9 @@ void test_list()
 	for (typename T::iterator it = lst.begin(); it != lst.end(); it++)
 		std::cout << *it << "| ";
 	std::cout << std::endl;
-		
+		// lst.insert(lst.begin(), 2, "hehe");
+		// 	for (typename T::iterator it = lst.begin(); it != lst.end(); it++)
+		// std::cout << *it << "| ";
 	{
 		T new_lst(5, "yo");
 		for (typename T::iterator it = new_lst.begin(); it != new_lst.end(); it++)
@@ -48,6 +50,8 @@ void test_list()
 
 	{
 		T new_lst(lst);
+		new_lst.pop_back();
+		new_lst.pop_front();
 		for (typename T::iterator it = new_lst.begin(); it != new_lst.end(); it++)
 			std::cout << *it << "| ";
 		std::cout << std::endl;
@@ -55,11 +59,16 @@ void test_list()
 	
 	{
 		T new_lst = lst;
-		new_lst.pop_back();
-		new_lst.pop_front();
 		for (typename T::iterator it = new_lst.begin(); it != new_lst.end(); it++)
 			std::cout << *it << "| ";
 		std::cout << std::endl;
+		typename T::iterator pos = new_lst.begin();
+		pos++; pos++;
+		new_lst.insert(pos, 3, "hehe");
+		for (typename T::iterator it = new_lst.begin(); it != new_lst.end(); it++)
+			std::cout << *it << "| ";
+		std::cout << std::endl;
+		std::cout << new_lst.back() << std::endl;
 	}
 	
 }
