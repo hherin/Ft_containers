@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 19:55:49 by heleneherin       #+#    #+#             */
-/*   Updated: 2021/01/18 15:11:28 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/18 16:04:21 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -408,15 +408,49 @@ namespace ft
 				}
 			}
 
-			void merge (list& x);
+			void merge (list& x)
+			{
+				for (iterator mergeIter(x.begin()); mergeIter != x.end(); ){
+					iterator Xnext(mergeIter);
+					Xnext++;
+					for (iterator ourIter(begin()); ourIter != end(); ){
+						iterator next(ourIter);
+						next++;
+						if (*ourIter >= *mergeIter){
+							std::cout << "lst: " << mergeIter->data << "\t";
+							std::cout << "nlst: " << ourIter->data << "\n";
+							transferLink(ourIter, mergeIter);
+							std::cout << "after transfert: " << (ourIter->prev->data) << std::endl;
+						}
+							
+						ourIter = next;
+					}
+					mergeIter = Xnext;
+				}
+				_size += x._size;
+				x._size = 0;
+			}
+			
 			template <class Compare>
-			void merge (list& x, Compare comp);
+			void merge (list& x, Compare comp)
+			{
+				for (iterator xIt(x.begin()); xIt != x.end(); xIt++){
+					for (iterator it(begin()); it != end(); it++){
+						if (comp(*xIt, *it)){
+							transferLink(it, xIt);
+							_size++ && x._size--;
+						}
+					}
+				}
+			}
+			
 			void sort();
 			template <class Compare>
 			void sort (Compare comp);
 			void reverse();
 
 			protected:
+				// create the neutral elem for the linked loop
 				void createNewList()
 				{
 					_endList = new Node;
@@ -425,6 +459,7 @@ namespace ft
 					_endList->prev = _endList;
 				}
 
+				//create new lik before pos
 				void addLink(iterator pos, const value_type &val)
 				{
 					Node *Cpos = pos.getCurrent();	// get pointer of pos
@@ -442,6 +477,7 @@ namespace ft
 					_size++;
 				}
 
+				// transfert newLink before pos
 				void transferLink(iterator pos, iterator newLink)
 				{
 					// change pointer of newLink old list
