@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   list.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: heleneherin <heleneherin@student.42.fr>    +#+  +:+       +#+        */
+/*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 19:55:49 by heleneherin       #+#    #+#             */
-/*   Updated: 2021/01/17 13:02:19 by heleneherin      ###   ########.fr       */
+/*   Updated: 2021/01/18 15:11:28 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ namespace ft
 			};
 			Node			*_endList;
 			size_type		_size;
+			allocator_type	_alloc;
 
 		public:
 			typedef typename ft::list_bidirect_iter<T, true, Node, Alloc>		iterator;
@@ -52,7 +53,7 @@ namespace ft
 			// =================== Member Functions ===================
 			// Default constructor
 			explicit list (const allocator_type& alloc = allocator_type())
-				: _endList(nullptr), _size(0)
+				: _endList(nullptr), _size(0), _alloc(alloc)
 			{
 				(void)alloc;
 				createNewList();
@@ -61,7 +62,7 @@ namespace ft
 			// Fill constructor
 			// remind : value_type() appelle le constructeur par defaut de T
 			explicit list (size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type())
-				: _endList(nullptr), _size(0)
+				: _endList(nullptr), _size(0), _alloc(alloc)
 			{
 				(void)alloc;
 				createNewList();
@@ -73,7 +74,7 @@ namespace ft
 			template <class InputIterator>
 			list (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type(), typename ft::isIterator< InputIterator, Node, Alloc>::type* = 0)
 			{
-				(void)alloc;
+				_alloc = alloc;
 				createNewList();
 				_size = 0;
 				while (first != last)
@@ -100,9 +101,9 @@ namespace ft
 
 			// begin() Returns an iterator pointing to the first element in the list container.
 			// end() Returns an iterator pointing to the last element in the list container.
-			iterator begin() { return iterator(_endList->next);}
+			iterator begin() { return iterator((!_size) ? _endList : _endList->next);}
 			iterator end() { return iterator(_endList); }
-			const_iterator begin() const { return iterator(_endList->next);}
+			const_iterator begin() const { return iterator((!_size) ? _endList : _endList->next);}
 			const_iterator end() const { return iterator(_endList);}
 
 			reverse_iterator rbegin();
@@ -197,6 +198,7 @@ namespace ft
 				Node *destr = _endList->next;		// save elem to be destroyed
 				_endList->next = destr->next;		// _endlist point to second elem => becomes first of the list
 				destr->next->prev = _endList;		// first elem point to _endList
+				_alloc.destroy(&destr->data);
 				delete destr;
 				_size--;
 			}
@@ -207,6 +209,7 @@ namespace ft
 				Node *destr = _endList->prev;		// save elem to be destroyed
 				_endList->prev = destr->prev;		// end of the list changed
 				destr->prev->next = _endList;		// new last elem point to _endList
+				_alloc.destroy(&destr->data);
 				delete destr;
 				_size--;
 			}
@@ -255,6 +258,7 @@ namespace ft
 				pos->prev->next = pos->next;
 				pos->next->prev = pos->prev;
 				ret = iterator(pos->next);
+				_alloc.destroy(&pos->data);
 				delete pos.getCurrent();
 				_size--;
 				return ret;
@@ -292,16 +296,8 @@ namespace ft
 			// Removes all elements from the list container, and leaving the container with a size of 0.
 			void clear()
 			{
-				Node *tmp;
-				int j = 0;
-				for (size_type i = 0; i < _size; i++){
-					// std::cout << j++;
-					tmp = _endList->next;
-					// std::cout << " date " << tmp->data << std::endl;
-					delete _endList;
-					_endList = tmp;
-				}
-				(void)j;
+				for (size_type i = 0; i < _size; i++)
+					pop_back();
 				_size = 0;
 			}
 
@@ -315,36 +311,103 @@ namespace ft
 			// entire list (1)
 			void splice (iterator pos, list& x)
 			{
-				iterator it(x.begin());
-				for (size_type i = 0; i < x._size; i++){
-					std::cout << "posi " << *pos << "\n";
-					std::cout << "splice " << *it << "\n";
-					iterator neLink = it->next;
-					it->next = pos->next;
-					it->prev = pos.getCurrent();
-					pos->prev = it.getCurrent();
-					pos->next->prev = it.getCurrent();
-					_size++;
-					it = neLink;
+				for (iterator it = x.begin(); it != x.end();){
+					iterator next = it->next;
+					splice(pos, x, it);
+					it = next;
 				}
-					x._size = 0;
-				std::cout << "nL size " << _size << std::endl;
-				// x.clear();
-				// (void)pos;
-				x.printlist();
-				// printlist();
 			}
 
 			// single element (2)
-			void splice (iterator pos, list& x, iterator i);
+			void splice (iterator pos, list& x, iterator i)
+			{
+				transferLink(pos, i);
+				_size++;
+				x._size--;
+			}
+			
 			// element range (3)
-			void splice (iterator pos, list& x, iterator first, iterator last);
-			void remove (const value_type& val);
+			void splice (iterator pos, list& x, iterator first, iterator last)
+			{
+				while (first != last){
+					iterator next = first->next;
+					splice(pos, x, first);
+					first = next;
+				}
+			}
+
+			
+			/*
+			** Removes from the container all the elements that compare equal to val. 
+			** This calls the destructor of these objects and reduces the container size by the number of elements removed.
+			*/
+			void remove (const value_type& val)
+			{
+				for (iterator it = begin(); it != end(); ){
+					iterator next = it->next;
+					if (*it == val){
+						it->prev->next = it->next;
+						it->next->prev = it->prev;
+						_alloc.destroy(&it->data);
+						delete it.getCurrent();
+					}
+					it = next;
+				}
+			}
+			
+			/*
+			** Removes from the container all the elements for which Predicate pred returns true. 
+			** This calls the destructor of these objects and reduces the container size by the number of elements removed.
+			** The function calls pred(*i) for each element (where i is an iterator to that element). 
+			** Any of the elements in the list for which this returns true, are removed from the container.
+			*/
 			template <class Predicate>
-			void remove_if (Predicate pred);
-			void unique();
+			void remove_if (Predicate pred)
+			{
+				for (iterator it = begin(); it != end(); ){
+					iterator next = it->next;
+					if (pred(*it)){
+						it->prev->next = it->next;
+						it->next->prev = it->prev;
+						_alloc.destroy(&it->data);
+						delete it.getCurrent();
+					}
+					it = next;
+				}
+			}
+
+			// Removes all but the first element from every consecutive group of equal elements in the container.
+			void unique()
+			{
+				for (iterator it(begin()); it != end(); it++){
+					iterator next = it->next;
+					if (*it == *next)
+						erase(it);
+					it = next;
+				}
+			}
+			
+			/*
+			** Takes as argument a specific comparison function that determine the "uniqueness" of an element. 
+			** In fact, any behavior can be implemented (and not only an equality comparison), but notice that the 
+			** function will call binary_pred(*i,*(i-1)) for all pairs of elements (where i is an iterator to an element, 
+			** starting from the second) and remove i from the list if the predicate returns true.
+			**
+			** @param binary_pred Predicate that, taking two values of the same type than those contained in the list, 
+			** returns true to remove the element passed as first argument from the container, and false otherwise.
+			** This shall be a function pointer or a function object.
+			*/
 			template <class BinaryPredicate>
-			void unique (BinaryPredicate binary_pred);
+			void unique (BinaryPredicate binary_pred)
+			{
+				for (iterator it(begin()); it != end(); it++){
+					iterator next = it;
+					next++;
+					if (binary_pred(*next,*it))
+						erase(next);
+				}
+			}
+
 			void merge (list& x);
 			template <class Compare>
 			void merge (list& x, Compare comp);
@@ -357,8 +420,9 @@ namespace ft
 				void createNewList()
 				{
 					_endList = new Node;
-					_endList->next = nullptr;
-					_endList->prev = nullptr;
+					_endList->data = value_type();
+					_endList->next = _endList;
+					_endList->prev = _endList;
 				}
 
 				void addLink(iterator pos, const value_type &val)
@@ -378,6 +442,21 @@ namespace ft
 					_size++;
 				}
 
+				void transferLink(iterator pos, iterator newLink)
+				{
+					// change pointer of newLink old list
+					newLink->prev->next = newLink->next;
+					newLink->next->prev = newLink->prev;
+					
+					// change pointer for new position of newLink
+					newLink->next = pos.getCurrent();
+					newLink->prev = pos->prev;
+
+					// this list point to newLink
+					pos->prev->next = newLink.getCurrent();
+					pos->prev = newLink.getCurrent();
+				}
+				
 				template <class H>
 				void	mySwap(H& a, H&b)
 				{
