@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   list.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: heleneherin <heleneherin@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 19:55:49 by heleneherin       #+#    #+#             */
-/*   Updated: 2021/01/16 15:14:31 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/17 13:02:19 by heleneherin      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 // # include "../utils/algo.hpp"
 
 namespace ft
-{	
+{
 	template <class T, class Alloc = std::allocator<T> >
 	class list
 	{
@@ -32,9 +32,9 @@ namespace ft
 			typedef typename allocator_type::difference_type	difference_type;
 			typedef typename allocator_type::pointer			pointer;
 			typedef typename allocator_type::const_pointer		const_pointer;
-			
+
 		protected :
-			struct Node 
+			struct Node
 			{
 				T data;
 				Node *next;
@@ -42,7 +42,7 @@ namespace ft
 			};
 			Node			*_endList;
 			size_type		_size;
-				
+
 		public:
 			typedef typename ft::list_bidirect_iter<T, true, Node, Alloc>		iterator;
 			typedef typename ft::list_bidirect_iter<T, false, Node, Alloc>	const_iterator;
@@ -69,7 +69,7 @@ namespace ft
 					push_back(val);
 			}
 
-			// Range constructor 
+			// Range constructor
 			template <class InputIterator>
 			list (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type(), typename ft::isIterator< InputIterator, Node, Alloc>::type* = 0)
 			{
@@ -104,14 +104,14 @@ namespace ft
 			iterator end() { return iterator(_endList); }
 			const_iterator begin() const { return iterator(_endList->next);}
 			const_iterator end() const { return iterator(_endList);}
-			
+
 			reverse_iterator rbegin();
 			const_reverse_iterator rbegin() const;
 			reverse_iterator rend();
 			const_reverse_iterator rend() const;
 
 			// ======================= Capacity =======================
-			
+
 			// Returns whether the list container is empty
 			bool empty() const { return (_size == 0); }
 
@@ -130,11 +130,11 @@ namespace ft
 			const_reference back() const { return _endList->prev->data; }
 
 			// ======================= Modifiers ======================
-			
+
 			/*
 			** Assigns new contents to the list container, replacing its current contents, and modifying its size accordingly.
 			**
-			** @param first, last Input iterators to the initial and final positions in a sequence. last exclueded. 
+			** @param first, last Input iterators to the initial and final positions in a sequence. last exclueded.
 			** @param n New size of the container
 			** @param val Value to fill the container with
 			*/
@@ -146,7 +146,7 @@ namespace ft
 				while (first != last)
 					push_back(*first++);
 			}
-			
+
 			void assign (size_type n, const value_type& val)
 			{
 				clear();
@@ -154,7 +154,7 @@ namespace ft
 				for (size_type i = 0; i < n; i++)
 					push_back(val);
 			}
-			
+
 			// Inserts a new element at the beginning of the list with the copy of val
 			void push_front (const value_type& val)
 			{
@@ -172,8 +172,8 @@ namespace ft
 				_endList->next = node;
 				_size++;
 			}
-			
-			// nserts a new element at the end of the list with the copy of val 
+
+			// nserts a new element at the end of the list with the copy of val
 			void push_back (const value_type& val)
 			{
 				Node *node = new Node;
@@ -190,7 +190,7 @@ namespace ft
 				_endList->prev = node;
 				_size++;
 			}
-			
+
 			// Removes the first element in the list container, effectively reducing its size by one.
 			void pop_front()
 			{
@@ -200,7 +200,7 @@ namespace ft
 				delete destr;
 				_size--;
 			}
-			
+
 			// Removes the last element in the list container, effectively reducing the container size by one.
 			void pop_back()
 			{
@@ -213,20 +213,20 @@ namespace ft
 
 			/*
 			** Insert new elements before the element at the specified position
-			** 
+			**
 			** @param pos Position in the container where the new elements are inserted
 			** @param n Number of elements to insert (initialize with a copy of val)
 			** @param val Value to be copied (or moved)
 			** @param first,last Iterators specifying a range of elements, last excluded
 			*/
 			// single element (1)
-			iterator insert (iterator pos, const value_type& val) 
+			iterator insert (iterator pos, const value_type& val)
 			{
 				iterator *Cpos = pos;
 				insert(pos, 1, val);
 				return Cpos++;
 			}
-			
+
 			// fill (2)
 			void insert (iterator pos, size_type n, const value_type& val)
 			{
@@ -235,7 +235,7 @@ namespace ft
 					pos = pos->prev;
 				}
 			}
-			
+
 			// range (3)
 			template <class InputIterator>
 			void insert (iterator pos, InputIterator first, InputIterator last, typename ft::isIterator< InputIterator, Node, Alloc>::type* = 0)
@@ -243,10 +243,10 @@ namespace ft
 				while (first != last)
 					addLink(pos, *first++);
 			}
-			
+
 			/*
 			** Removes from the vector either a single element (position) or a range of elements ([first,last))
-			** Return : An iterator pointing to the new location of the element that followed the last element 
+			** Return : An iterator pointing to the new location of the element that followed the last element
 			** 			erased by the function call
 			*/
 			iterator erase (iterator pos)
@@ -259,7 +259,7 @@ namespace ft
 				_size--;
 				return ret;
 			}
-			
+
 			iterator erase (iterator first, iterator last)
 			{
 				iterator ret;
@@ -267,7 +267,7 @@ namespace ft
 					ret = erase(first++);
 				return ret;
 			}
-			
+
 			// Exchanges the content of the container by the content of x, which is another vector object of the same type. Sizes may differ.
 			void swap (list& x)
 			{
@@ -276,7 +276,7 @@ namespace ft
 				_endList = x._endList;
 				x._endList = tmp;
 			}
-			
+
 			/*
 			** Resizes the container so that it contains n elements.
 			** reduce or expand the size of the list
@@ -286,28 +286,59 @@ namespace ft
 				while (n > _size)
 					pop_back();
 				while (n < _size)
-					push_back();
+					push_back(val);
 			}
-			
+
 			// Removes all elements from the list container, and leaving the container with a size of 0.
 			void clear()
 			{
 				Node *tmp;
+				int j = 0;
 				for (size_type i = 0; i < _size; i++){
-					tmp = _endList;
-					_endList = _endList->next;
-					delete tmp;
+					// std::cout << j++;
+					tmp = _endList->next;
+					// std::cout << " date " << tmp->data << std::endl;
+					delete _endList;
+					_endList = tmp;
 				}
+				(void)j;
 				_size = 0;
 			}
 
 			// ======================= Operations =====================
+			/*
+			** Transfers elements from x into the container, inserting them at position.
+			** The first version (1) transfers all the elements of x into the container.
+			** The second version (2) transfers only the element pointed by i from x into the container.
+			** The third version (3) transfers the range [first,last) from x into the container.
+			*/
 			// entire list (1)
-			void splice (iterator position, list& x);
+			void splice (iterator pos, list& x)
+			{
+				iterator it(x.begin());
+				for (size_type i = 0; i < x._size; i++){
+					std::cout << "posi " << *pos << "\n";
+					std::cout << "splice " << *it << "\n";
+					iterator neLink = it->next;
+					it->next = pos->next;
+					it->prev = pos.getCurrent();
+					pos->prev = it.getCurrent();
+					pos->next->prev = it.getCurrent();
+					_size++;
+					it = neLink;
+				}
+					x._size = 0;
+				std::cout << "nL size " << _size << std::endl;
+				// x.clear();
+				// (void)pos;
+				x.printlist();
+				// printlist();
+			}
+
 			// single element (2)
-			void splice (iterator position, list& x, iterator i);
+			void splice (iterator pos, list& x, iterator i);
 			// element range (3)
-			void splice (iterator position, list& x, iterator first, iterator last);
+			void splice (iterator pos, list& x, iterator first, iterator last);
 			void remove (const value_type& val);
 			template <class Predicate>
 			void remove_if (Predicate pred);
@@ -329,20 +360,20 @@ namespace ft
 					_endList->next = nullptr;
 					_endList->prev = nullptr;
 				}
-				
+
 				void addLink(iterator pos, const value_type &val)
 				{
 					Node *Cpos = pos.getCurrent();	// get pointer of pos
 					Node *nod = new Node();
-					
+
 					// insert nod in the list
-					nod->next = Cpos;			
+					nod->next = Cpos;
 					nod->prev = pos->prev;
-					
+
 					// change list pointer to close the list
 					pos->prev->next = nod;
 					pos->prev = nod;
-					
+
 					nod->data = val;
 					_size++;
 				}
@@ -353,6 +384,13 @@ namespace ft
 					H& tmp = a;
 					a = b;
 					b = tmp;
+				}
+
+				void printlist()
+				{
+					for (iterator it = begin(); it != end(); it++)
+						std::cout << *it << "| ";
+					std::cout << std::endl << std::endl;
 				}
 	};
 }
