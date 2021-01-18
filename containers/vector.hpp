@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/04 12:58:14 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/13 15:27:54 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/18 15:43:11 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -262,7 +262,7 @@ namespace ft
 			*/
 			iterator	insert(const_iterator pos, const value_type& x) { return insert(pos, (size_type)1, x); }
 
-			iterator	insert(const_iterator pos, size_type n, const value_type& x)
+			iterator	insert(iterator pos, size_type n, const value_type& x)
 			{
 				difference_type addX = iterator(pos) - begin(); // position for added value x
 				difference_type tmp = end() - iterator(pos) + n; // how many time we have to swap the vector
@@ -277,7 +277,7 @@ namespace ft
 						it--;
 					}
 					tmp --;
-				}
+				}pkuhoi
 				it = begin() + addX;
 				_size += n;
 				while (n--){
