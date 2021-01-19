@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   test_list.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: heleneherin <heleneherin@student.42.fr>    +#+  +:+       +#+        */
+/*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/15 14:35:17 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/17 13:01:28 by heleneherin      ###   ########.fr       */
+/*   Updated: 2021/01/19 15:40:51 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,19 +20,61 @@ void printlist(T &lst)
 {
 	for (typename T::iterator it = lst.begin(); it != lst.end(); it++)
 		std::cout << *it << "| ";
-	std::cout << std::endl << std::endl;
+	std::cout << std::endl;
 }
 
+class predicate
+{
+	public:
+	predicate(){}
+	// predicate(predicate const& d) {}
+	~predicate(){}
+	bool operator()(std::string s, std::string s2){ return (s2 == s);}
+};
+
+bool is_splce(std::string i)
+{
+	std::string s("1");
+	return (i == s);
+}
+class hehe
+{
+    public :
+    hehe(){std::cout << "const called\n";}
+	hehe(const hehe&){std::cout << "copy called\n";}
+    ~hehe(){std::cout << "dest called\n";}
+hehe& operator=(const hehe& ){std::cout << "assign called\n"; return *this;}
+};
 
 template <class T>
 void test_list()
 {
+	
 	T lst;
+	hehe J;
+	std::cout << "PUSHBACK\n";
+	lst.push_back(J);
+	// lst.push_back(4);
+	// lst.push_back(6);
+	// lst.push_back(8);
+	// lst.push_back(10);
 
-	lst.push_back("salut");
-	// lst.push_back("cava");
-	// lst.push_back("bien");
-
+	// T new_lst;
+	// new_lst.push_back(5);
+	// new_lst.push_back(1);
+	// new_lst.push_back(7);
+	// new_lst.push_back(3);
+	// new_lst.push_back(9);
+	// new_lst.push_back(0);
+	// // predicate pred;
+	// // lst.unique(pred);
+	// // lst.merge(new_lst);
+	
+	// new_lst.swap(lst);
+	// std::cout << "lst ";
+	// printlist(lst);
+	// std::cout << "newlst ";
+	// printlist(new_lst);
 	// lst.push_back(1);
 	// lst.push_back(2);
 	// lst.push_back(3);
@@ -67,7 +109,7 @@ void test_list()
 	// }
 
 	{
-		T new_lst(6, "yoyo");
+		// T new_lst(6, "yoyo");
 		// for (typename T::iterator it = new_lst.begin(); it != new_lst.end(); it++)
 		// 	std::cout << *it << "| ";
 		// std::cout << std::endl;
@@ -121,11 +163,11 @@ void test_list()
 		// std::cout << "ON EST ICI size: " << lst.size() << std::endl;
 	}
 
-	{
-		T new_lst;
-		new_lst.push_back("1");
-		new_lst.push_back("2");
-		new_lst.push_back("3");
+	
+		// T new_lst;
+		// new_lst.push_back("1");
+		// new_lst.push_back("2");
+		// new_lst.push_back("3");
 
 		// std::cout << "\n\nnew lst ";
 		// printlist(new_lst);
@@ -135,13 +177,39 @@ void test_list()
 
 		// std::cout << "new lst ";
 		// std::cout << "new size " << new_lst.size() << "\n";
-		typename T::iterator it(new_lst.begin());
-		it++;
-		// std::cout << "pos iterateur " << *it << "\n";
-		new_lst.splice(it, lst);
+		// typename T::iterator it(new_lst.begin());
+		// it++;
+		
+		// std::cout << "first splice all list\n";
+		// new_lst.splice(it, lst);
+		// printlist(new_lst);
+		// printlist(lst);
+		// lst.push_back("hey");
+		// lst.push_back("lol");
+		// typename T::iterator it2(lst.begin());
+
+		// std::cout << "second splice 1 link\n";
+		// new_lst.splice(it, lst, it2);
+		// printlist(new_lst);
+		// printlist(lst);
+		// lst.push_back("splce1");
+		// lst.push_back("splce2");
+		// lst.push_back("splce3");
+		// lst.push_back("splce4");
+		// std::cout << "\nthird splice\n";
+		// it--; it--;
+		// new_lst.splice(it, lst, lst.begin(), lst.end());
+		// printlist(new_lst);
+		// printlist(lst);
+	
+		// std::cout << "\nREMOVE\n";
+		// new_lst.remove("salut");
 		// printlist(new_lst);
 
-	}
+		// std::cout << "\n REMOVE if\n";
+		// predicate pred("splce2");
+		// new_lst.template remove_if<predicate>(pred);
+		// printlist(new_lst);
 
 }
 
