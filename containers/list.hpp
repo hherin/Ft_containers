@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 19:55:49 by heleneherin       #+#    #+#             */
-/*   Updated: 2021/01/19 15:55:02 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/19 16:13:31 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -596,6 +596,40 @@ namespace ft
 						std::cout << *it << "| ";
 					std::cout << std::endl << std::endl;
 				}
+				
+			public:
+			friend void swap (list& x, list& y) { x.swap(y); }
+			
+			friend bool operator==(const list& lhs, const list& rhs)
+			{
+				if (lhs._size != rhs._size)
+					return false;
+				iterator left(lhs.begin());
+				iterator right(rhs.begin());
+				for (size_type i = 0; i < lhs._size; i++)
+					if (*left++ != *right++)
+						return false;
+				return true;
+			}
+
+			friend bool operator<(const list& lhs, const list& rhs)
+			{
+				if (lhs._size > rhs._size)
+					return false;
+				iterator right(rhs.begin());
+				for (iterator left(lhs.begin()); left != iterator(lhs.end()); left++)
+					if (*right++ < *left)
+						return false;
+				return true;
+			}
+
+			friend bool operator!= (const list& lhs, const list& rhs) { return !(operator==(lhs, rhs)); }
+
+			friend bool operator<= (const list& lhs, const list& rhs) { return operator==(lhs, rhs) || operator<(lhs, rhs); }
+
+			friend bool operator>  (const list& lhs, const list& rhs) { return !operator<=(lhs, rhs); }
+
+			friend bool operator>= (const list& lhs, const list& rhs) { return operator==(lhs, rhs) || operator>(lhs, rhs); }
 	};
 }
 
