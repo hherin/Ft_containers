@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 19:55:49 by heleneherin       #+#    #+#             */
-/*   Updated: 2021/01/19 15:23:07 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/19 15:55:02 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,18 +53,13 @@ namespace ft
 			// =================== Member Functions ===================
 			// Default constructor
 			explicit list (const allocator_type& alloc = allocator_type())
-				: _endList(nullptr), _size(0), _alloc(alloc)
-			{
-				(void)alloc;
-				createNewList();
-			}
+				: _endList(nullptr), _size(0), _alloc(alloc) { createNewList(); }
 
 			// Fill constructor
 			// remind : value_type() appelle le constructeur par defaut de T
 			explicit list (size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type())
 				: _endList(nullptr), _size(0), _alloc(alloc)
 			{
-				(void)alloc;
 				createNewList();
 				for (size_type i = 0; i < n; i++)
 					push_back(val);
@@ -82,7 +77,11 @@ namespace ft
 			}
 
 			// Copy constructor
-			list (const list& x) { *this = x; }
+			list (const list& x) 
+			{
+				createNewList();
+				*this = x;
+			}
 
 			~list() { clear(); }
 
@@ -90,8 +89,7 @@ namespace ft
 			{
 				if (this == &x)
 					return *this;
-				_size = 0;
-				createNewList();
+				clear();
 				for (iterator it(x.begin()); it != iterator(x.end()); it++)
 					push_back(*it);
 				return *this;
@@ -178,6 +176,7 @@ namespace ft
 			void push_back (const value_type& val)
 			{
 				Node *node = new Node;
+				std::cout << "SALUT\n";
 				node->data = val;
 				if (!_size){
 					node->prev = _endList;
