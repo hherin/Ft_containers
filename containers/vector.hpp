@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/04 12:58:14 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/19 15:29:32 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/19 17:11:41 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,20 @@
 
 namespace ft
 {
+	template <class InputIterator1, class InputIterator2>
+	bool lexicographical_compare (InputIterator1 first1, InputIterator1 last1, InputIterator2 first2, InputIterator2 last2)
+	{
+		while (first1 != last1)
+		{
+			if (first2 == last2 || *first2 < *first1) 
+				return false;
+			else if (*first1 < *first2) 
+				return true;
+			++first1; ++first2;
+		}
+		return (first2 != last2);
+	}
+	
 	template <class T, class Alloc = std::allocator<T> >
 	class vector
 	{
@@ -47,7 +61,13 @@ namespace ft
 					exceptionOutOfRange(){}
 					const char* what() const throw() { return "Input out of range.\n";}
 			};
-
+			
+		private:
+			size_type	_size;
+			size_type	_capacity;
+			pointer			_vector;
+		
+		public:
 			//=======================================Coplien Class=======================================
 			//allocatorawarecontainer copy cpp reference
 			//Default constructor
@@ -167,7 +187,7 @@ namespace ft
 			** no effect on vector size
 			** trow an exception if > max_size
 			** @param n Minimum capacity for the vector
-			*/ exception
+			*/
 			void reserve(size_type n)
 			{
 				if (n <= _capacity)
@@ -348,10 +368,6 @@ namespace ft
 				ft::mySwap(_capacity, sVec._capacity);
 			}
 
-		private:
-			unsigned int	_size;
-			unsigned int	_capacity;
-			pointer			_vector;
 
 			void resizeIfNeeded()
 			{
@@ -367,6 +383,7 @@ namespace ft
 				}
 			}
 			
+		public:
 		//================================= Non Members function ========================================
 		friend bool operator==(const vector<T, Alloc> &lhs, const vector<T, Alloc> &rhs )
 				{
@@ -390,19 +407,6 @@ namespace ft
 
 		friend void swap (vector<T,Alloc>& x, vector<T,Alloc>& y) { x.swap(y); }
 	};
-	
-	template <class InputIterator1, class InputIterator2>
-	bool lexicographical_compare (InputIterator1 first1, InputIterator1 last1, InputIterator2 first2, InputIterator2 last2)
-	{
-		while (first1 != last1)
-		{
-			if (first2 == last2 || *first2 < *first1) 
-				return false;
-			else if (*first1 < *first2) 
-				return true;
-			++first1; ++first2;
-		}
-		return (first2 != last2);
-	}
+
 }
 #endif
