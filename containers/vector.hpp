@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/04 12:58:14 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/18 15:43:11 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/19 15:29:32 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -165,8 +165,9 @@ namespace ft
 			** Reverve at least n unitialized elements in vector
 			** if n > current capacity: rallocation storage to size n or more
 			** no effect on vector size
+			** trow an exception if > max_size
 			** @param n Minimum capacity for the vector
-			*/
+			*/ exception
 			void reserve(size_type n)
 			{
 				if (n <= _capacity)
@@ -277,7 +278,7 @@ namespace ft
 						it--;
 					}
 					tmp --;
-				}pkuhoi
+				}
 				it = begin() + addX;
 				_size += n;
 				while (n--){
@@ -341,9 +342,10 @@ namespace ft
 
 			// exchange the content of the vector with the content of sVec
 			void	swap(vector &sVec)
-			{
-				swapVector(ft::max<vector>(*this, sVec), ft::min<vector>(*this, sVec));
-				std::swap(this->_size, sVec._size);
+			{				
+				ft::mySwap(_vector, sVec._vector);
+				ft::mySwap(_size, sVec._size);
+				ft::mySwap(_capacity, sVec._capacity);
 			}
 
 		private:
@@ -363,18 +365,6 @@ namespace ft
 					_vector = newVec;
 					_capacity += EXTRA_MEM;
 				}
-			}
-
-			void swapVector(vector& min, vector& max)
-			{
-				vector tmp = max;
-				for (std::pair< vector::iterator, vector::iterator > it(max.begin(), min.begin()); it.second != min.end(); it.first++, it.second++)
-					*it.first = *it.second;
-				delete [] min._vector;
-				min._vector = new T[_capacity];
-				for (std::pair< vector::iterator, vector::iterator > it(min.begin(), tmp.begin()); it.second != tmp.end(); it.first++, it.second++)
-					*it.first = *it.second;
-				min._capacity = max._capacity;
 			}
 			
 		//================================= Non Members function ========================================
@@ -400,6 +390,19 @@ namespace ft
 
 		friend void swap (vector<T,Alloc>& x, vector<T,Alloc>& y) { x.swap(y); }
 	};
-
+	
+	template <class InputIterator1, class InputIterator2>
+	bool lexicographical_compare (InputIterator1 first1, InputIterator1 last1, InputIterator2 first2, InputIterator2 last2)
+	{
+		while (first1 != last1)
+		{
+			if (first2 == last2 || *first2 < *first1) 
+				return false;
+			else if (*first1 < *first2) 
+				return true;
+			++first1; ++first2;
+		}
+		return (first2 != last2);
+	}
 }
 #endif
