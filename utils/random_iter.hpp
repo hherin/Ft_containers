@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   random_iter.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: heleneherin <heleneherin@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/08 16:30:56 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/13 15:28:16 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/19 19:07:11 by heleneherin      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,15 +24,10 @@ namespace ft
 			: public virtual ft::vect_bidirect_iter<T, B, Alloc>
 	{
 		public:
-			typedef typename Alloc::difference_type			difference_type;
-			typedef typename Alloc::value_type				value_type;
-			typedef typename Alloc::size_type				size_type;
-			typedef std::random_access_iterator_tag			iterator_category;
-
-			typedef typename ft::chooseIf<B,  typename Alloc::const_reference, typename Alloc::reference>::type reference;
-			typedef typename ft::chooseIf<B,  typename Alloc::const_pointer, typename Alloc::pointer>::type pointer;
-
-			typedef typename Alloc::pointer nonConst_pointer;
+			typedef typename std::ptrdiff_t							difference_type;
+			typedef  T*												nonConst_pointer;
+			typedef typename ft::chooseIf<B, const T&, T&>::type	reference;
+			typedef typename ft::chooseIf<B, const T*, T*>::type	pointer;
 
 			random_iter(nonConst_pointer val = 0) : ft::vect_bidirect_iter<T, B, Alloc>(val){}
 			random_iter(random_iter<T, true, Alloc> const &cp) : ft::vect_bidirect_iter<T, B, Alloc>(cp) {}
@@ -112,15 +107,10 @@ namespace ft
 			: public virtual ft::vect_reverse_bidirect_iter<T, B, Alloc>
 	{
 		public:
-			typedef typename Alloc::difference_type			difference_type;
-			typedef typename Alloc::value_type				value_type;
-			typedef typename Alloc::size_type				size_type;
-			typedef std::random_access_iterator_tag			iterator_category;
-
-			typedef typename ft::chooseIf<B,  typename Alloc::const_reference, typename Alloc::reference>::type reference;
-			typedef typename ft::chooseIf<B,  typename Alloc::const_pointer, typename Alloc::pointer>::type pointer;
-
-			typedef typename Alloc::pointer nonConst_pointer;
+			typedef typename std::ptrdiff_t							difference_type;
+			typedef  T*												nonConst_pointer;
+			typedef typename ft::chooseIf<B, const T&, T&>::type	reference;
+			typedef typename ft::chooseIf<B, const T*, T*>::type	pointer;
 
 			reverse_random_iter(nonConst_pointer val = 0) : ft::vect_reverse_bidirect_iter<T, B, Alloc>(val){}
 			reverse_random_iter(reverse_random_iter<T, true, Alloc> const &cp) : ft::vect_reverse_bidirect_iter<T, B, Alloc>(cp) {}

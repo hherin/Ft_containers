@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   reverse_bidirect_iter.hpp                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: heleneherin <heleneherin@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 18:18:40 by heleneherin       #+#    #+#             */
-/*   Updated: 2021/01/13 16:35:48 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/19 19:07:32 by heleneherin      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,14 +22,10 @@ namespace ft
     template <class T, bool B, class Alloc = std::allocator<T> > class vect_reverse_bidirect_iter
 	{
 		public:
-			typedef typename Alloc::difference_type difference_type;
-			typedef typename Alloc::value_type value_type;
-
-			typedef typename ft::chooseIf<B,  typename Alloc::const_reference, typename Alloc::reference>::type reference;
-			typedef typename ft::chooseIf<B,  typename Alloc::const_pointer, typename Alloc::pointer>::type pointer;
-
-			typedef typename Alloc::pointer nonConst_pointer;
-			typedef std::bidirectional_iterator_tag iterator_category;
+			typedef typename std::ptrdiff_t							difference_type;
+			typedef  T*												nonConst_pointer;
+			typedef typename ft::chooseIf<B, const T&, T&>::type	reference;
+			typedef typename ft::chooseIf<B, const T*, T*>::type	pointer;
 
 			vect_reverse_bidirect_iter(nonConst_pointer val = 0) : _current(val){}
 			vect_reverse_bidirect_iter(vect_reverse_bidirect_iter<T, true, Alloc> const &cp) {_current = cp.getCurrent();}
@@ -60,14 +56,10 @@ namespace ft
 	template <class T, bool B, class Alloc = std::allocator<T> > class list_reverse_bidirect_iter
 	{
 		public:
-			typedef typename Alloc::difference_type difference_type;
-			typedef typename Alloc::value_type value_type;
-
-			typedef typename ft::chooseIf<B,  typename Alloc::const_reference, typename Alloc::reference>::type reference;
-			typedef typename ft::chooseIf<B,  typename Alloc::const_pointer, typename Alloc::pointer>::type pointer;
-
-			typedef typename Alloc::pointer nonConst_pointer;
-			typedef std::bidirectional_iterator_tag iterator_category;
+			typedef typename std::ptrdiff_t							difference_type;
+			typedef  T*												nonConst_pointer;
+			typedef typename ft::chooseIf<B, const T&, T&>::type	reference;
+			typedef typename ft::chooseIf<B, const T*, T*>::type	pointer;
 
 			list_reverse_bidirect_iter(nonConst_pointer val = 0) : _current(val){}
 			list_reverse_bidirect_iter(list_reverse_bidirect_iter<T, true, Alloc> const &cp) {_current = cp.getCurrent();}
