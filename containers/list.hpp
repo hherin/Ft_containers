@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 19:55:49 by heleneherin       #+#    #+#             */
-/*   Updated: 2021/01/18 16:04:21 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/19 15:23:07 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 # include <memory>
 # include "../utils/bidirect_iter.hpp"
 # include "../utils/reverse_bidirect_iter.hpp"
-// # include "../utils/algo.hpp"
+# include "../utils/algo.hpp"
 
 namespace ft
 {
@@ -275,10 +275,11 @@ namespace ft
 			// Exchanges the content of the container by the content of x, which is another vector object of the same type. Sizes may differ.
 			void swap (list& x)
 			{
-				mySwap<size_type>(_size, x._size);
-				Node *tmp = _endList;
-				_endList = x._endList;
-				x._endList = tmp;
+				ft::mySwap(_size, x._size);
+				ft::mySwap(_endList, x._endList);
+				// Node *tmp = _endList;
+				// _endList = x._endList;
+				// x._endList = tmp;
 			}
 
 			/*
@@ -321,7 +322,7 @@ namespace ft
 			// single element (2)
 			void splice (iterator pos, list& x, iterator i)
 			{
-				transferLink(pos, i);
+				transfertLink(pos, i);
 				_size++;
 				x._size--;
 			}
@@ -408,49 +409,143 @@ namespace ft
 				}
 			}
 
+			/*
+			** Merges x into the list by transferring all of its elements at their respective ordered positions into the container 
+			** (both containers shall already be ordered). his effectively removes all the elements in x (which becomes empty), 
+			** and inserts them into their ordered position within container
+			*/
 			void merge (list& x)
 			{
-				for (iterator mergeIter(x.begin()); mergeIter != x.end(); ){
-					iterator Xnext(mergeIter);
-					Xnext++;
-					for (iterator ourIter(begin()); ourIter != end(); ){
-						iterator next(ourIter);
-						next++;
-						if (*ourIter >= *mergeIter){
-							std::cout << "lst: " << mergeIter->data << "\t";
-							std::cout << "nlst: " << ourIter->data << "\n";
-							transferLink(ourIter, mergeIter);
-							std::cout << "after transfert: " << (ourIter->prev->data) << std::endl;
-						}
-							
-						ourIter = next;
+				if (this == &x)
+					return ;
+				iterator ourIter(begin());
+				iterator mergeIter(x.begin());  //iterator on x list
+				
+				while (1){
+					iterator ourNext(ourIter->next);
+					iterator mergeNext(mergeIter->next);
+					
+					if (x.empty())
+						break;
+					if (ourIter == end()){
+						splice(end(), x, mergeIter, x.end());
+						break;
 					}
-					mergeIter = Xnext;
+					if (*ourIter >= *mergeIter){
+						transfertLink(ourIter, mergeIter);
+						_size++;
+						x._size--;
+						mergeIter = mergeNext;
+					}
+					else
+						ourIter = ourNext;
 				}
-				_size += x._size;
-				x._size = 0;
 			}
 			
+			/* 
+			** @param comp Binary predicate that, taking two values of the same type than those contained in the list, 
+			** returns true if the first argument is considered to go before the second in the strict weak ordering it defines, and false otherwise.
+			** This shall be a function pointer or a function object.
+			*/ 
 			template <class Compare>
 			void merge (list& x, Compare comp)
 			{
-				for (iterator xIt(x.begin()); xIt != x.end(); xIt++){
-					for (iterator it(begin()); it != end(); it++){
-						if (comp(*xIt, *it)){
-							transferLink(it, xIt);
-							_size++ && x._size--;
+				if (this == &x)
+					return ;
+				iterator ourIter(begin());
+				iterator mergeIter(x.begin());  //iterator on x list
+				
+				while (1){
+					iterator ourNext(ourIter->next);
+					iterator mergeNext(mergeIter->next);
+					
+					if (x.empty())
+						break;
+					if (ourIter == end()){
+						splice(end(), x, mergeIter, x.end());
+						break;
+					}
+					if (comp(*mergeIter, *ourIter)){
+						transfertLink(ourIter, mergeIter);
+						_size++;
+						x._size--;
+						mergeIter = mergeNext;
+					}
+					else
+						ourIter = ourNext;
+				}
+			}
+			
+			void sort()
+			{
+				for (size_type i = 0; i < _size; i++){
+					
+					for (iterator current(begin()->next); current != end(); ){
+						iterator next(current->next);
+						iterator previous(current->prev);
+						if (*current < *previous){
+							current->next->prev = previous.getCurrent();
+							
+							Node* tmp= current->next;
+							current->next = previous.getCurrent();
+							current->prev = previous->prev;
+							
+							previous->prev->next = current.getCurrent();
+							previous->prev = current.getCurrent();
+							previous->next = tmp;
 						}
+						current = next;
 					}
 				}
 			}
 			
-			void sort();
 			template <class Compare>
-			void sort (Compare comp);
-			void reverse();
+			void sort (Compare comp)
+			{
+				for (size_type i = 0; i < _size; i++){
+					
+					for (iterator current(begin()->next); current != end(); ){
+						iterator next(current->next);
+						iterator previous(current->prev);
+						if (comp(*current, *previous)){
+							current->next->prev = previous.getCurrent();
+							
+							Node* tmp= current->next;
+							current->next = previous.getCurrent();
+							current->prev = previous->prev;
+							
+							previous->prev->next = current.getCurrent();
+							previous->prev = current.getCurrent();
+							previous->next = tmp;
+						}
+						current = next;
+					}
+				}
+			}
+			
+			
+			// Reverses the order of the elements in the list container.
+			void reverse()
+			{
+				Node *tmp;
+				iterator rest(begin());
+				
+				for (size_type i = 0; i < _size; i++){ // changer order inside the list
+					iterator next(rest->next);
+					tmp = rest->prev;
+					rest->prev = rest->next;
+					rest->next = tmp;
+					rest = next;
+				}
+
+				//change order of the neutral side node
+				tmp = _endList->next;
+				_endList->next = _endList->prev;
+				_endList->prev = tmp;
+			}
 
 			protected:
-				// create the neutral elem for the linked loop
+				// create the neutral elem for the linked list
 				void createNewList()
 				{
 					_endList = new Node;
@@ -459,7 +554,7 @@ namespace ft
 					_endList->prev = _endList;
 				}
 
-				//create new lik before pos
+				// create new link before pos with a copy of val
 				void addLink(iterator pos, const value_type &val)
 				{
 					Node *Cpos = pos.getCurrent();	// get pointer of pos
@@ -478,8 +573,10 @@ namespace ft
 				}
 
 				// transfert newLink before pos
-				void transferLink(iterator pos, iterator newLink)
+				void transfertLink(iterator pos, iterator newLink)
 				{
+					if (pos == newLink)
+						return ;
 					// change pointer of newLink old list
 					newLink->prev->next = newLink->next;
 					newLink->next->prev = newLink->prev;
@@ -492,14 +589,7 @@ namespace ft
 					pos->prev->next = newLink.getCurrent();
 					pos->prev = newLink.getCurrent();
 				}
-				
-				template <class H>
-				void	mySwap(H& a, H&b)
-				{
-					H& tmp = a;
-					a = b;
-					b = tmp;
-				}
+			
 
 				void printlist()
 				{
