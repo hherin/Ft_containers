@@ -13,7 +13,6 @@
 #ifndef ALGO_HPP
 # define ALGO_HPP
 
-#include "../containers/vector.hpp"
 
 namespace ft
 {
@@ -45,18 +44,13 @@ namespace ft
 		return a < b;
 	}
 
-	template <class InputIterator1, class InputIterator2>
-	bool lexicographical_compare (InputIterator1 first1, InputIterator1 last1, InputIterator2 first2, InputIterator2 last2)
+	template <class H>
+	void	mySwap(H& a, H&b)
 	{
-		while (first1 != last1)
-		{
-			if (first2 == last2 || *first2 < *first1) 
-				return false;
-			else if (*first1 < *first2) 
-				return true;
-			++first1; ++first2;
-		}
-		return (first2 != last2);
+		H tmp = a;
+		a = b;
+		b = tmp;
 	}
+
 }
 #endif
