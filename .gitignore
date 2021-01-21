@@ -1,4 +1,5 @@
 *.o
 container
 *.json
-.cchudant*
+ft_*
+a.out*

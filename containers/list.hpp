@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 19:55:49 by heleneherin       #+#    #+#             */
-/*   Updated: 2021/01/19 16:13:31 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/21 16:26:53 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,8 @@
 # define LIST_HPP
 
 # include <memory>
-# include "../utils/bidirect_iter.hpp"
-# include "../utils/reverse_bidirect_iter.hpp"
+# include "../utils/iterator/bidirect_iter.hpp"
+# include "../utils/iterator/reverse_bidirect_iter.hpp"
 # include "../utils/algo.hpp"
 
 namespace ft
@@ -45,10 +45,10 @@ namespace ft
 			allocator_type	_alloc;
 
 		public:
-			typedef typename ft::list_bidirect_iter<T, true, Node, Alloc>		iterator;
-			typedef typename ft::list_bidirect_iter<T, false, Node, Alloc>	const_iterator;
-			typedef typename ft::list_reverse_bidirect_iter<T, true, Alloc>	reverse_iterator;
-			typedef typename ft::list_reverse_bidirect_iter<T, false, Alloc>	const_reverse_iterator;
+			typedef typename ft::list_bidirect_iter<T, true, Node>		iterator;
+			typedef typename ft::list_bidirect_iter<T, false, Node>		const_iterator;
+			typedef typename ft::list_reverse_bidirect_iter<T, true, Node>		reverse_iterator;
+			typedef typename ft::list_reverse_bidirect_iter<T, false, Node>	const_reverse_iterator;
 
 			// =================== Member Functions ===================
 			// Default constructor
@@ -67,7 +67,7 @@ namespace ft
 
 			// Range constructor
 			template <class InputIterator>
-			list (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type(), typename ft::isIterator< InputIterator, Node, Alloc>::type* = 0)
+			list (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type(), typename std::enable_if<!ft::is_integral<InputIterator>::value>::type * = 0)
 			{
 				_alloc = alloc;
 				createNewList();
@@ -99,9 +99,9 @@ namespace ft
 
 			// begin() Returns an iterator pointing to the first element in the list container.
 			// end() Returns an iterator pointing to the last element in the list container.
-			iterator begin() { return iterator((!_size) ? _endList : _endList->next);}
+			iterator begin() { return (!_size ? iterator(_endList) : iterator(_endList->next));}
 			iterator end() { return iterator(_endList); }
-			const_iterator begin() const { return iterator((!_size) ? _endList : _endList->next);}
+			const_iterator begin() const { return (!_size ? iterator(_endList) : iterator(_endList->next));}
 			const_iterator end() const { return iterator(_endList);}
 
 			reverse_iterator rbegin();
@@ -138,7 +138,7 @@ namespace ft
 			** @param val Value to fill the container with
 			*/
 			template <class InputIterator>
-			void assign (InputIterator first, InputIterator last, typename ft::isIterator< InputIterator, Node, Alloc>::type* = 0)
+			void assign (InputIterator first, InputIterator last, typename std::enable_if<!ft::is_integral<InputIterator>::value>::type * = 0)
 			{
 				clear();
 				createNewList();
@@ -176,7 +176,6 @@ namespace ft
 			void push_back (const value_type& val)
 			{
 				Node *node = new Node;
-				std::cout << "SALUT\n";
 				node->data = val;
 				if (!_size){
 					node->prev = _endList;
@@ -240,7 +239,7 @@ namespace ft
 
 			// range (3)
 			template <class InputIterator>
-			void insert (iterator pos, InputIterator first, InputIterator last, typename ft::isIterator< InputIterator, Node, Alloc>::type* = 0)
+			void insert (iterator pos, InputIterator first, InputIterator last, typename std::enable_if<!ft::is_integral<InputIterator>::value>::type * = 0)
 			{
 				while (first != last)
 					addLink(pos, *first++);

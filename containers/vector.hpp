@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/04 12:58:14 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/19 17:11:41 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/21 16:57:41 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,13 +18,16 @@
 # include <memory>
 # include <exception>
 # include "../utils/traits.hpp"
-# include "../utils/random_iter.hpp"
+# include "../utils/iterator/random_iter.hpp"
 # include "../utils/algo.hpp"
 
 # define EXTRA_MEM 15
 
 namespace ft
 {
+	template <class T, bool B> class random_iter;
+	template <class T, bool B> class reverse_random_iter;
+	 
 	template <class InputIterator1, class InputIterator2>
 	bool lexicographical_compare (InputIterator1 first1, InputIterator1 last1, InputIterator2 first2, InputIterator2 last2)
 	{
@@ -51,10 +54,10 @@ namespace ft
 			typedef typename allocator_type::difference_type	difference_type;
 			typedef typename allocator_type::pointer			pointer;
 			typedef typename allocator_type::const_pointer		const_pointer;
-			typedef typename ft::random_iter<T, true, Alloc>	iterator;
-			typedef typename ft::random_iter<T, false, Alloc>	const_iterator;
-			typedef typename ft::reverse_random_iter<T, true, Alloc>	reverse_iterator;
-			typedef typename ft::reverse_random_iter<T, false, Alloc>	const_reverse_iterator;
+			typedef typename ft::random_iter<T, true>	iterator;
+			typedef typename ft::random_iter<T, false>	const_iterator;
+			typedef typename ft::reverse_random_iter<T, true>	reverse_iterator;
+			typedef typename ft::reverse_random_iter<T, false>	const_reverse_iterator;
 			class exceptionOutOfRange
 			{
 				public:
@@ -91,7 +94,7 @@ namespace ft
 																											// if inputs are pointer segfault, std::vector throw an exception
 			// Fill constructor with a range between the first to the last elements of an other vector
 			template <class InputIterator>
-			vector(InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type(), typename ft::enable_if<!ft::is_integer<InputIterator>::value, InputIterator >::type* = 0)
+			vector(InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type(), typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator >::type* = 0)
 				: _size(0), _capacity(EXTRA_MEM)
 			{
 				(void)alloc;				
@@ -238,7 +241,7 @@ namespace ft
 
 			// Range version. new elements constructed in the range between first and last
 			template <class InputIterator>
-			void	assign(InputIterator first, InputIterator last, typename ft::enable_if<!ft::is_integer<InputIterator>::value, InputIterator >::type* = 0)
+			void	assign(InputIterator first, InputIterator last, typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator >::type* = 0)
 			{
 				clear();
 				while (first != last)
@@ -309,7 +312,7 @@ namespace ft
 			}
 
 			template <class InputIterator>
-			iterator	insert(const_iterator pos, InputIterator first, InputIterator last, typename ft::enable_if<!ft::is_integer<InputIterator>::value, InputIterator >::type* = 0)
+			iterator	insert(const_iterator pos, InputIterator first, InputIterator last, typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator >::type* = 0)
 			{
 				iterator posIt(pos);
 				size_type index = posIt - begin();

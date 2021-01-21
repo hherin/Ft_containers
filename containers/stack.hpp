@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/19 16:31:43 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/19 17:22:58 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/21 10:57:53 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,8 @@
 
 # include "vector.hpp"
 
-namespace ft{
+namespace ft {
+	
 	template <class T, class Container = ft::vector<T> > class stack
 	{
 		public: 
@@ -24,19 +25,17 @@ namespace ft{
 			typedef Container				container_type;
 		
 		protected:
-			Container _ctnr;
-			size_type _size;
+			container_type _ctnr;
 			
 		public:
 			// =================== Member Functions ===================
-			explicit stack (const container_type& ctnr = container_type())
-				: _ctnr(ctnr), _size(ctnr.size()) {}
+			explicit stack (const container_type& ctnr = container_type()) : _ctnr(ctnr) {}
 			
 			// Returns whether the stack is empty: i.e. whether its size is zero.
-			bool empty() const { return (_size == 0); }
+			bool empty() const { return !_ctnr.size(); }
 			
 			// Returns the number of elements in the stack.
-			size_type size() const { return _size; }
+			size_type size() const { return _ctnr.size(); }
 
 			// Returns a reference to the top element in the stack. 
 			value_type& top() { return _ctnr.front(); }
@@ -44,25 +43,17 @@ namespace ft{
 
 			// Inserts a new element at the top of the stack, above its current top element. 
 			// The content of this new element is initialized to a copy of val.
-			void push (const value_type& val)
-			{
-				_size++;
-				_ctnr.insert(_ctnr.begin(), val); 
-			}
+			void push (const value_type& val) { _ctnr.insert(_ctnr.begin(), val); }
 
 			// Removes the element on top of the stack, effectively reducing its size by one.
-			void pop()
-			{
-				_size--;
-				_ctnr.erase(_ctnr.begin());
-			}
+			void pop() { _ctnr.erase(_ctnr.begin()); }
 		
-			friend bool operator== (const stack& lhs, const stack& rhs) { return lhs.operator==(lhs, rhs); }
-			friend bool operator!= (const stack& lhs, const stack& rhs) { return lhs.operator!=(lhs, rhs); }
-			friend bool operator<  (const stack& lhs, const stack& rhs) { return lhs.operator<(lhs, rhs); }
-			friend bool operator<= (const stack& lhs, const stack& rhs) { return lhs.operator<=(lhs, rhs); }
-			friend bool operator>  (const stack& lhs, const stack& rhs) { return lhs.operator>(lhs, rhs); }
-			friend bool operator>= (const stack& lhs, const stack& rhs) { return lhs.operator>=(lhs, rhs); }
+			friend bool operator== (const stack& lhs, const stack& rhs) { return lhs._ctnr == rhs._ctnr; }
+			friend bool operator!= (const stack& lhs, const stack& rhs) { return lhs._ctnr != rhs._ctnr; }
+			friend bool operator<  (const stack& lhs, const stack& rhs) { return lhs._ctnr < rhs._ctnr; }
+			friend bool operator<= (const stack& lhs, const stack& rhs) { return lhs._ctnr <= rhs._ctnr; }
+			friend bool operator>  (const stack& lhs, const stack& rhs) { return lhs._ctnr > rhs._ctnr; }
+			friend bool operator>= (const stack& lhs, const stack& rhs) { return lhs._ctnr >= rhs._ctnr; }
 		
 	};
 }
