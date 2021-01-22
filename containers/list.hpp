@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 19:55:49 by heleneherin       #+#    #+#             */
-/*   Updated: 2021/01/21 16:26:53 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/22 14:29:15 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,14 +24,14 @@ namespace ft
 	class list
 	{
 		public:
-			typedef T											value_type;
-			typedef Alloc										allocator_type;
-			typedef typename allocator_type::reference			reference;
-			typedef typename allocator_type::const_reference	const_reference;
-			typedef typename allocator_type::size_type			size_type;
-			typedef typename allocator_type::difference_type	difference_type;
-			typedef typename allocator_type::pointer			pointer;
-			typedef typename allocator_type::const_pointer		const_pointer;
+			typedef T					value_type;
+			typedef Alloc				allocator_type;
+			typedef T&					reference;
+			typedef const T&			const_reference;
+			typedef size_t				size_type;
+			typedef std::ptrdiff_t		difference_type;
+			typedef T*					pointer;
+			typedef const T*			const_pointer;
 
 		protected :
 			struct Node
@@ -45,9 +45,9 @@ namespace ft
 			allocator_type	_alloc;
 
 		public:
-			typedef typename ft::list_bidirect_iter<T, true, Node>		iterator;
-			typedef typename ft::list_bidirect_iter<T, false, Node>		const_iterator;
-			typedef typename ft::list_reverse_bidirect_iter<T, true, Node>		reverse_iterator;
+			typedef typename ft::list_bidirect_iter<T, true, Node>			iterator;
+			typedef typename ft::list_bidirect_iter<T, false, Node>			const_iterator;
+			typedef typename ft::list_reverse_bidirect_iter<T, true, Node>	reverse_iterator;
 			typedef typename ft::list_reverse_bidirect_iter<T, false, Node>	const_reverse_iterator;
 
 			// =================== Member Functions ===================
@@ -103,11 +103,13 @@ namespace ft
 			iterator end() { return iterator(_endList); }
 			const_iterator begin() const { return (!_size ? iterator(_endList) : iterator(_endList->next));}
 			const_iterator end() const { return iterator(_endList);}
-
-			reverse_iterator rbegin();
-			const_reverse_iterator rbegin() const;
-			reverse_iterator rend();
-			const_reverse_iterator rend() const;
+			
+			// rbegin() Returns a reverse iterator pointing to the last element in the container
+			// rend() Returns a reverse iterator pointing to the theoretical element preceding the first element in the list container 
+			reverse_iterator rbegin() { return reverse_iterator(_endList->prev); }
+			const_reverse_iterator rbegin() const { return reverse_iterator(_endList->prev); }
+			reverse_iterator rend() { return reverse_iterator(_endList); }
+			const_reverse_iterator rend() const { return reverse_iterator(_endList); }
 
 			// ======================= Capacity =======================
 
@@ -275,9 +277,6 @@ namespace ft
 			{
 				ft::mySwap(_size, x._size);
 				ft::mySwap(_endList, x._endList);
-				// Node *tmp = _endList;
-				// _endList = x._endList;
-				// x._endList = tmp;
 			}
 
 			/*
@@ -521,7 +520,6 @@ namespace ft
 				}
 			}
 			
-			
 			// Reverses the order of the elements in the list container.
 			void reverse()
 			{
@@ -542,63 +540,62 @@ namespace ft
 				_endList->prev = tmp;
 			}
 
-			protected:
-				// create the neutral elem for the linked list
-				void createNewList()
-				{
-					_endList = new Node;
-					_endList->data = value_type();
-					_endList->next = _endList;
-					_endList->prev = _endList;
-				}
+		protected:
+			// create the neutral elem for the linked list
+			void createNewList()
+			{
+				_endList = new Node;
+				_endList->data = value_type();
+				_endList->next = _endList;
+				_endList->prev = _endList;
+			}
 
-				// create new link before pos with a copy of val
-				void addLink(iterator pos, const value_type &val)
-				{
-					Node *Cpos = pos.getCurrent();	// get pointer of pos
-					Node *nod = new Node();
+			// create new link before pos with a copy of val
+			void addLink(iterator pos, const value_type &val)
+			{
+				Node *Cpos = pos.getCurrent();	// get pointer of pos
+				Node *nod = new Node();
+				// insert nod in the list
+				nod->next = Cpos;
+				nod->prev = pos->prev;
 
-					// insert nod in the list
-					nod->next = Cpos;
-					nod->prev = pos->prev;
+				// change list pointer to close the list
+				pos->prev->next = nod;
+				pos->prev = nod;
 
-					// change list pointer to close the list
-					pos->prev->next = nod;
-					pos->prev = nod;
-
-					nod->data = val;
-					_size++;
-				}
+				nod->data = val;
+				_size++;
+			}
 
 				// transfert newLink before pos
-				void transfertLink(iterator pos, iterator newLink)
-				{
-					if (pos == newLink)
-						return ;
-					// change pointer of newLink old list
-					newLink->prev->next = newLink->next;
-					newLink->next->prev = newLink->prev;
+			void transfertLink(iterator pos, iterator newLink)
+			{
+				if (pos == newLink)
+					return ;
+				// change pointer of newLink old list
+				newLink->prev->next = newLink->next;
+				newLink->next->prev = newLink->prev;
 					
-					// change pointer for new position of newLink
-					newLink->next = pos.getCurrent();
-					newLink->prev = pos->prev;
+				// change pointer for new position of newLink
+				newLink->next = pos.getCurrent();
+				newLink->prev = pos->prev;
 
-					// this list point to newLink
-					pos->prev->next = newLink.getCurrent();
-					pos->prev = newLink.getCurrent();
-				}
+				// this list point to newLink
+				pos->prev->next = newLink.getCurrent();
+				pos->prev = newLink.getCurrent();
+			}
 			
 
-				void printlist()
-				{
-					for (iterator it = begin(); it != end(); it++)
-						std::cout << *it << "| ";
-					std::cout << std::endl << std::endl;
-				}
-				
-			public:
+			void printlist()
+			{
+				for (iterator it = begin(); it != end(); it++)
+					std::cout << *it << "| ";
+				std::cout << std::endl << std::endl;
+			}
+
+		// =====================Non Member method ==========================	
+		public:
 			friend void swap (list& x, list& y) { x.swap(y); }
-			
 			friend bool operator==(const list& lhs, const list& rhs)
 			{
 				if (lhs._size != rhs._size)
@@ -610,7 +607,6 @@ namespace ft
 						return false;
 				return true;
 			}
-
 			friend bool operator<(const list& lhs, const list& rhs)
 			{
 				if (lhs._size > rhs._size)
@@ -621,13 +617,9 @@ namespace ft
 						return false;
 				return true;
 			}
-
 			friend bool operator!= (const list& lhs, const list& rhs) { return !(operator==(lhs, rhs)); }
-
 			friend bool operator<= (const list& lhs, const list& rhs) { return operator==(lhs, rhs) || operator<(lhs, rhs); }
-
 			friend bool operator>  (const list& lhs, const list& rhs) { return !operator<=(lhs, rhs); }
-
 			friend bool operator>= (const list& lhs, const list& rhs) { return operator==(lhs, rhs) || operator>(lhs, rhs); }
 	};
 }
