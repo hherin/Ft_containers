@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/08 16:30:56 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/22 11:43:57 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/22 12:11:50 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,14 +66,14 @@ namespace ft
 			random_iter operator+=(int n)
 			{
 				for (int i = 0; i < n; i++)
-					(n > 0) ? this->_current-- : this->_current++;
+					(n > 0) ? this->_current++ : this->_current--;
 				return *this;
 			}
 			
 			random_iter operator-=(int n)
 			{
 				for (int i = 0; i < n; i++)
-					(n > 0) ? this->_current++ : this->_current--;
+					(n > 0) ? this->_current-- : this->_current++;
 				return *this;
 			}
 			

@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/04 12:58:14 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/21 16:57:41 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/22 13:33:54 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -284,43 +284,41 @@ namespace ft
 			** @param x Value to be copied
 			** @param first/last Copies of elements in this range are inserted at pos
 			*/
-			iterator	insert(const_iterator pos, const value_type& x) { return insert(pos, (size_type)1, x); }
-
-			iterator	insert(iterator pos, size_type n, const value_type& x)
+			iterator	insert(const_iterator pos, const value_type& x) 
 			{
-				difference_type addX = iterator(pos) - begin(); // position for added value x
-				difference_type tmp = end() - iterator(pos) + n; // how many time we have to swap the vector
+				difference_type posIdx = iterator(pos) - begin();			// save the index position in case reserve is called
+				
+				if (_size + 1 > _capacity)
+					reserve(_size + 1 + EXTRA_MEM);
+				iterator it(begin() + posIdx);			
+				value_type tmp = *it;										// save previous value of pos
+				*it++ = x;													// insert the value 
+				for ( ; it != end(); it++)									// loop for swap the rest of the vector
+					ft::mySwap(tmp, *it);
+				*it = tmp;													// last element of vector
+				_size++;
+				return begin() + posIdx;
+			}
 
-				iterator it;
-				if (_size + n > _capacity) // check if there is enought place in vector
-					reserve(_size + n + EXTRA_MEM);
-				for (size_type i = n; i > 0; i--){ // how many times the vector is swap
-					it = end() - 1 + n;
-					for (difference_type j = 0; j < tmp; j++){ // loop for how many time it will be swapped
-						std::swap(*(it), *(it + 1));
-						it--;
-					}
-					tmp --;
+			void	insert(iterator pos, size_type n, const value_type& x)
+			{
+				difference_type posIdx = iterator(pos) - begin();
+				for (size_type i = 0; i < n; i++){
+					iterator it(begin() + posIdx++);
+					insert(it, x);
 				}
-				it = begin() + addX;
-				_size += n;
-				while (n--){
-					*it = x;
-					it++;
-				}
-				return iterator(pos);
 			}
 
 			template <class InputIterator>
 			iterator	insert(const_iterator pos, InputIterator first, InputIterator last, typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator >::type* = 0)
 			{
-				iterator posIt(pos);
-				size_type index = posIt - begin();
-				insert(pos, last - first, 0);
-				iterator it = begin() + index;
-				while (first != last)
-					*(it++) = *(first++);
-				return posIt;
+				int diff = -1;
+				iterator retInsert(pos - 1);
+				while (first != last){
+					retInsert = insert(retInsert + 1, *first++);
+					diff++;
+				}
+				return retInsert - diff;
 			}
 
 			/*
