@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 18:18:40 by heleneherin       #+#    #+#             */
-/*   Updated: 2021/01/21 15:55:45 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/22 11:48:28 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,8 +28,8 @@ namespace ft
 			typedef typename ft::chooseIf<B, const T*, T*>::type	pointer;
 
 			vect_reverse_bidirect_iter(nonConst_pointer val = 0) : _current(val){}
-			vect_reverse_bidirect_iter(vect_reverse_bidirect_iter<T, true> const &cp) {_current = cp.getCurrent(); }
-			vect_reverse_bidirect_iter(vect_reverse_bidirect_iter<T, false> const &cp) {_current = cp.getCurrent(); }
+			vect_reverse_bidirect_iter(vect_reverse_bidirect_iter<T, true> const &cp) { _current = cp.getCurrent(); }
+			vect_reverse_bidirect_iter(vect_reverse_bidirect_iter<T, false> const &cp) { _current = cp.getCurrent(); }
 			vect_reverse_bidirect_iter operator=(vect_reverse_bidirect_iter const &cp)
 			{
 				if (this != &cp)
@@ -43,11 +43,11 @@ namespace ft
 			vect_reverse_bidirect_iter		operator++(int) { vect_reverse_bidirect_iter tmp = *this; ++(*this); return tmp; } //post incrementation
 			vect_reverse_bidirect_iter		operator--() { _current++; return *this; }
 			vect_reverse_bidirect_iter		operator--(int) { vect_reverse_bidirect_iter tmp = *this; --(*this); return tmp; }
-			reference			operator*() const { return *_current; }
-			pointer				operator->() { return _current; }
-			friend bool			operator==(const vect_reverse_bidirect_iter& a, const vect_reverse_bidirect_iter& b) { return a._current == b._current; }
-			friend bool			operator!=(const vect_reverse_bidirect_iter& a, const vect_reverse_bidirect_iter& b) { return a._current != b._current; }
-			nonConst_pointer	getCurrent() const { return _current; }
+			reference						operator*() const { return *_current; }
+			pointer							operator->() { return _current; }
+			bool							operator==(const vect_reverse_bidirect_iter& b) { return this->_current == b._current; }
+			bool							operator!=(const vect_reverse_bidirect_iter& b) { return this->_current != b._current; }
+			nonConst_pointer				getCurrent() const { return _current; }
 
 		protected:
 			nonConst_pointer _current;
@@ -77,11 +77,11 @@ namespace ft
 			list_reverse_bidirect_iter		operator++(int) { list_reverse_bidirect_iter tmp = *this; ++(*this); return tmp; } //post incrementation
 			list_reverse_bidirect_iter		operator--() { _current = _current->next; return *this; }
 			list_reverse_bidirect_iter		operator--(int) { list_reverse_bidirect_iter tmp = *this; --(*this); return tmp; }
-			reference			operator*() const { return _current->data; }
-			pointer				operator->() { return _current; }
-			friend bool			operator==(const list_reverse_bidirect_iter& a, const list_reverse_bidirect_iter& b) { return a._current == b._current; }
-			friend bool			operator!=(const list_reverse_bidirect_iter& a, const list_reverse_bidirect_iter& b) { return a._current != b._current; }
-			listelem_pointer	getCurrent() const { return _current; }
+			reference						operator*() const { return _current->data; }
+			pointer							operator->() { return _current; }
+			bool							operator==(const vect_reverse_bidirect_iter& b) { return this->_current == b._current; }
+			bool							operator!=(const vect_reverse_bidirect_iter& b) { return this->_current != b._current; }
+			listelem_pointer				getCurrent() const { return _current; }
 
 		protected:
 			listelem_pointer _current;
