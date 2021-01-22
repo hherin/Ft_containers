@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 19:55:49 by heleneherin       #+#    #+#             */
-/*   Updated: 2021/01/22 14:35:45 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/22 15:26:22 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -198,7 +198,6 @@ namespace ft
 				Node *destr = _endList->next;		// save elem to be destroyed
 				_endList->next = destr->next;		// _endlist point to second elem => becomes first of the list
 				destr->next->prev = _endList;		// first elem point to _endList
-				_alloc.destroy(&destr->data);
 				delete destr;
 				_size--;
 			}
@@ -209,7 +208,6 @@ namespace ft
 				Node *destr = _endList->prev;		// save elem to be destroyed
 				_endList->prev = destr->prev;		// end of the list changed
 				destr->prev->next = _endList;		// new last elem point to _endList
-				_alloc.destroy(&destr->data);
 				delete destr;
 				_size--;
 			}
@@ -258,7 +256,6 @@ namespace ft
 				pos->prev->next = pos->next;
 				pos->next->prev = pos->prev;
 				ret = iterator(pos->next);
-				_alloc.destroy(&pos->data);
 				delete pos.getCurrent();
 				_size--;
 				return ret;
@@ -346,7 +343,6 @@ namespace ft
 					if (*it == val){
 						it->prev->next = it->next;
 						it->next->prev = it->prev;
-						_alloc.destroy(&it->data);
 						delete it.getCurrent();
 					}
 					it = next;
@@ -367,7 +363,6 @@ namespace ft
 					if (pred(*it)){
 						it->prev->next = it->next;
 						it->next->prev = it->prev;
-						_alloc.destroy(&it->data);
 						delete it.getCurrent();
 					}
 					it = next;

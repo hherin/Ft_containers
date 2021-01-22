@@ -19,3 +19,14 @@ https://h-deb.clg.qc.ca/Sujets/TrucsScouts/is_iterator.html
 *Swap containers*
 
 http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0178r0.html
+
+
+## Map
+
+*Arbres Binaires* 
+
+
+http://carl.seleborg.free.fr/cpp/cours/chap2/arbres.html
+
+
+https://www.youtube.com/watch?v=h1Z8_ebEqao
