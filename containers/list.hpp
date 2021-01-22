@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 19:55:49 by heleneherin       #+#    #+#             */
-/*   Updated: 2021/01/22 14:29:15 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/22 14:35:45 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ namespace ft
 			typedef T*					pointer;
 			typedef const T*			const_pointer;
 
-		protected :
+		private :
 			struct Node
 			{
 				T data;

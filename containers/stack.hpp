@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/19 16:31:43 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/21 10:57:53 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/22 14:59:05 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,15 +38,15 @@ namespace ft {
 			size_type size() const { return _ctnr.size(); }
 
 			// Returns a reference to the top element in the stack. 
-			value_type& top() { return _ctnr.front(); }
-			const value_type& top() const { return _ctnr.front(); }
+			value_type& top() { return _ctnr.back(); }
+			const value_type& top() const { return _ctnr.back(); }
 
 			// Inserts a new element at the top of the stack, above its current top element. 
 			// The content of this new element is initialized to a copy of val.
-			void push (const value_type& val) { _ctnr.insert(_ctnr.begin(), val); }
+			void push (const value_type& val) { _ctnr.push_back(); }
 
 			// Removes the element on top of the stack, effectively reducing its size by one.
-			void pop() { _ctnr.erase(_ctnr.begin()); }
+			void pop() { _ctnr.pop_back(); }
 		
 			friend bool operator== (const stack& lhs, const stack& rhs) { return lhs._ctnr == rhs._ctnr; }
 			friend bool operator!= (const stack& lhs, const stack& rhs) { return lhs._ctnr != rhs._ctnr; }
