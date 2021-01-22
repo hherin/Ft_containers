@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 19:55:49 by heleneherin       #+#    #+#             */
-/*   Updated: 2021/01/22 15:26:22 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/22 16:42:56 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,10 +68,9 @@ namespace ft
 			// Range constructor
 			template <class InputIterator>
 			list (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type(), typename std::enable_if<!ft::is_integral<InputIterator>::value>::type * = 0)
+				: _size(0), _alloc(alloc)
 			{
-				_alloc = alloc;
 				createNewList();
-				_size = 0;
 				while (first != last)
 					push_back(*first++);
 			}
@@ -293,7 +292,6 @@ namespace ft
 			{
 				for (size_type i = 0; i < _size; i++)
 					pop_back();
-				_size = 0;
 			}
 
 			// ======================= Operations =====================
