@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 18:18:40 by heleneherin       #+#    #+#             */
-/*   Updated: 2021/01/22 11:48:28 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/22 11:58:23 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,8 +79,8 @@ namespace ft
 			list_reverse_bidirect_iter		operator--(int) { list_reverse_bidirect_iter tmp = *this; --(*this); return tmp; }
 			reference						operator*() const { return _current->data; }
 			pointer							operator->() { return _current; }
-			bool							operator==(const vect_reverse_bidirect_iter& b) { return this->_current == b._current; }
-			bool							operator!=(const vect_reverse_bidirect_iter& b) { return this->_current != b._current; }
+			bool							operator==(const list_reverse_bidirect_iter& b) { return this->_current == b._current; }
+			bool							operator!=(const list_reverse_bidirect_iter& b) { return this->_current != b._current; }
 			listelem_pointer				getCurrent() const { return _current; }
 
 		protected:
