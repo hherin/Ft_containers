@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/08 16:30:56 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/21 17:26:32 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/22 11:43:57 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,64 +47,43 @@ namespace ft
 
 			~random_iter(){}
 
+			// ---------------------------------- Operators overload ------------------------------------
 			difference_type	operator-(random_iter const &lhs) { return (this->_current - lhs._current); }
 
 			random_iter operator+(int n)
 			{
 				random_iter ret(*this);
-				for (int i = 0; i < n; i++)
-					ret++;
-				return ret;
+				return ret += n;
 			}
-
-			friend random_iter operator+(random_iter const &rhs, int n)
-			{
-				random_iter ret(rhs);
-				return ret + n;
-			}
-
-			// it - n  	| n - it
+			
 			random_iter operator-(int n)
 			{
 				random_iter ret(*this);
-				for (int i = 0; i < n; i++)
-					ret--;
-				return ret;
+				return ret -= n;
 			}
 
-			friend random_iter operator-(int n, random_iter &rhs)
-			{
-				random_iter ret(rhs);
-				return ret - n;
-			}
-
-			// Inequality comparisons
-			friend bool operator>(const random_iter &x, const random_iter &y) { return (*x > *y); }
-			friend bool operator>=(const random_iter &x, const random_iter &y) { return (*x >= *y); }
-			friend bool operator<(const random_iter &x, const random_iter &y) { return (*x < *y); }
-			friend bool operator<=(const random_iter &x, const random_iter &y) { return (*x <= *y); }
-
-			//Compoud assignment
+			// ------------------------------------ Compoud assignment ------------------------------------
 			random_iter operator+=(int n)
-			{
-				for (int i = 0; i < n; i++)
-					(n > 0) ? this->_current++ : this->_current--;
-				return *this;
-			}
-			random_iter operator-=(int n)
 			{
 				for (int i = 0; i < n; i++)
 					(n > 0) ? this->_current-- : this->_current++;
 				return *this;
 			}
-			value_type operator[](int n)
+			
+			random_iter operator-=(int n)
 			{
-				nonConst_pointer ret = this->getCurrent();
-				for (int i = 0; i < n; i++){
-					(n > 0) ? ret++ : ret--;}
-					std::cout << "ret " << *ret << std::endl;
-				return *ret;
+				for (int i = 0; i < n; i++)
+					(n > 0) ? this->_current++ : this->_current--;
+				return *this;
 			}
+			
+			value_type operator[](int n) { return *(*this + n); }
+
+			// ------------------------------------ Inequality comparisons ------------------------------------
+			friend bool operator>(const random_iter &x, const random_iter &y) { return (*x > *y); }
+			friend bool operator>=(const random_iter &x, const random_iter &y) { return (*x >= *y); }
+			friend bool operator<(const random_iter &x, const random_iter &y) { return (*x < *y); }
+			friend bool operator<=(const random_iter &x, const random_iter &y) { return (*x <= *y); }
 	};
 
 	//============================================== Reverse ===============================================
@@ -133,6 +112,7 @@ namespace ft
 
 			~reverse_random_iter(){}
 
+			// ---------------------------------- Operators overload ------------------------------------
 			difference_type	operator-(reverse_random_iter const &lhs) { return (lhs._current - this->getCurrent()); }
 
 			reverse_random_iter operator+(int n)
@@ -140,34 +120,35 @@ namespace ft
 				reverse_random_iter ret(*this);
 				return ret += n;
 			}
-
-			// ------------------------------------ Inequality comparisons ------------------------------------
-			friend bool operator>(const reverse_random_iter &x, const reverse_random_iter &y) { return (*x > *y); }
-			friend bool operator>=(const reverse_random_iter &x, const reverse_random_iter &y) { return (*x >= *y); }
-			friend bool operator<(const reverse_random_iter &x, const reverse_random_iter &y) { return (*x < *y); }
-			friend bool operator<=(const reverse_random_iter &x, const reverse_random_iter &y) { return (*x <= *y); }
+			
+			reverse_random_iter operator-(int n)
+			{
+				reverse_random_iter ret(*this);
+				return ret -= n;
+			}
 
 			// ------------------------------------ Compoud assignment ------------------------------------
 			reverse_random_iter operator+=(int n)
 			{
 				for (int i = 0; i < n; i++)
-					this->_current--;
+					(n > 0) ? this->_current-- : this->_current++;
 				return *this;
 			}
 			
 			reverse_random_iter operator-=(int n)
 			{
 				for (int i = 0; i < n; i++)
-					this->_current++;
+					(n > 0) ? this->_current++ : this->_current--;
 				return *this;
 			}
 			
-			value_type operator[](int n)
-			{
-				for (int i = 0; i < n; i++)
-					this->_current--;
-				return *(this->_current);
-			}
+			value_type operator[](int n) { return *(*this + n); }
+			
+			// ------------------------------------ Inequality comparisons ------------------------------------
+			friend bool operator>(const reverse_random_iter &x, const reverse_random_iter &y) { return (*x > *y); }
+			friend bool operator>=(const reverse_random_iter &x, const reverse_random_iter &y) { return (*x >= *y); }
+			friend bool operator<(const reverse_random_iter &x, const reverse_random_iter &y) { return (*x < *y); }
+			friend bool operator<=(const reverse_random_iter &x, const reverse_random_iter &y) { return (*x <= *y); }
 	};
 }
 
