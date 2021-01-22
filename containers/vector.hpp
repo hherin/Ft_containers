@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/04 12:58:14 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/22 13:33:54 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/22 14:20:12 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,27 +66,26 @@ namespace ft
 			};
 			
 		private:
-			size_type	_size;
-			size_type	_capacity;
+			size_type		_size;
+			size_type		_capacity;
 			pointer			_vector;
+			allocator_type	_alloc;
 		
 		public:
 			//=======================================Coplien Class=======================================
 			//allocatorawarecontainer copy cpp reference
 			//Default constructor
 			explicit vector (const allocator_type& alloc = allocator_type())
-				: _size(0), _capacity(0)
+				: _size(0), _capacity(0), _alloc(alloc)
 			{
-				(void)alloc;
-				_vector = new T[_capacity];
+				_vector = _alloc.allocate(_capacity); //new T[_capacity];
 			}
 
 			//Fill constructor with n elements
 			explicit vector(size_type n, const value_type &value = value_type(), const allocator_type &alloc = allocator_type())
-				: _size(0), _capacity(EXTRA_MEM)
+				: _size(0), _capacity(EXTRA_MEM), _alloc(alloc)
 			{
-				(void)alloc;
-				_vector = new T[_capacity];
+				_vector = _alloc.allocate(_capacity); //new T[_capacity];
 				for (size_type i = 0; i < n; i++)
 					push_back(value);
 			}
@@ -95,10 +94,9 @@ namespace ft
 			// Fill constructor with a range between the first to the last elements of an other vector
 			template <class InputIterator>
 			vector(InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type(), typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator >::type* = 0)
-				: _size(0), _capacity(EXTRA_MEM)
+				: _size(0), _capacity(EXTRA_MEM), _alloc(alloc)
 			{
-				(void)alloc;				
-				_vector = new T[_capacity];
+				_vector = _alloc.allocate(_capacity);
 				while (first != last){
 					push_back(*first);
 					first++;
@@ -109,7 +107,8 @@ namespace ft
 			vector(const vector &x)
 				:_size(x._size), _capacity(x._capacity)
 			{
-				_vector = new T[_capacity];
+				_alloc = x._alloc;
+				_vector = _alloc.allocate(_capacity);
 				iterator it = begin();
 				for (iterator xIt(x.begin()); xIt != iterator(x.end()); xIt++)
 					*it++ = *xIt;
@@ -117,16 +116,8 @@ namespace ft
 
 			vector& operator=(const vector& x)
 			{
-				if (this == &x)
-					return *this;
-				delete[] _vector;
-				_size = x._size;
-				_capacity = x._capacity;
-				_vector = new T[_capacity];
-				iterator it = begin();
-				iterator itEnd = iterator(x.end());
-				for (iterator xIt = x.begin(); xIt != itEnd; xIt++)
-					*it++ = *xIt;
+				vector tmp(x);
+				swap(tmp);
 				return *this;
 			}
 
@@ -134,7 +125,7 @@ namespace ft
 			{
 				for (size_type i = 0; i < _size; i++)
 					pop_back();
-				delete [] _vector;
+				_alloc.deallocate(_vector, _capacity);
 			}
 
 			//=======================================Iterators=======================================
@@ -172,10 +163,9 @@ namespace ft
 					for (size_type i = 0; i < rem; i++)
 						pop_back();
 				}
-				else{
+				else
 					for (size_t i = _size; i < sz; i++)
 						push_back(c);
-				}
 			}
 
 			// Returns the size of the storage space currrently allocated for the vector (in terme of elements)
@@ -195,10 +185,13 @@ namespace ft
 			{
 				if (n <= _capacity)
 					return ;
-				pointer tmp = new T[n]();
-				for (std::pair<iterator, int> it (begin(), 0); it.first != end(); it.first++, it.second++)
-					tmp[it.second] = *it.first;
-				delete [] _vector;
+				pointer tmp = _alloc.allocate(n);
+				int i = 0;
+				for (iterator it = begin(); it != end(); it++){
+					_alloc.construct(&tmp[i++], *it);
+					_alloc.destroy(&(*it));
+				}
+				_alloc.deallocate(_vector, _capacity);
 				_capacity = n;
 				_vector = tmp;
 			}
@@ -274,7 +267,11 @@ namespace ft
 			}
 
 			// Removes the last element in the vector + reduce container size
-			void	pop_back() { _size--; }
+			void	pop_back() 
+			{
+				_alloc.destroy(&_vector[_size - 1]);
+				_size--;
+			}
 
 			/*
 			** Insert the new element before the element at the specified position
@@ -309,8 +306,8 @@ namespace ft
 				}
 			}
 
-			template <class InputIterator>
-			iterator	insert(const_iterator pos, InputIterator first, InputIterator last, typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator >::type* = 0)
+			template <class InputIter>
+			iterator	insert(const_iterator pos, InputIter first, InputIter last, typename ft::enable_if<!ft::is_integral<InputIter>::value, InputIter >::type* = 0)
 			{
 				int diff = -1;
 				iterator retInsert(pos - 1);
@@ -339,15 +336,16 @@ namespace ft
 				}
 				pointer tmp;
 				size_t ret = iterator(last) - begin();
-				tmp = new T[_capacity - era]();
+				tmp = _alloc.allocate(_capacity - era);
 				size_type j = 0;
 				for (size_type i = 0; i < _size; i++){
 					if (i < (size_type)(iterator(first) - begin()) || i >= (size_type)(iterator(last) - begin()) + add)
-						tmp[j++] = _vector[i];
+						_alloc.construct(&tmp[j++], _vector[i]);
+					_alloc.destroy(&_vector[i]);
 				}
+				_alloc.deallocate(_vector, _capacity);
 				_size -= era - 1 + add;
 				_capacity -= era;
-				delete [] _vector;
 				_vector = tmp;
 				return iterator(begin() + ret);
 			}
@@ -355,10 +353,8 @@ namespace ft
 			// Removed all element from the vector. new size container = 0
 			void	clear()
 			{
-				delete [] _vector;
-				_vector = new T[EXTRA_MEM]();
-				_capacity = 0;
-				_size = 0;
+				while (_size)
+					pop_back();
 			}
 
 			// exchange the content of the vector with the content of sVec
@@ -367,46 +363,42 @@ namespace ft
 				ft::mySwap(_vector, sVec._vector);
 				ft::mySwap(_size, sVec._size);
 				ft::mySwap(_capacity, sVec._capacity);
+				ft::mySwap(_alloc, sVec._alloc);
 			}
 
 
 			void resizeIfNeeded()
 			{
 				if (_size >= _capacity){
-					pointer newVec = new T[_capacity + EXTRA_MEM];
-					for (unsigned int i = 0; i < _size; i++)
-						newVec[i] = _vector[i];
-					delete [] _vector;
-					// for (unsigned int i = 0; i < _size; i++)
-					// 	_myAlloc.destroy(&_vector[i]);
+					pointer newVec = _alloc.allocate(_capacity + EXTRA_MEM);
+					for (unsigned int i = 0; i < _size; i++){
+						_alloc.construct(&newVec[i], _vector[i]);
+						_alloc.destroy(&_vector[i]);
+					}
+					_alloc.deallocate(_vector, _capacity);
 					_vector = newVec;
 					_capacity += EXTRA_MEM;
 				}
 			}
 			
 		public:
-		//================================= Non Members function ========================================
-		friend bool operator==(const vector<T, Alloc> &lhs, const vector<T, Alloc> &rhs )
-				{
-					if (lhs._size != rhs._size)
-						return false;
-					for (size_t i = 0; i < lhs._size; i++){
-						if (lhs[i] != rhs[i])
+			//================================= Non Members function ========================================
+			friend bool operator==(const vector<T, Alloc> &lhs, const vector<T, Alloc> &rhs )
+					{
+						if (lhs._size != rhs._size)
 							return false;
+						for (size_t i = 0; i < lhs._size; i++){
+							if (lhs[i] != rhs[i])
+								return false;
+						}
+						return true;
 					}
-					return true;
-				}
-		friend bool operator!=(const vector<T, Alloc> &lhs, const vector<T, Alloc> &rhs ) { return !(operator==(lhs, rhs)); }
-				
-		friend bool operator<(const vector<T, Alloc> &lhs, const vector<T, Alloc> &rhs ) { return ft::lexicographical_compare<typename ft::vector<T, Alloc>::iterator, typename ft::vector<T, Alloc>::iterator>(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()); }
-		
-		friend bool operator<=(const vector<T, Alloc> &lhs, const vector<T, Alloc> &rhs ) { if (lhs == rhs || lhs < rhs) return true; return false; }
-		
-		friend bool operator>( const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs ) { if (!operator==(lhs, rhs) && !operator<(lhs, rhs)) return true; return false; }
-
-		friend bool operator>=( const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs ) { if (lhs == rhs || lhs > rhs) return true; return false;}
-
-		friend void swap (vector<T,Alloc>& x, vector<T,Alloc>& y) { x.swap(y); }
+			friend bool operator!=(const vector<T, Alloc> &lhs, const vector<T, Alloc> &rhs ) { return !(operator==(lhs, rhs)); }
+			friend bool operator<(const vector<T, Alloc> &lhs, const vector<T, Alloc> &rhs ) { return ft::lexicographical_compare<typename ft::vector<T, Alloc>::iterator, typename ft::vector<T, Alloc>::iterator>(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()); }
+			friend bool operator<=(const vector<T, Alloc> &lhs, const vector<T, Alloc> &rhs ) { if (lhs == rhs || lhs < rhs) return true; return false; }
+			friend bool operator>( const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs ) { if (!operator==(lhs, rhs) && !operator<(lhs, rhs)) return true; return false; }
+			friend bool operator>=( const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs ) { if (lhs == rhs || lhs > rhs) return true; return false;}
+			friend void swap (vector<T,Alloc>& x, vector<T,Alloc>& y) { x.swap(y); }
 	};
 
 }
