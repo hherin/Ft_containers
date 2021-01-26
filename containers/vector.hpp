@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/04 12:58:14 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/22 14:20:12 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/26 11:55:46 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,27 +21,18 @@
 # include "../utils/iterator/random_iter.hpp"
 # include "../utils/algo.hpp"
 
-# define EXTRA_MEM 15
 
 namespace ft
 {
 	template <class T, bool B> class random_iter;
 	template <class T, bool B> class reverse_random_iter;
-	 
+	template <bool B, class T> struct enable_if;
 	template <class InputIterator1, class InputIterator2>
-	bool lexicographical_compare (InputIterator1 first1, InputIterator1 last1, InputIterator2 first2, InputIterator2 last2)
-	{
-		while (first1 != last1)
-		{
-			if (first2 == last2 || *first2 < *first1) 
-				return false;
-			else if (*first1 < *first2) 
-				return true;
-			++first1; ++first2;
-		}
-		return (first2 != last2);
-	}
-	
+	bool lexicographical_compare (InputIterator1 first1, InputIterator1 last1, InputIterator2 first2, InputIterator2 last2);
+}
+
+namespace ft
+{
 	template <class T, class Alloc = std::allocator<T> >
 	class vector
 	{
@@ -54,11 +45,11 @@ namespace ft
 			typedef typename allocator_type::difference_type	difference_type;
 			typedef typename allocator_type::pointer			pointer;
 			typedef typename allocator_type::const_pointer		const_pointer;
-			typedef typename ft::random_iter<T, true>	iterator;
-			typedef typename ft::random_iter<T, false>	const_iterator;
+			typedef typename ft::random_iter<T, true>			iterator;
+			typedef typename ft::random_iter<T, false>			const_iterator;
 			typedef typename ft::reverse_random_iter<T, true>	reverse_iterator;
 			typedef typename ft::reverse_random_iter<T, false>	const_reverse_iterator;
-			class exceptionOutOfRange
+			class exceptionOutOfRange : public std::exception
 			{
 				public:
 					exceptionOutOfRange(){}
@@ -72,20 +63,20 @@ namespace ft
 			allocator_type	_alloc;
 		
 		public:
-			//=======================================Coplien Class=======================================
+			// =======================================Coplien Class=======================================
 			//allocatorawarecontainer copy cpp reference
 			//Default constructor
 			explicit vector (const allocator_type& alloc = allocator_type())
 				: _size(0), _capacity(0), _alloc(alloc)
 			{
-				_vector = _alloc.allocate(_capacity); //new T[_capacity];
+				_vector = _alloc.allocate(_capacity);
 			}
 
 			//Fill constructor with n elements
 			explicit vector(size_type n, const value_type &value = value_type(), const allocator_type &alloc = allocator_type())
-				: _size(0), _capacity(EXTRA_MEM), _alloc(alloc)
+				: _size(0), _capacity(n), _alloc(alloc)
 			{
-				_vector = _alloc.allocate(_capacity); //new T[_capacity];
+				_vector = _alloc.allocate(n);
 				for (size_type i = 0; i < n; i++)
 					push_back(value);
 			}
@@ -94,7 +85,7 @@ namespace ft
 			// Fill constructor with a range between the first to the last elements of an other vector
 			template <class InputIterator>
 			vector(InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type(), typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator >::type* = 0)
-				: _size(0), _capacity(EXTRA_MEM), _alloc(alloc)
+				: _size(0), _capacity(last - first), _alloc(alloc)
 			{
 				_vector = _alloc.allocate(_capacity);
 				while (first != last){
@@ -105,13 +96,13 @@ namespace ft
 
 			// Copy constructor
 			vector(const vector &x)
-				:_size(x._size), _capacity(x._capacity)
+				:_size(x._size), _capacity(x._size)
 			{
 				_alloc = x._alloc;
 				_vector = _alloc.allocate(_capacity);
 				iterator it = begin();
 				for (iterator xIt(x.begin()); xIt != iterator(x.end()); xIt++)
-					*it++ = *xIt;
+					_alloc.construct(&(*it++), *xIt);
 			}
 
 			vector& operator=(const vector& x)
@@ -262,7 +253,7 @@ namespace ft
 			void	push_back(const value_type& x) 																			// check leaks if pointer array
 			{
 				resizeIfNeeded();
-				_vector[_size] = x;
+				_alloc.construct(&_vector[_size], x);
 				_size++;
 			}
 
@@ -286,7 +277,7 @@ namespace ft
 				difference_type posIdx = iterator(pos) - begin();			// save the index position in case reserve is called
 				
 				if (_size + 1 > _capacity)
-					reserve(_size + 1 + EXTRA_MEM);
+					reserve(_size * 2);
 				iterator it(begin() + posIdx);			
 				value_type tmp = *it;										// save previous value of pos
 				*it++ = x;													// insert the value 
@@ -370,29 +361,29 @@ namespace ft
 			void resizeIfNeeded()
 			{
 				if (_size >= _capacity){
-					pointer newVec = _alloc.allocate(_capacity + EXTRA_MEM);
+					pointer newVec = _alloc.allocate((!_size) ? 1 : _size * 2);
 					for (unsigned int i = 0; i < _size; i++){
 						_alloc.construct(&newVec[i], _vector[i]);
 						_alloc.destroy(&_vector[i]);
 					}
 					_alloc.deallocate(_vector, _capacity);
 					_vector = newVec;
-					_capacity += EXTRA_MEM;
+					_capacity = _size * 2;
 				}
 			}
 			
 		public:
 			//================================= Non Members function ========================================
 			friend bool operator==(const vector<T, Alloc> &lhs, const vector<T, Alloc> &rhs )
-					{
-						if (lhs._size != rhs._size)
-							return false;
-						for (size_t i = 0; i < lhs._size; i++){
-							if (lhs[i] != rhs[i])
-								return false;
-						}
-						return true;
-					}
+			{
+				if (lhs._size != rhs._size)
+					return false;
+				for (size_t i = 0; i < lhs._size; i++){
+					if (lhs[i] != rhs[i])
+						return false;
+				}
+				return true;
+			}
 			friend bool operator!=(const vector<T, Alloc> &lhs, const vector<T, Alloc> &rhs ) { return !(operator==(lhs, rhs)); }
 			friend bool operator<(const vector<T, Alloc> &lhs, const vector<T, Alloc> &rhs ) { return ft::lexicographical_compare<typename ft::vector<T, Alloc>::iterator, typename ft::vector<T, Alloc>::iterator>(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()); }
 			friend bool operator<=(const vector<T, Alloc> &lhs, const vector<T, Alloc> &rhs ) { if (lhs == rhs || lhs < rhs) return true; return false; }
