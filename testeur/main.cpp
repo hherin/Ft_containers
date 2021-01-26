@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/26 14:37:35 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/26 15:50:32 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/26 17:26:48 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #include <iostream>
 #include <fstream>
 #include "test_vector.hpp"
+#include "valueGene.hpp"
 #include <string>
 
 std::ofstream stdFile;
@@ -28,7 +29,8 @@ void    CreateTestFiles()
 
 int main(void)
 {
-    
+    geneClass<char> geneC( {-1, 0, 32, 33, 48,  36, 76, 117, 82, 21, 105, 72, 99, 111, 125, 122, 43, 50, 69, 88} );
+    char *arrChar = ;
     CreateTestFiles();
     
     Test_constr<std::vector<int>, 1>();
