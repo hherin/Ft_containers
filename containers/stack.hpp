@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/19 16:31:43 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/22 14:59:05 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/26 11:29:33 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ namespace ft {
 
 			// Inserts a new element at the top of the stack, above its current top element. 
 			// The content of this new element is initialized to a copy of val.
-			void push (const value_type& val) { _ctnr.push_back(); }
+			void push (const value_type& val) { _ctnr.push_back(val); }
 
 			// Removes the element on top of the stack, effectively reducing its size by one.
 			void pop() { _ctnr.pop_back(); }
