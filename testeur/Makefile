@@ -1,4 +1,4 @@
-NAME	=	container
+NAME	=	test
 
 SRCS	=	main.cpp
 
@@ -8,7 +8,7 @@ FLAGS	=	-Werror -Wextra -Wall -std=c++98 -g3 -fsanitize=address
 
 OBJS	=	${SRCS:.cpp=.o}
 
-HDRS	=	containers/*.hpp utils/*.hpp
+HDRS	=	../containers/vector.hpp test_vector.hpp
 
 all		:	${NAME}
 
@@ -20,10 +20,9 @@ ${NAME}	:	${OBJS}
 
 ${OBJS}	:	${HDRS}
 
-test	:
-			${GCC} ${FLAGS} -o iterator.o -c iterator.cpp
-			${GCC} ${FLAGS} -o test iterator.o
-
+diff	:	all
+			./${NAME}
+			diff output/ft_vector.txt output/std_vector.txt
 clean	:
 			rm -rf *.o
 
