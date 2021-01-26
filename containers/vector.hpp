@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/04 12:58:14 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/26 11:55:46 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/26 14:21:58 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -260,6 +260,8 @@ namespace ft
 			// Removes the last element in the vector + reduce container size
 			void	pop_back() 
 			{
+				if (!_size)
+					return ;
 				_alloc.destroy(&_vector[_size - 1]);
 				_size--;
 			}
