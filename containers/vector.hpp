@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/04 12:58:14 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/26 14:21:58 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/27 15:40:45 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ namespace ft
 			{
 				public:
 					exceptionOutOfRange(){}
-					const char* what() const throw() { return "Input out of range.\n";}
+					const char* what() const throw() { return "vector";}
 			};
 			
 		private:
@@ -69,7 +69,7 @@ namespace ft
 			explicit vector (const allocator_type& alloc = allocator_type())
 				: _size(0), _capacity(0), _alloc(alloc)
 			{
-				_vector = _alloc.allocate(_capacity);
+				_vector = _alloc.allocate(0);
 			}
 
 			//Fill constructor with n elements
@@ -85,8 +85,11 @@ namespace ft
 			// Fill constructor with a range between the first to the last elements of an other vector
 			template <class InputIterator>
 			vector(InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type(), typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator >::type* = 0)
-				: _size(0), _capacity(last - first), _alloc(alloc)
+				: _size(0), _capacity(0), _alloc(alloc)
 			{
+				InputIterator tmp(first);
+				while (tmp++ != last)
+					_capacity++;
 				_vector = _alloc.allocate(_capacity);
 				while (first != last){
 					push_back(*first);
@@ -276,27 +279,20 @@ namespace ft
 			*/
 			iterator	insert(const_iterator pos, const value_type& x) 
 			{
-				difference_type posIdx = iterator(pos) - begin();			// save the index position in case reserve is called
-				
-				if (_size + 1 > _capacity)
-					reserve(_size * 2);
-				iterator it(begin() + posIdx);			
-				value_type tmp = *it;										// save previous value of pos
-				*it++ = x;													// insert the value 
-				for ( ; it != end(); it++)									// loop for swap the rest of the vector
-					ft::mySwap(tmp, *it);
-				*it = tmp;													// last element of vector
-				_size++;
+				difference_type posIdx = pos - begin();			// save the index position in case reserve is called				
+				insert(pos, 1, x);
 				return begin() + posIdx;
 			}
 
 			void	insert(iterator pos, size_type n, const value_type& x)
 			{
-				difference_type posIdx = iterator(pos) - begin();
-				for (size_type i = 0; i < n; i++){
-					iterator it(begin() + posIdx++);
-					insert(it, x);
-				}
+				difference_type posIdx = pos - begin();
+				if (_size + n >= _capacity)
+					reserve((_size + n) * 2);
+				moveVectorRight(posIdx, n);
+				_size+= n;
+				for (size_type i = 0; i < n; i++)
+					consTruct(_vector[posIdx++], x);
 			}
 
 			template <class InputIter>
@@ -317,30 +313,21 @@ namespace ft
 			** element erased by the function call
 			** Container end if it's empty
 			*/
-			iterator	erase(const_iterator position) { return erase(position, position); }
+			iterator	erase(const_iterator position) { return erase(position, position + 1); }
 
 			iterator	erase(const_iterator first, const_iterator last)
 			{
-				bool add = (first == last) ? 1 : 0; // booleen for erase with 1 element
-				size_type era = last - first + 1; // number of element to be destroyed
-				if (_size == era){
-					clear();
-					return NULL;
-				}
-				pointer tmp;
-				size_t ret = iterator(last) - begin();
-				tmp = _alloc.allocate(_capacity - era);
-				size_type j = 0;
-				for (size_type i = 0; i < _size; i++){
-					if (i < (size_type)(iterator(first) - begin()) || i >= (size_type)(iterator(last) - begin()) + add)
-						_alloc.construct(&tmp[j++], _vector[i]);
-					_alloc.destroy(&_vector[i]);
-				}
-				_alloc.deallocate(_vector, _capacity);
-				_size -= era - 1 + add;
-				_capacity -= era;
-				_vector = tmp;
-				return iterator(begin() + ret);
+				if (first == last)
+					return iterator(first);
+				size_type n = 0;
+				difference_type posIdx = first - begin();
+				iterator tmp(first);
+				while (tmp++ != last)
+					n++;
+				moveVectorLeft(posIdx, n);
+				_size -= n;
+				
+				return iterator(begin() + posIdx);
 			}
 
 			// Removed all element from the vector. new size container = 0
@@ -372,6 +359,48 @@ namespace ft
 					_vector = newVec;
 					_capacity = _size * 2;
 				}
+			}
+			
+			void moveVectorRight(difference_type posIdx, size_type n)
+			{
+				if ((size_type)posIdx >= _size)
+					return ;
+				int nbLoop = _size - posIdx;
+				
+				iterator start(_vector + _size + n - 1);
+				iterator cop(_vector + _size - 1);
+				
+				while (nbLoop--){
+					consTruct(*(start--), *(cop--));
+					_alloc.destroy(&(*cop));
+				}
+			}
+			
+			void moveVectorLeft(difference_type posIdx, size_type n)
+			{
+				if ((size_type)posIdx >= _size)
+					return ;
+				int nbLoop = _size - posIdx - n;
+				iterator start(_vector + posIdx);
+				iterator cop(start + 1);
+				
+				while (nbLoop--){
+					consTruct(*(start++), *(cop++));
+					_alloc.destroy(&(*cop));
+				}
+			}
+			
+			void consTruct(T &elem, const value_type &val)
+			{
+				_alloc.destroy(&elem);
+				_alloc.construct(&elem, val);
+			}
+
+			void printvector()
+			{
+				for (size_type i = 0; i < _size; i++)
+					std::cout << _vector[i] << " | ";
+				std::cout << std::endl;
 			}
 			
 		public:

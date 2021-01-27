@@ -6,14 +6,13 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/13 14:28:27 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/19 17:24:19 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/27 15:29:48 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <list>
 #include <iostream>
 #include "containers/list.hpp"
-#include "test_list.hpp"
 #include"containers/stack.hpp"
 #include"containers/vector.hpp"
 #include <vector>
@@ -21,28 +20,28 @@
 
 class hehe;
 
+void printVector(ft::vector<int> v)
+{
+    for (size_t i = 0; i < v.size(); i++)
+        std::cout << v[i] << " | ";
+    std::cout << "\n";
+}
+
+void printVector(std::vector<int> v)
+{
+    for (size_t i = 0; i < v.size(); i++)
+        std::cout << v[i] << " | ";
+    std::cout << "\n";
+}
 
 int main(void)
 {
-    std::vector<int> v0 (5, 3);
-    std::stack<int, std::vector<int> > s0(v0);
-    
-    std::cout << "stack size " << s0.size() << "\n Push\n";
-    s0.push(7);
-    std::cout << "stack size " << s0.size() << "\n";
-    std::cout << "TOP " << s0.top() << "\n";
+    std::cout << "FT CONTAINER\n";
+    // ft::vector<int> v0;
 
-    std::cout <<"\n\n";
-    ft::vector<int> v1 (5, 3);
-    ft::stack<int, ft::vector<int> > s1(v1);
-    
-    std::cout << "stack size " << s1.size() << "\n Push\n";
-    s1.push(7);
-    std::cout << "stack size " << s1.size() << "\n";
-    std::cout << "TOP " << s1.top() << "\n";
-    // std::list<int> ls;
-    
-    // test_list<std::list<hehe> >();
-    // std::cout << std::endl;
-    // test_list<ft::list<hehe> >();
+    std::vector<int> v1;
+    for (int i = 0; i < 4; i++)
+        v1.push_back(i + 10);
+    v1.erase(v1.begin(), v1.begin());
+    printVector(v1);
 }
