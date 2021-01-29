@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 19:55:49 by heleneherin       #+#    #+#             */
-/*   Updated: 2021/01/22 16:42:56 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/29 15:20:15 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ namespace ft
 				Node *next;
 				Node *prev;
 			};
-			Node			*_endList;
+			Node			*_head;
 			size_type		_size;
 			allocator_type	_alloc;
 
@@ -53,12 +53,12 @@ namespace ft
 			// =================== Member Functions ===================
 			// Default constructor
 			explicit list (const allocator_type& alloc = allocator_type())
-				: _endList(nullptr), _size(0), _alloc(alloc) { createNewList(); }
+				: _head(nullptr), _size(0), _alloc(alloc) { createNewList(); }
 
 			// Fill constructor
 			// remind : value_type() appelle le constructeur par defaut de T
 			explicit list (size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type())
-				: _endList(nullptr), _size(0), _alloc(alloc)
+				: _head(nullptr), _size(0), _alloc(alloc)
 			{
 				createNewList();
 				for (size_type i = 0; i < n; i++)
@@ -76,21 +76,20 @@ namespace ft
 			}
 
 			// Copy constructor
-			list (const list& x) 
+			list (const list& x)
+				: _size(0)
 			{
 				createNewList();
-				*this = x;
+				for (iterator it(x.begin()); it != iterator(x.end()); it++)
+					push_back(*it);
 			}
 
 			~list() { clear(); }
 
 			list& operator= (const list& x)
 			{
-				if (this == &x)
-					return *this;
-				clear();
-				for (iterator it(x.begin()); it != iterator(x.end()); it++)
-					push_back(*it);
+				list tmp(x);
+				swap(tmp);
 				return *this;
 			}
 
@@ -98,17 +97,17 @@ namespace ft
 
 			// begin() Returns an iterator pointing to the first element in the list container.
 			// end() Returns an iterator pointing to the last element in the list container.
-			iterator begin() { return (!_size ? iterator(_endList) : iterator(_endList->next));}
-			iterator end() { return iterator(_endList); }
-			const_iterator begin() const { return (!_size ? iterator(_endList) : iterator(_endList->next));}
-			const_iterator end() const { return iterator(_endList);}
+			iterator begin() { return (!_size ? iterator(_head) : iterator(_head->next));}
+			iterator end() { return iterator(_head); }
+			const_iterator begin() const { return (!_size ? iterator(_head) : iterator(_head->next));}
+			const_iterator end() const { return iterator(_head);}
 			
 			// rbegin() Returns a reverse iterator pointing to the last element in the container
 			// rend() Returns a reverse iterator pointing to the theoretical element preceding the first element in the list container 
-			reverse_iterator rbegin() { return reverse_iterator(_endList->prev); }
-			const_reverse_iterator rbegin() const { return reverse_iterator(_endList->prev); }
-			reverse_iterator rend() { return reverse_iterator(_endList); }
-			const_reverse_iterator rend() const { return reverse_iterator(_endList); }
+			reverse_iterator rbegin() { return reverse_iterator(_head->prev); }
+			const_reverse_iterator rbegin() const { return reverse_iterator(_head->prev); }
+			reverse_iterator rend() { return reverse_iterator(_head); }
+			const_reverse_iterator rend() const { return reverse_iterator(_head); }
 
 			// ======================= Capacity =======================
 
@@ -124,10 +123,10 @@ namespace ft
 			// ===================== Element access ===================
 			// front() Returns a reference to the first data element in the list container.
 			// back() Returns a reference to the last data element in the list container.
-			reference front() { return _endList->next->data; }
-			reference back() { return _endList->prev->data; }
-			const_reference front() const { return _endList->next->data; }
-			const_reference back() const { return _endList->prev->data; }
+			reference front() { return _head->next->data; }
+			reference back() { return _head->prev->data; }
+			const_reference front() const { return _head->next->data; }
+			const_reference back() const { return _head->prev->data; }
 
 			// ======================= Modifiers ======================
 
@@ -160,16 +159,11 @@ namespace ft
 			{
 				Node *node = new Node;
 				node->data = val;
-				if (!_size){
-					node->next = _endList;
-					_endList->prev = node;
-				}
-				else{
-					node->next = _endList->next;
-					_endList->next->prev = node;
-				}
-				node->prev = _endList;
-				_endList->next = node;
+				node->next = _head->next;
+				node->prev = _head;
+				
+				_head->next->prev = node;
+				_head->next = node;
 				_size++;
 			}
 
@@ -178,25 +172,22 @@ namespace ft
 			{
 				Node *node = new Node;
 				node->data = val;
-				if (!_size){
-					node->prev = _endList;
-					_endList->next = node;
-				}
-				else{
-					node->prev = _endList->prev;
-					_endList->prev->next = node;
-				}
-				node->next = _endList;
-				_endList->prev = node;
+				node->next = _head;
+				node->prev = _head->prev;
+
+				_head->prev->next = node;
+				_head->prev = node;
 				_size++;
 			}
 
 			// Removes the first element in the list container, effectively reducing its size by one.
 			void pop_front()
 			{
-				Node *destr = _endList->next;		// save elem to be destroyed
-				_endList->next = destr->next;		// _endlist point to second elem => becomes first of the list
-				destr->next->prev = _endList;		// first elem point to _endList
+				if (!_size)
+					return ;
+				Node *destr = _head->next;				// save elem to be destroyed
+				_head->next = destr->next;				// _head point to second elem => becomes first of the list
+				destr->next->next->prev = _head;		// first elem point to _head
 				delete destr;
 				_size--;
 			}
@@ -204,9 +195,11 @@ namespace ft
 			// Removes the last element in the list container, effectively reducing the container size by one.
 			void pop_back()
 			{
-				Node *destr = _endList->prev;		// save elem to be destroyed
-				_endList->prev = destr->prev;		// end of the list changed
-				destr->prev->next = _endList;		// new last elem point to _endList
+				if (!_size)
+					return ;
+				Node *destr = _head->prev;				// save elem to be destroyed
+				_head->prev = destr->prev;				// end of the list changed
+				destr->prev->next = _head;		// new last elem point to _head
 				delete destr;
 				_size--;
 			}
@@ -222,9 +215,8 @@ namespace ft
 			// single element (1)
 			iterator insert (iterator pos, const value_type& val)
 			{
-				iterator *Cpos = pos;
 				insert(pos, 1, val);
-				return Cpos++;
+				return iterator(pos->prev);
 			}
 
 			// fill (2)
@@ -262,7 +254,7 @@ namespace ft
 
 			iterator erase (iterator first, iterator last)
 			{
-				iterator ret;
+				iterator ret(first);
 				while (first != last)
 					ret = erase(first++);
 				return ret;
@@ -272,7 +264,7 @@ namespace ft
 			void swap (list& x)
 			{
 				ft::mySwap(_size, x._size);
-				ft::mySwap(_endList, x._endList);
+				ft::mySwap(_head, x._head);
 			}
 
 			/*
@@ -282,15 +274,15 @@ namespace ft
 			void resize (size_type n, value_type val = value_type())
 			{
 				while (n > _size)
-					pop_back();
-				while (n < _size)
 					push_back(val);
+				while (n < _size)
+					pop_back();
 			}
 
 			// Removes all elements from the list container, and leaving the container with a size of 0.
 			void clear()
 			{
-				for (size_type i = 0; i < _size; i++)
+				while(_size)
 					pop_back();
 			}
 
@@ -342,6 +334,7 @@ namespace ft
 						it->prev->next = it->next;
 						it->next->prev = it->prev;
 						delete it.getCurrent();
+						_size--;
 					}
 					it = next;
 				}
@@ -528,19 +521,19 @@ namespace ft
 				}
 
 				//change order of the neutral side node
-				tmp = _endList->next;
-				_endList->next = _endList->prev;
-				_endList->prev = tmp;
+				tmp = _head->next;
+				_head->next = _head->prev;
+				_head->prev = tmp;
 			}
 
 		protected:
 			// create the neutral elem for the linked list
 			void createNewList()
 			{
-				_endList = new Node;
-				_endList->data = value_type();
-				_endList->next = _endList;
-				_endList->prev = _endList;
+				_head = new Node;
+				_head->data = value_type();
+				_head->next = _head;
+				_head->prev = _head;
 			}
 
 			// create new link before pos with a copy of val

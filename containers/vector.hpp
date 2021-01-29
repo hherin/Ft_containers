@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/04 12:58:14 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/27 15:40:45 by hherin           ###   ########.fr       */
+/*   Updated: 2021/01/29 12:34:41 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -372,7 +372,7 @@ namespace ft
 				
 				while (nbLoop--){
 					consTruct(*(start--), *(cop--));
-					_alloc.destroy(&(*cop));
+					// _alloc.destroy(&(*cop));
 				}
 			}
 			
@@ -386,7 +386,7 @@ namespace ft
 				
 				while (nbLoop--){
 					consTruct(*(start++), *(cop++));
-					_alloc.destroy(&(*cop));
+					// _alloc.destroy(&(*cop));
 				}
 			}
 			
