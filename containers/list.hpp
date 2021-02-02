@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 19:55:49 by heleneherin       #+#    #+#             */
-/*   Updated: 2021/01/29 15:20:15 by hherin           ###   ########.fr       */
+/*   Updated: 2021/02/02 15:39:29 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,12 +53,12 @@ namespace ft
 			// =================== Member Functions ===================
 			// Default constructor
 			explicit list (const allocator_type& alloc = allocator_type())
-				: _head(nullptr), _size(0), _alloc(alloc) { createNewList(); }
+				: _head(NULL), _size(0), _alloc(alloc) { createNewList(); }
 
 			// Fill constructor
 			// remind : value_type() appelle le constructeur par defaut de T
 			explicit list (size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type())
-				: _head(nullptr), _size(0), _alloc(alloc)
+				: _head(NULL), _size(0), _alloc(alloc)
 			{
 				createNewList();
 				for (size_type i = 0; i < n; i++)
@@ -67,7 +67,7 @@ namespace ft
 
 			// Range constructor
 			template <class InputIterator>
-			list (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type(), typename std::enable_if<!ft::is_integral<InputIterator>::value>::type * = 0)
+			list (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type(), typename ft::enable_if<!ft::is_integral<InputIterator>::value>::type * = 0)
 				: _size(0), _alloc(alloc)
 			{
 				createNewList();
@@ -138,7 +138,7 @@ namespace ft
 			** @param val Value to fill the container with
 			*/
 			template <class InputIterator>
-			void assign (InputIterator first, InputIterator last, typename std::enable_if<!ft::is_integral<InputIterator>::value>::type * = 0)
+			void assign (InputIterator first, InputIterator last, typename ft::enable_if<!ft::is_integral<InputIterator>::value>::type * = 0)
 			{
 				clear();
 				createNewList();
@@ -230,7 +230,7 @@ namespace ft
 
 			// range (3)
 			template <class InputIterator>
-			void insert (iterator pos, InputIterator first, InputIterator last, typename std::enable_if<!ft::is_integral<InputIterator>::value>::type * = 0)
+			void insert (iterator pos, InputIterator first, InputIterator last, typename ft::enable_if<!ft::is_integral<InputIterator>::value>::type * = 0)
 			{
 				while (first != last)
 					addLink(pos, *first++);
@@ -355,6 +355,7 @@ namespace ft
 						it->prev->next = it->next;
 						it->next->prev = it->prev;
 						delete it.getCurrent();
+						_size--;
 					}
 					it = next;
 				}
@@ -363,8 +364,9 @@ namespace ft
 			// Removes all but the first element from every consecutive group of equal elements in the container.
 			void unique()
 			{
-				for (iterator it(begin()); it != end(); it++){
-					iterator next = it->next;
+				for (iterator it(begin()); it->next != end().getCurrent(); ){
+					iterator next(it);
+					next++;
 					if (*it == *next)
 						erase(it);
 					it = next;
@@ -384,11 +386,12 @@ namespace ft
 			template <class BinaryPredicate>
 			void unique (BinaryPredicate binary_pred)
 			{
-				for (iterator it(begin()); it != end(); it++){
-					iterator next = it;
+				for (iterator it(begin()->next); it != end(); ){
+					iterator next(it);
 					next++;
-					if (binary_pred(*next,*it))
-						erase(next);
+					if (binary_pred(it->prev->data , *it))
+						erase(it);
+					it = next;
 				}
 			}
 
@@ -401,27 +404,24 @@ namespace ft
 			{
 				if (this == &x)
 					return ;
-				iterator ourIter(begin());
-				iterator mergeIter(x.begin());  //iterator on x list
+				iterator ourIter(end());
 				
-				while (1){
-					iterator ourNext(ourIter->next);
-					iterator mergeNext(mergeIter->next);
+				while (!x.empty()){
+					iterator mergeIter = x.begin();
 					
-					if (x.empty())
-						break;
-					if (ourIter == end()){
+					if (ourIter->next == end().getCurrent()){
 						splice(end(), x, mergeIter, x.end());
 						break;
 					}
-					if (*ourIter >= *mergeIter){
-						transfertLink(ourIter, mergeIter);
+					if (ourIter->next->data > *mergeIter){
+						iterator pos(ourIter->next);
+						transfertLink(pos, mergeIter);
 						_size++;
 						x._size--;
-						mergeIter = mergeNext;
+						ourIter++;
 					}
 					else
-						ourIter = ourNext;
+						ourIter++;
 				}
 			}
 			
@@ -435,27 +435,24 @@ namespace ft
 			{
 				if (this == &x)
 					return ;
-				iterator ourIter(begin());
-				iterator mergeIter(x.begin());  //iterator on x list
+				iterator ourIter(end());
 				
-				while (1){
-					iterator ourNext(ourIter->next);
-					iterator mergeNext(mergeIter->next);
+				while (!x.empty()){
+					iterator mergeIter = x.begin();
 					
-					if (x.empty())
-						break;
-					if (ourIter == end()){
+					if (ourIter->next == end().getCurrent()){
 						splice(end(), x, mergeIter, x.end());
 						break;
 					}
-					if (comp(*mergeIter, *ourIter)){
-						transfertLink(ourIter, mergeIter);
+					if (comp(*mergeIter, ourIter->next->data)){
+						iterator pos(ourIter->next);
+						transfertLink(pos, mergeIter);
 						_size++;
 						x._size--;
-						mergeIter = mergeNext;
+						ourIter++;
 					}
 					else
-						ourIter = ourNext;
+						ourIter++;
 				}
 			}
 			
@@ -593,16 +590,7 @@ namespace ft
 						return false;
 				return true;
 			}
-			friend bool operator<(const list& lhs, const list& rhs)
-			{
-				if (lhs._size > rhs._size)
-					return false;
-				iterator right(rhs.begin());
-				for (iterator left(lhs.begin()); left != iterator(lhs.end()); left++)
-					if (*right++ < *left)
-						return false;
-				return true;
-			}
+			friend bool operator<(const list& lhs, const list& rhs){ return ft::lexicographical_compare<typename ft::list<T, Alloc>::iterator, typename ft::list<T, Alloc>::iterator>(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()); }
 			friend bool operator!= (const list& lhs, const list& rhs) { return !(operator==(lhs, rhs)); }
 			friend bool operator<= (const list& lhs, const list& rhs) { return operator==(lhs, rhs) || operator<(lhs, rhs); }
 			friend bool operator>  (const list& lhs, const list& rhs) { return !operator<=(lhs, rhs); }
