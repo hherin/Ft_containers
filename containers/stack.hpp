@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/19 16:31:43 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/26 11:29:33 by hherin           ###   ########.fr       */
+/*   Updated: 2021/02/03 11:02:01 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,13 @@ namespace ft {
 		public:
 			// =================== Member Functions ===================
 			explicit stack (const container_type& ctnr = container_type()) : _ctnr(ctnr) {}
+			stack(const stack& other) : _ctnr(other._ctnr) {}
+			stack& operator=(const stack& other) 
+			{ 
+				if (this != &other)
+					_ctnr = other._ctnr; 
+					return *this;
+			}
 			
 			// Returns whether the stack is empty: i.e. whether its size is zero.
 			bool empty() const { return !_ctnr.size(); }
