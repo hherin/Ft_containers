@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/06 15:35:44 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/21 17:21:10 by hherin           ###   ########.fr       */
+/*   Updated: 2021/02/04 12:33:53 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,14 @@ namespace ft
 		typedef T type;
 	};
 
+
+	// ========================= isABR ========================
+	// template <class, class = void>
+	// struct isABR { static const bool value = false; };
+	
+	// template<>
+	// struct isABR<s_abr> { static const bool value = true; };
+	
 	// ================== IsInterger type =====================
 	template <class, class = void>
 	struct is_integral { static const bool value = false; };
@@ -59,9 +67,7 @@ namespace ft
 	** => true is for non const type, false for const type
 	*/
 	template <bool B, typename isConst, typename notConst>
-	struct chooseIf
-	{
-	};
+	struct chooseIf {};
 
 	template <typename isConst, typename notConst>
 	struct chooseIf<true, isConst, notConst>
@@ -74,15 +80,6 @@ namespace ft
 	{
 		typedef const isConst type;
 	};
-
-	// =================== isIterator traits ======================
-	template <typename T, typename D>
-	struct isIterator
-	{};
-
-	template <typename T, typename D>
-	struct isIterator< list_bidirect_iter<T, true, D>, D>
-	{ typedef T type; };
 
 } // namespace ft
 #endif
