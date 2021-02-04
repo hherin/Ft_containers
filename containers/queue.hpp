@@ -32,6 +32,13 @@ namespace ft
 			// Constructs a queue container adaptor object.
 			explicit queue (const container_type& ctnr = container_type())
 				: _ctnr(ctnr) {}
+			queue (const queue& other) : _ctnr(other._ctnr) {}
+			queue& operator=(const queue& other)
+			{
+				if (this != &other)
+					_ctnr = other._ctnr;
+				return *this;
+			}
 			
 			// Returns whether the queue is empty: i.e. whether its size is zero.
 			bool empty() const { return _ctnr.empty(); }
@@ -48,13 +55,13 @@ namespace ft
 			const value_type& back() const { return _ctnr.back(); }
 
 			// Inserts a new element at the end of the queue, after its current last element. The content of this new element is initialized to val.
-			void push (const value_type& val) { _ctnr.push_back(); }
+			void push (const value_type& val) { _ctnr.push_back(val); }
 			
 			// Removes the next element in the queue, effectively reducing its size by one.
 			void pop() { return _ctnr.pop_front(); }
 
 
-			friend bool operator== (const queue<T,Container>& lhs, const queue<T,Container>& rhs) { return lhs._ctnr = rhs._ctnr; }
+			friend bool operator== (const queue<T,Container>& lhs, const queue<T,Container>& rhs) { return lhs._ctnr == rhs._ctnr; }
 			friend bool operator!= (const queue<T,Container>& lhs, const queue<T,Container>& rhs) { return lhs._ctnr != rhs._ctnr; }
 			friend bool operator<  (const queue<T,Container>& lhs, const queue<T,Container>& rhs) { return lhs._ctnr < rhs._ctnr; }
 			friend bool operator<= (const queue<T,Container>& lhs, const queue<T,Container>& rhs) { return lhs._ctnr <= rhs._ctnr; }

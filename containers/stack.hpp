@@ -35,7 +35,7 @@ namespace ft {
 			{ 
 				if (this != &other)
 					_ctnr = other._ctnr; 
-					return *this;
+				return *this;
 			}
 			
 			// Returns whether the stack is empty: i.e. whether its size is zero.

@@ -84,7 +84,12 @@ namespace ft
 					push_back(*it);
 			}
 
-			~list() { clear(); }
+			~list() 
+			{ 
+				while (_size)
+					pop_back();
+				delete _head;
+			}
 
 			list& operator= (const list& x)
 			{

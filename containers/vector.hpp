@@ -74,9 +74,9 @@ namespace ft
 
 			//Fill constructor with n elements
 			explicit vector(size_type n, const value_type &value = value_type(), const allocator_type &alloc = allocator_type())
-				: _size(0), _capacity(n), _alloc(alloc)
+				: _size(0), _capacity(n * 2), _alloc(alloc)
 			{
-				_vector = _alloc.allocate(n);
+				_vector = _alloc.allocate(n * 2);
 				for (size_type i = 0; i < n; i++)
 					push_back(value);
 			}
@@ -99,13 +99,11 @@ namespace ft
 
 			// Copy constructor
 			vector(const vector &x)
-				:_size(x._size), _capacity(x._size)
+				:_size(0), _capacity(x._size), _alloc(x._alloc)
 			{
-				_alloc = x._alloc;
 				_vector = _alloc.allocate(_capacity);
-				iterator it = begin();
-				for (iterator xIt(x.begin()); xIt != iterator(x.end()); xIt++)
-					_alloc.construct(&(*it++), *xIt);
+				for (iterator xIt(x.begin()); xIt != x.end(); xIt++)
+					push_back(*xIt);
 			}
 
 			vector& operator=(const vector& x)
@@ -117,7 +115,7 @@ namespace ft
 
 			~vector()
 			{
-				for (size_type i = 0; i < _size; i++)
+				while (_size)
 					pop_back();
 				_alloc.deallocate(_vector, _capacity);
 			}
@@ -291,8 +289,10 @@ namespace ft
 					reserve((_size + n) * 2);
 				moveVectorRight(posIdx, n);
 				_size+= n;
-				for (size_type i = 0; i < n; i++)
-					consTruct(_vector[posIdx++], x);
+				for (size_type i = 0; i < n; i++){
+					// _alloc.destroy(&_vector[posIdx]);
+					_alloc.construct(&_vector[posIdx++], x);
+				}
 			}
 
 			template <class InputIter>
@@ -357,7 +357,7 @@ namespace ft
 					}
 					_alloc.deallocate(_vector, _capacity);
 					_vector = newVec;
-					_capacity = _size * 2;
+					_capacity = (!_size) ? 1 :_size * 2;
 				}
 			}
 			
@@ -371,8 +371,8 @@ namespace ft
 				iterator cop(_vector + _size - 1);
 				
 				while (nbLoop--){
-					consTruct(*(start--), *(cop--));
-					// _alloc.destroy(&(*cop--));
+					_alloc.construct(&(*start--), *cop);
+					_alloc.destroy(&(*cop--));
 				}
 			}
 			
@@ -380,20 +380,14 @@ namespace ft
 			{
 				if ((size_type)posIdx >= _size)
 					return ;
-				int nbLoop = _size - posIdx - n;
 				iterator start(_vector + posIdx);
-				iterator cop(start + 1);
-				
-				while (nbLoop--){
-					consTruct(*(start++), *(cop++));
-					// _alloc.destroy(&(*cop++));
+				iterator cop(start + n);
+				while (cop != end()){
+					_alloc.destroy(&(*start));
+					_alloc.construct(&(*start++), *cop++);
 				}
-			}
-			
-			void consTruct(T &elem, const value_type &val)
-			{
-				// _alloc.destroy(&elem);
-				_alloc.construct(&elem, val);
+				while (start != end())
+					_alloc.destroy(&(*start++));
 			}
 
 			void printvector()
