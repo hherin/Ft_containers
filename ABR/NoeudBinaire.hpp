@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/04 11:46:17 by hherin            #+#    #+#             */
-/*   Updated: 2021/02/08 15:42:56 by hherin           ###   ########.fr       */
+/*   Updated: 2021/02/09 16:12:32 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,9 @@
 # define NOEUDBINAIRE_HPP
 
 # include "../utils/traits.hpp"
+# include <cmath>
+# include "../containers/vector.hpp"
+# include <iomanip>
 
 template <class T>
 struct s_abr
@@ -113,6 +116,63 @@ T	Max(s_abr<T> *bst)
 }
 
 template <class T>
+ft::vector<s_abr<T>*> save_key(s_abr<T> *bst)
+{
+	ft::vector<s_abr<T>*> TreeArray;
+	if (!bst)
+		return TreeArray;
+		
+	s_abr<T> *current = bst;
+	TreeArray.push_back(current);
+	
+	int i = 1;
+	// std::cout << "SIZE NODE " << 2 * (getHeightTree(bst) - 1)<< "\n";
+	while (i <= 2 * (getHeightTree(bst) - 1) + 1)
+	{
+		// std::cout << i - 1 << "= ";
+		// (TreeArray[i - 1]) ? std::cout << current->key : std::cout << "nil";
+		// std::cout << "\n";
+		(TreeArray[i - 1]) ? TreeArray.push_back(current->left) : TreeArray.push_back(0);
+		(TreeArray[i - 1]) ? TreeArray.push_back(current->right) : TreeArray.push_back(0);
+
+		current = TreeArray[i];
+		i++;
+	}
+	return TreeArray;
+}
+
+template <class T>
+void printTree(s_abr<T> *bst)
+{
+	ft::vector<s_abr<T> *> treeArray = save_key(bst);
+	int level = 1;
+	size_t i = 1;
+	int index = 1;
+	// int width =  (2 * getHeightTree(bst) + 1) * 3 * 3;
+	
+	// std::cout.width((width - 3) / 2);
+	std::cout << "[ " << treeArray[0]->key << " ]" << "\n";
+	
+	while (i < treeArray.size()){
+		// std::cout.width( (width - pow(2, level) * 3) / (pow(2, level) + 1) );
+		(treeArray[i]) ? 
+			std::cout << "[ " << treeArray[i]->key << " ]" : std::cout << "[NIL]";
+		
+		if (index == pow(2, level)) {
+			std::cout << "\n";
+			level++;
+			index = 1;
+		}
+		else{
+			std::cout << " ";
+			index++;
+		}
+		i++;
+	}
+	treeArray.clear();
+}
+
+template <class T>
 s_abr<T>	*deleteNode(s_abr<T> **bst, T& key)
 {
 	if (!*bst || !isKeyInBinTree(key, *bst))
@@ -130,9 +190,9 @@ s_abr<T>	*deleteNode(s_abr<T> **bst, T& key)
 		else if (!(*bst)->right)
 			tmp = (*bst)->left;
 		else{
-			T tmp2 = Max<T>(bst);
+			T tmp2 = Max<T>(*bst);
 			(*bst)->key = tmp2;
-			return deleteNose((*bst)->left, tmp2);
+			return deleteNode(&((*bst)->left), tmp2);
 		}
 		delete *bst;
 		*bst = NULL;
@@ -141,30 +201,19 @@ s_abr<T>	*deleteNode(s_abr<T> **bst, T& key)
 	return *bst;
 }
 
-template <class T>
-std::string addNodeInBuf(s_abr<T> *bst)
-{
-	std::string buf;
+// template <class T>
+// void	print_MTF_Tree(s_abr<T> const *bst)
+// {
+// 	int height = getHeightTree(bst);
+// 	std::string buf;
+// 	s_abr<T> *tmp = bst;
 	
-	if (!bst)
-		return buf;
-	buf += bst->data;
-	
-}
-	
-template <class T>
-void	print_MTF_Tree(s_abr<T> const *bst)
-{
-	int height = getHeightTree(bst);
-	std::string buf;
-	s_abr<T> *tmp = bst;
-	
-	buf += tmp->data;
-	while (height){
-		buf += tmp->left->data;
-		buf += tmp->right-data;
-	}
-}
+// 	buf += tmp->data;
+// 	while (height){
+// 		buf += tmp->left->data;
+// 		buf += tmp->right-data;
+// 	}
+// }
 
 
 
