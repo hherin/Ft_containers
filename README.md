@@ -25,8 +25,8 @@ http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0178r0.html
 
 *Arbres Binaires* 
 
-
 http://carl.seleborg.free.fr/cpp/cours/chap2/arbres.html
 
-
 https://www.youtube.com/watch?v=h1Z8_ebEqao
+
+http://ressources.unisciel.fr/algoprog/s46bst/emodules/rn00macours1/res/rn00cours-texte-xxx.pdf

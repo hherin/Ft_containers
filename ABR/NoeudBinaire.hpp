@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/04 11:46:17 by hherin            #+#    #+#             */
-/*   Updated: 2021/02/09 16:12:32 by hherin           ###   ########.fr       */
+/*   Updated: 2021/02/12 11:54:10 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,8 +126,8 @@ ft::vector<s_abr<T>*> save_key(s_abr<T> *bst)
 	TreeArray.push_back(current);
 	
 	int i = 1;
-	// std::cout << "SIZE NODE " << 2 * (getHeightTree(bst) - 1)<< "\n";
-	while (i <= 2 * (getHeightTree(bst) - 1) + 1)
+	// std::cout << "save keyITER " << pow(2, (getHeightTree(bst) - 1)) - 1 << "\n";
+	while (i <= pow(2, (getHeightTree(bst) - 1)) - 1)
 	{
 		// std::cout << i - 1 << "= ";
 		// (TreeArray[i - 1]) ? std::cout << current->key : std::cout << "nil";
@@ -148,13 +148,13 @@ void printTree(s_abr<T> *bst)
 	int level = 1;
 	size_t i = 1;
 	int index = 1;
-	// int width =  (2 * getHeightTree(bst) + 1) * 3 * 3;
+	int width =  pow(2, getHeightTree(bst)) * 3;  // =>   * spaces
 	
-	// std::cout.width((width - 3) / 2);
+	std::cout.width((width - 3) / 2);
 	std::cout << "[ " << treeArray[0]->key << " ]" << "\n";
 	
 	while (i < treeArray.size()){
-		// std::cout.width( (width - pow(2, level) * 3) / (pow(2, level) + 1) );
+		std::cout.width( (width - 3) / (pow(2, level) + 1) );
 		(treeArray[i]) ? 
 			std::cout << "[ " << treeArray[i]->key << " ]" : std::cout << "[NIL]";
 		
@@ -201,19 +201,6 @@ s_abr<T>	*deleteNode(s_abr<T> **bst, T& key)
 	return *bst;
 }
 
-// template <class T>
-// void	print_MTF_Tree(s_abr<T> const *bst)
-// {
-// 	int height = getHeightTree(bst);
-// 	std::string buf;
-// 	s_abr<T> *tmp = bst;
-	
-// 	buf += tmp->data;
-// 	while (height){
-// 		buf += tmp->left->data;
-// 		buf += tmp->right-data;
-// 	}
-// }
 
 
 
