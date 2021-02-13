@@ -6,23 +6,22 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/04 11:46:17 by hherin            #+#    #+#             */
-/*   Updated: 2021/02/12 11:54:10 by hherin           ###   ########.fr       */
+/*   Updated: 2021/02/13 16:09:04 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef NOEUDBINAIRE_HPP
 # define NOEUDBINAIRE_HPP
 
-# include "../utils/traits.hpp"
 # include <cmath>
-# include "../containers/vector.hpp"
-# include <iomanip>
+# include "utilsTree.hpp"
 
 template <class T>
 struct s_abr
 {
 	T key;
 	
+	s_abr *parent;
 	s_abr *left;
 	s_abr *right;
 };
@@ -31,7 +30,7 @@ template <class T>
 T& nodValue(s_abr<T> *a) { return a->key; } // lancer exception si vide ?
 
 template <class T>
-s_abr<T> *createNewTree(T &key, s_abr<T> *ls, s_abr<T> *rs)
+s_abr<T> *createNewTree(T &key, s_abr<T> *ls, s_abr<T> *rs, s_abr<T> *p)
 {
 	s_abr<T> *root = new s_abr<T>;
 	if (!root){
@@ -41,6 +40,7 @@ s_abr<T> *createNewTree(T &key, s_abr<T> *ls, s_abr<T> *rs)
 	root->key = key;
 	root->left = ls;
 	root->right = rs;
+	root->parent = p;
 	return root;
 }
 
@@ -65,20 +65,31 @@ s_abr<T> *isKeyInBinTree(T &key, s_abr<T> *bst)
 }
 
 template <class T>
-void insertNewNode(s_abr<T> **bst, T &key)
+void recInsertNode(s_abr<T> **bst, T &key, s_abr<T> *parent)
 {
 	if (isKeyInBinTree(key, *bst))						// IS the key already present
 		return ;
 	else if (!*bst){
-		if (!(*bst = createNewTree<T>(key, NULL, NULL)))	// case empty tree
+		if (!(*bst = createNewTree<T>(key, NULL, NULL, parent)))	// case empty tree
 			return ;
 	}
 	else{												// check which side the leave should be added
+		parent = *bst;
 		if (key > (*bst)->key)
-			insertNewNode(&(*bst)->right, key);
+			recInsertNode(&(*bst)->right, key, parent);
 		else if (key < (*bst)->key)
-			insertNewNode(&(*bst)->left, key);
+			recInsertNode(&(*bst)->left, key, parent);
 	}
+}
+
+
+template <class T>
+void insertNewNode(s_abr<T> **bst, T &key)
+{
+	s_abr<T> *t = NULL;
+	// int height
+	recInsertNode(bst, key, t);
+	
 }
 
 template <class T>
@@ -106,6 +117,7 @@ void	iterTree(s_abr<T> const *bst)
 		iterTree(bst->right);
 	}
 }
+
 template <class T>
 T	Max(s_abr<T> *bst)
 {
@@ -113,63 +125,6 @@ T	Max(s_abr<T> *bst)
 		return bst->key;
 	else
 		return Max<T>(bst->right);
-}
-
-template <class T>
-ft::vector<s_abr<T>*> save_key(s_abr<T> *bst)
-{
-	ft::vector<s_abr<T>*> TreeArray;
-	if (!bst)
-		return TreeArray;
-		
-	s_abr<T> *current = bst;
-	TreeArray.push_back(current);
-	
-	int i = 1;
-	// std::cout << "save keyITER " << pow(2, (getHeightTree(bst) - 1)) - 1 << "\n";
-	while (i <= pow(2, (getHeightTree(bst) - 1)) - 1)
-	{
-		// std::cout << i - 1 << "= ";
-		// (TreeArray[i - 1]) ? std::cout << current->key : std::cout << "nil";
-		// std::cout << "\n";
-		(TreeArray[i - 1]) ? TreeArray.push_back(current->left) : TreeArray.push_back(0);
-		(TreeArray[i - 1]) ? TreeArray.push_back(current->right) : TreeArray.push_back(0);
-
-		current = TreeArray[i];
-		i++;
-	}
-	return TreeArray;
-}
-
-template <class T>
-void printTree(s_abr<T> *bst)
-{
-	ft::vector<s_abr<T> *> treeArray = save_key(bst);
-	int level = 1;
-	size_t i = 1;
-	int index = 1;
-	int width =  pow(2, getHeightTree(bst)) * 3;  // =>   * spaces
-	
-	std::cout.width((width - 3) / 2);
-	std::cout << "[ " << treeArray[0]->key << " ]" << "\n";
-	
-	while (i < treeArray.size()){
-		std::cout.width( (width - 3) / (pow(2, level) + 1) );
-		(treeArray[i]) ? 
-			std::cout << "[ " << treeArray[i]->key << " ]" : std::cout << "[NIL]";
-		
-		if (index == pow(2, level)) {
-			std::cout << "\n";
-			level++;
-			index = 1;
-		}
-		else{
-			std::cout << " ";
-			index++;
-		}
-		i++;
-	}
-	treeArray.clear();
 }
 
 template <class T>
@@ -201,6 +156,27 @@ s_abr<T>	*deleteNode(s_abr<T> **bst, T& key)
 	return *bst;
 }
 
+template <class T>
+void	rightRotation(s_abr<T> **root)
+{
+	if (!*root)
+		return ;
+	
+	s_abr<T> *pivot = (*root)->left;
+
+	(*root)->left = pivot->right;
+	pivot->right->parent = *root;
+	
+	pivot->right = (*root);
+	pivot->right->parent = (*root)->parent;
+
+	if ((*root)->parent){
+		s_abr<T> *parent = (*root)->parent;
+		
+		(parent->left == *root) ? parent->left = pivot : parent->right = pivot; 
+	}
+	*root = pivot;
+}
 
 
 
