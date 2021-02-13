@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/04 11:46:17 by hherin            #+#    #+#             */
-/*   Updated: 2021/02/13 17:22:37 by hherin           ###   ########.fr       */
+/*   Updated: 2021/02/13 17:32:35 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,18 +93,9 @@ void	recBalancedTree(s_abr<T> const *node, s_abr<T> const *root)
 	if (!node)
 		return ;
 	while (node != root){
-		int bg = 0;
-		int br = 0;
-		s_abr<T> *right = node->right;
-		s_abr<T> *left = node->left;
-		while (right){
-			br++;
-			right = node->right;
-		}
-		while (left){
-			bl++;
-			left = node->left;
-		}
+		int bl = getHeightTree(node->left);
+		int br = getHeightTree(node->right);
+		if (-2 > bl - br  < 2)
 	}
 }
 
