@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/13 16:00:14 by hherin            #+#    #+#             */
-/*   Updated: 2021/02/13 16:04:53 by hherin           ###   ########.fr       */
+/*   Updated: 2021/02/13 16:47:42 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,25 @@ void printTree(s_abr<T> *bst)
 	treeArray.clear();
 }
 
+template <class T>
+void	iterTree(s_abr<T> const *bst)
+{
+	if (!bst)
+		return ;
+	else{
+		iterTree(bst->left);
+		std::cout << bst->key << " ";
+		iterTree(bst->right);
+	}
+}
 
+template <class T>
+T	Max(s_abr<T> *bst)
+{
+	if (!bst->right)
+		return bst->key;
+	else
+		return Max<T>(bst->right);
+}
 
 #endif

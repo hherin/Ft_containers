@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/04 11:46:17 by hherin            #+#    #+#             */
-/*   Updated: 2021/02/13 16:09:04 by hherin           ###   ########.fr       */
+/*   Updated: 2021/02/13 17:22:37 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,9 +27,6 @@ struct s_abr
 };
 
 template <class T>
-T& nodValue(s_abr<T> *a) { return a->key; } // lancer exception si vide ?
-
-template <class T>
 s_abr<T> *createNewTree(T &key, s_abr<T> *ls, s_abr<T> *rs, s_abr<T> *p)
 {
 	s_abr<T> *root = new s_abr<T>;
@@ -45,6 +42,9 @@ s_abr<T> *createNewTree(T &key, s_abr<T> *ls, s_abr<T> *rs, s_abr<T> *p)
 }
 
 
+/*
+** function returns
+*/
 template <class T>
 s_abr<T> *isKeyInBinTree(T &key, s_abr<T> *bst)
 {	
@@ -64,21 +64,47 @@ s_abr<T> *isKeyInBinTree(T &key, s_abr<T> *bst)
 	}
 }
 
+
+/*
+** Recursive insert function that returns the new created node
+*/
 template <class T>
-void recInsertNode(s_abr<T> **bst, T &key, s_abr<T> *parent)
+s_abr<T> *recInsertNode(s_abr<T> **bst, T &key, s_abr<T> *parent)
 {
 	if (isKeyInBinTree(key, *bst))						// IS the key already present
-		return ;
+		return NULL;
 	else if (!*bst){
 		if (!(*bst = createNewTree<T>(key, NULL, NULL, parent)))	// case empty tree
-			return ;
+			return NULL;
 	}
 	else{												// check which side the leave should be added
 		parent = *bst;
 		if (key > (*bst)->key)
-			recInsertNode(&(*bst)->right, key, parent);
+			return recInsertNode(&(*bst)->right, key, parent);
 		else if (key < (*bst)->key)
-			recInsertNode(&(*bst)->left, key, parent);
+			return recInsertNode(&(*bst)->left, key, parent);
+	}
+	return *bst;
+}
+
+template <class T>
+void	recBalancedTree(s_abr<T> const *node, s_abr<T> const *root)
+{
+	if (!node)
+		return ;
+	while (node != root){
+		int bg = 0;
+		int br = 0;
+		s_abr<T> *right = node->right;
+		s_abr<T> *left = node->left;
+		while (right){
+			br++;
+			right = node->right;
+		}
+		while (left){
+			bl++;
+			left = node->left;
+		}
 	}
 }
 
@@ -86,9 +112,12 @@ void recInsertNode(s_abr<T> **bst, T &key, s_abr<T> *parent)
 template <class T>
 void insertNewNode(s_abr<T> **bst, T &key)
 {
-	s_abr<T> *t = NULL;
-	// int height
-	recInsertNode(bst, key, t);
+	s_abr<T> *newNode = NULL;
+	newNode = recInsertNode(bst, key, newNode);
+	std::cout << "INSERT KEY " << newNode->key << "\n";
+	if (newNode){
+		
+	}
 	
 }
 
@@ -105,27 +134,6 @@ int getHeightTree(s_abr<T> const *a)
 	right = getHeightTree(a->right);
 	return (left > right) ? left + 1 : right + 1;
 } 
-
-template <class T>
-void	iterTree(s_abr<T> const *bst)
-{
-	if (!bst)
-		return ;
-	else{
-		iterTree(bst->left);
-		std::cout << bst->key << " ";
-		iterTree(bst->right);
-	}
-}
-
-template <class T>
-T	Max(s_abr<T> *bst)
-{
-	if (!bst->right)
-		return bst->key;
-	else
-		return Max<T>(bst->right);
-}
 
 template <class T>
 s_abr<T>	*deleteNode(s_abr<T> **bst, T& key)
@@ -177,7 +185,5 @@ void	rightRotation(s_abr<T> **root)
 	}
 	*root = pivot;
 }
-
-
 
 #endif
