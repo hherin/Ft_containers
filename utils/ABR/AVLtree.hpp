@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/04 11:46:17 by hherin            #+#    #+#             */
-/*   Updated: 2021/02/15 15:59:52 by hherin           ###   ########.fr       */
+/*   Updated: 2021/02/15 16:21:46 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,7 +137,7 @@ void insertNewNode(s_abr<T, M> **bst, T const &key, M const &map)
 {
 	s_abr<T, M> *newNode = NULL;
 	newNode = recInsertNode(bst, key, map, newNode);
-	BalancedTree<T>(newNode, bst);
+	// BalancedTree<T>(newNode, bst);
 }
 
 template <class T, class M>
@@ -162,10 +162,12 @@ s_abr<T, M>	*recDeleteNode(s_abr<T, M> **bst, s_abr<T, M> **root, T const& key)
 	if ((*bst)->p.first > key){										// the deletenode is in left side
 		(*bst)->left = recDeleteNode(&((*bst)->left), root, key);
 		((*bst)->left) ?  (*bst)->left->parent = *bst : 0;
+		BalancedTree((*bst)->left, root);
 	}
 	else if ((*bst)->p.first < key)	{									// ... right side
 		(*bst)->right = recDeleteNode(&((*bst)->right), root, key);
 		((*bst)->right) ? (*bst)->right->parent = *bst : 0;
+		BalancedTree((*bst)->right, root);
 	}
 	else {
 		s_abr<T, M> *tmp = NULL;
@@ -176,24 +178,16 @@ s_abr<T, M>	*recDeleteNode(s_abr<T, M> **bst, s_abr<T, M> **root, T const& key)
 		else if (!(*bst)->right)
 			tmp = (*bst)->left;
 		else{
-			s_abr<T, M> *tmp2 = isKeyInBinTree(Max<T>(*bst), *bst);
+			s_abr<T, M> *tmp2 = isKeyInBinTree(Min<T>((*bst)->right), *bst);
+			std::cout << "MIN " << tmp2 >> "\n";
 			(*bst)->p.first = tmp2->p.first;
 			(*bst)->right = recDeleteNode(&((*bst)->right), root, tmp2->p.first);
 			return *bst;
 		}
-		s_abr<T, M> *parent = (*bst)->parent;
-		std::cout << "parent " << parent->p.first << "\n";
 		delete *bst;
 		*bst = NULL;
-		std::cout << "\n===================================\n";
-		std::cout << " \n BEFOR\n"; printTree(*root);
-		BalancedTree(parent, root);
-		std::cout << "\n AFTER \n"; printTree(*root);
-		std::cout << "ADDR " << tmp << "\n";
-		std::cout << "\n===================================\n";
 		return tmp;
 	}
-	std::cout << "\n END FUNCTION \n"; printTree(*root);
 	return *bst;
 }
 
