@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/13 16:00:14 by hherin            #+#    #+#             */
-/*   Updated: 2021/02/15 16:17:45 by hherin           ###   ########.fr       */
+/*   Updated: 2021/02/15 16:43:09 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,21 +85,21 @@ void	iterTree(s_abr<T, M> const *bst)
 }
 
 template <class T, class M>
-T	Max(s_abr<T, M> *bst)
+s_abr<T, M>	*Max(s_abr<T, M> *bst)
 {
 	if (!bst->right)
-		return bst->p.first;
+		return bst;
 	else
-		return Max<T>(bst->right);
+		return Max<T, M>(bst->right);
 }
 
 template <class T, class M>
-T	Min(s_abr<T, M> *bst)
+s_abr<T, M>	*Min(s_abr<T, M> *bst)
 {
 	if (!bst->left)
-		return bst->p.first;
+		return bst;
 	else
-		return Min<T>(bst->left);
+		return Min<T, M>(bst->left);
 }
 
 template <class T, class M>

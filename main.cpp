@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/13 14:28:27 by hherin            #+#    #+#             */
-/*   Updated: 2021/02/15 16:18:34 by hherin           ###   ########.fr       */
+/*   Updated: 2021/02/15 16:32:08 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,6 @@ int main(void)
 	std::cout << "\n===================================\n";
 	// deleteNode<char>(&a, 'f');
 	std::cout << "IN MAIN \n";
-	// printTree(a);
+	printTree(a);
 
 }
