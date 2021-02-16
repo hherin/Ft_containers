@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/04 11:46:17 by hherin            #+#    #+#             */
-/*   Updated: 2021/02/15 16:43:28 by hherin           ###   ########.fr       */
+/*   Updated: 2021/02/16 14:00:09 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ struct s_abr
 {
 	ft::pair<T, M> p;
 	
+	s_abr *neutral;
 	s_abr *parent;
 	s_abr *left;
 	s_abr *right;
@@ -157,16 +158,16 @@ s_abr<T, M>	*recDeleteNode(s_abr<T, M> **bst, s_abr<T, M> **root, T const& key)
 {
 	if (!*bst)
 		return *bst;
-	std::cout << "add bst " << *bst << "KEY: " << (*bst)->p.first << "\n";
+	// std::cout << "add bst " << *bst << "KEY: " << (*bst)->p.first << "\n";
 	if ((*bst)->p.first > key){										// the deletenode is in left side
 		(*bst)->left = recDeleteNode(&((*bst)->left), root, key);
 		((*bst)->left) ?  (*bst)->left->parent = *bst : 0;
-		BalancedTree((*bst)->left, root);
+		// BalancedTree((*bst)->left, root);
 	}
 	else if ((*bst)->p.first < key)	{									// ... right side
 		(*bst)->right = recDeleteNode(&((*bst)->right), root, key);
 		((*bst)->right) ? (*bst)->right->parent = *bst : 0;
-		BalancedTree((*bst)->right, root);
+		// BalancedTree((*bst)->right, root);
 	}
 	else if (key == (*root)->p.first){
 		s_abr<T, M> *tmp2 = ((*root)->right) ? ::Min<T, M>((*root)->right) : Max<T, M>((*root)->left);

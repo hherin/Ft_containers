@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/13 16:00:14 by hherin            #+#    #+#             */
-/*   Updated: 2021/02/15 16:43:09 by hherin           ###   ########.fr       */
+/*   Updated: 2021/02/16 14:14:24 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,5 +120,27 @@ s_abr<T, M> *isKeyInBinTree(T const &key, s_abr<T, M> *bst)
 		}
 	}
 }
+
+template <class T, class M>
+	s_abr<T, M> rightMostNode(s_abr<T, M> *bst)
+	{
+		s_abr<T, M> *tmp = bst->right;
+		while (tmp){
+			bst = tmp;
+			tmp->right;
+		}
+		return bst;
+	}
+
+	template <class T, class M>
+	s_abr<T, M> leftMostNode(s_abr<T, M> *bst)
+	{
+		s_abr<T, M> *tmp = bst->left;
+		while (tmp){
+			bst = tmp;
+			tmp->left;
+		}
+		return bst;
+	}
 
 #endif
