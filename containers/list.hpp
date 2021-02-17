@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 19:55:49 by heleneherin       #+#    #+#             */
-/*   Updated: 2021/02/17 10:50:23 by hherin           ###   ########.fr       */
+/*   Updated: 2021/02/17 11:36:07 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -286,11 +286,7 @@ namespace ft
 			}
 
 			// Removes all elements from the list container, and leaving the container with a size of 0.
-			void clear()
-			{
-				while(_size)
-					pop_back();
-			}
+			void clear() { erase(begin(), end()); }
 
 			// ======================= Operations =====================
 			/*

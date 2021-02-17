@@ -4,7 +4,7 @@ SRCS	=	main.cpp
 
 GCC		=	clang++
 
-FLAGS	=	-Werror -Wextra -Wall -std=c++98 -g3 -fsanitize=address
+FLAGS	=	-Werror -Wextra -Wall -std=c++98 -g -fsanitize=address
 
 OBJS	=	${SRCS:.cpp=.o}
 
@@ -13,10 +13,10 @@ HDRS	=	containers/*.hpp utils/*.hpp utils/ABR/*.hpp utils/iterator/*.hpp
 all		:	${NAME}
 
 ${NAME}	:	${OBJS}
-			${GCC} ${FLAGS} -o ${NAME} ${OBJS}
+			@${GCC} ${FLAGS} -o ${NAME} ${OBJS}
 
 %.o		:	%.cpp
-			${GCC} ${FLAGS} -o $@ -c $<
+			@${GCC} ${FLAGS} -o $@ -c $<
 
 ${OBJS}	:	${HDRS}
 

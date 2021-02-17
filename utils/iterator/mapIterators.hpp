@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/15 14:51:35 by hherin            #+#    #+#             */
-/*   Updated: 2021/02/16 15:47:56 by hherin           ###   ########.fr       */
+/*   Updated: 2021/02/17 12:13:59 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ namespace ft
 			map_bidirect_iter	operator--(int) { map_bidirect_iter tmp = *this; --(*this); return tmp; }
 			value_type&			operator*() const { return _current->content; }
 			value_type*			operator->() { return &_current->content; }
-			bool				operator==(const map_bidirect_iter& b) { return (this->_current->first == b._current->first && this->_current->second == b._current->second); }
+			bool				operator==(const map_bidirect_iter& b) { return (this->_current->content.first == b._current->content.first && this->_current->content.second == b._current->content.second); }
 			bool				operator!=(const map_bidirect_iter& b) { return this->_current != b._current; }
 			mapelem_pointer	getCurrent() const { return _current; }					// two types of iterators (const and non const)
 

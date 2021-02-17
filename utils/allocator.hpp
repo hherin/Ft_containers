@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/17 09:55:07 by hherin            #+#    #+#             */
-/*   Updated: 2021/02/17 10:47:37 by hherin           ###   ########.fr       */
+/*   Updated: 2021/02/17 11:26:43 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,14 @@ namespace ft
 		typedef const T&		const_reference;
 		typedef std::size_t		size_type;
 		typedef std::ptrdiff_t	difference_type;
-
+		
+		// nothing in constructor because no state in allocator
+		myAlloc() throw() {}
+		myAlloc(const myAlloc&) throw() {}
+		template <class U>
+		myAlloc (const myAlloc<U>&) throw() {}
+		~myAlloc() throw() {}
+	   
 		pointer allocate(int n)
 		{
 			pointer ret;

@@ -59,7 +59,7 @@ namespace ft
 			size_type _size;
 			key_compare _comp;
 			allocator_type _alloc;
-			std::allocator<Node*> _nodAlloc;
+			ft::myAlloc<Node> _nodAlloc;
 		
 		public:
 		/*
@@ -68,42 +68,27 @@ namespace ft
 		// empty constr
 		explicit map (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type())
 		: _root(0), _size(0), _comp(comp), _alloc(alloc)
-		{}
+		{
+			createRoot();
+		}
 
 		// range (2)	
 		template <class InputIterator>
-		map (InputIterator first, InputIterator last, const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type(), typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator >::type* = 0)
+		map (InputIterator first, InputIterator last, const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type(), typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator >::type* = 0) :
+			_size(0), _comp(comp), _alloc(alloc)
 		{
 			createRoot();
-			_comp = comp;
-			_alloc(alloc);
-			InputIterator tmp(first);
-			while (first != last){
-				iterator beg = begin();
-				while (beg != end()){
-					if (_comp((*first).first, (*beg).first))
-						addLink(beg, *first);
-					beg++;
-				}
-				first++;
-			}
+			for ( ; first != last; first++)
+				insert(*first);
 		}
 		// copy (3)	
 		map (const map& x)
+		: _size(0), _comp(x._comp), _alloc(x._alloc)
 		{
 			createRoot();
-			_comp = x._comp;
-			_alloc(x._alloc);
-			iterator xit = x.begin();
-			while (xit != x.end()){
-				iterator it = begin();
-				while (it != end()){
-					if (_comp((*xit).first, (*it).first))
-						addLink(it, *xit);
-					it++;
-				}
-				xit++;
-			}
+			for (iterator xit = x.begin(); xit != x.end(); xit++)
+				insert(*xit);
+			
 		}
 
 		~map()
@@ -112,10 +97,11 @@ namespace ft
 				Node *destr = _root->prev;				// save elem to be destroyed
 				_root->prev = destr->prev;				// end of the list changed
 				destr->prev->next = _root;		// new last elem point to _root
-				delete destr;
+				_alloc.destroy(&destr->content);
+				_nodAlloc.deallocate(destr, 1);
 				_size--;
 			}
-			delete _root;
+			// _nodAlloc.deallocate(_root, 1);
 		}
 
 		map& operator= (const map& x)
@@ -161,12 +147,17 @@ namespace ft
 					return ft::pair<iterator,bool>(it, false);
 				if (_comp(val.first, (*it).first)){
 					addLink(it, val);
-					break;
+					return ft::pair<iterator, bool>(it++, true);
 				}
 				it++;
 			}
-				return ft::pair<iterator, bool>(it, true);
+			if (it == end()){
+				addLink(it, val);
+				it++;
+			}
+			return ft::pair<iterator, bool>(it, true);
 		}
+
 		// with hint (2)	
 		iterator insert (iterator position, const value_type& val)
 		{
@@ -175,29 +166,77 @@ namespace ft
 					return position;
 				if (_comp(val.first, (*position).first)){
 					addLink(position, val);
-					break;
-					// return ft::pair<iterator, bool>(position, true);
+					return position++;
 				}
+				position++;
+			}
+			if (position == end()){
+				addLink(end(), val);
 				position++;
 			}
 			return position;
 		}
 		// // range (3)	
-		// template <class InputIterator>
-		// void insert (InputIterator first, InputIterator last);
+		template <class InputIterator>
+		void insert (InputIterator first, InputIterator last, typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator >::type* = 0)
+		{
+			while (first != last){
+				insert(begin(), *first);
+				first++;
+			}
+		}
 
-		// void erase (iterator position);
-		// size_type erase (const key_type& k);
-    	// void erase (iterator first, iterator last);
+		void erase (iterator position)
+		{
+			Node *pos = position.getCurrent();
+			pos->prev->next = pos->next;
+			pos->next->prev = pos->prev;
+			_alloc.destroy(&pos->content);
+			_nodAlloc.deallocate(pos, 1);
+			_size--;
+		}
 
-		// void swap (map& x);
-		// void clear();
+		size_type erase (const key_type& k)
+		{
+			size_type size = 0;
+			iterator beg(_root->next);
+
+			while (beg != end()){
+				if ((*beg).first == k){
+					erase(beg);
+					size++;
+				}
+				beg++;
+			}
+			return size;
+		}
+
+    	void erase (iterator first, iterator last)
+		{
+
+			while (first != last){
+				iterator next(first.getCurrent()->next);
+				erase(first);
+				first = next;
+			}
+		}
+
+		void swap (map& x)
+		{
+			ft::mySwap(_size, x._size);
+			ft::mySwap(_root, x._root);
+			ft::mySwap(_comp, x._comp);
+			ft::mySwap(_alloc, x._alloc);
+			ft::mySwap(_nodAlloc, x._nodAlloc);
+		}
+
+		void clear() { erase(begin(), end()); }
 
 		// /*
 		// ** ======================================== Observers ==============================
 		// */
 
-		// key_compare key_comp() const;
+		key_compare key_comp() const { return _comp; }
 		// value_compare value_comp() const;
 
 		// /*
@@ -216,8 +255,8 @@ namespace ft
 		private:
 			void createRoot()
 			{
-				_root = new Node;
-				_root->data = value_type();
+				_root = _nodAlloc.allocate(1);
+				_alloc.construct(&_root->content, value_type());
 				_root->next = _root;
 				_root->prev = _root;
 			}
@@ -226,7 +265,7 @@ namespace ft
 			void addLink(iterator pos, const value_type &val)
 			{
 				Node *Cpos = pos.getCurrent();	// get pointer of pos
-				Node *nod = new Node();
+				Node *nod =  _nodAlloc.allocate(1);
 				// insert nod in the list
 				nod->next = Cpos;
 				nod->prev = Cpos->prev;
@@ -236,7 +275,7 @@ namespace ft
 				Cpos->prev = nod;
 				
 
-				nod->content = val;
+				_alloc.construct(&nod->content, val);
 				_size++;
 			}
 	};
