@@ -15,16 +15,16 @@
 
 # include <memory>
 # include <iostream>
-// # include "../utils/ABR/AVLtree.hpp"
 # include "../utils/algo.hpp"
 # include "../utils/iterator/mapIterators.hpp"
+# include "../utils/allocator.hpp"
 
 namespace ft
 {
 	template < class Key,												// map::key_type
 			class T,													// map::mapped_type
 			class Compare = ft::less<Key>,								// map::key_compare
-			class Alloc = std::allocator<ft::pair<const Key,T> >		// map::allocator_type
+			class Alloc = ft::myAlloc<ft::pair<const Key,T> >			// map::allocator_type
 			> 
 	class map
 	{
@@ -43,11 +43,12 @@ namespace ft
 
 			typedef Compare											key_compare;
 			typedef Alloc											allocator_type;
-			typedef value_type&										reference;
-			typedef const value_type&								const_reference;
-			typedef size_t											size_type;
-			typedef value_type*										pointer;
-			typedef const value_type*								const_pointer;
+			typedef typename allocator_type::reference				reference;
+			typedef typename allocator_type::const_reference		const_reference;
+			typedef typename allocator_type::size_type				size_type;
+			typedef typename allocator_type::difference_type		difference_type;
+			typedef typename allocator_type::pointer				pointer;
+			typedef typename allocator_type::const_pointer			const_pointer;
 			typedef typename ft::map_bidirect_iter<T, true, Node, key_type, mapped_type>	iterator;
 			typedef typename ft::map_bidirect_iter<T, false, Node, key_type, mapped_type>	const_iterator;
 			// typedef typename ft::map_reverse_bidirect_iter<T, true, Node>	reverse_iterator;
@@ -58,6 +59,7 @@ namespace ft
 			size_type _size;
 			key_compare _comp;
 			allocator_type _alloc;
+			std::allocator<Node*> _nodAlloc;
 		
 		public:
 		/*
@@ -163,9 +165,9 @@ namespace ft
 				}
 				it++;
 			}
-					return ft::pair<iterator, bool>(it, true);
+				return ft::pair<iterator, bool>(it, true);
 		}
-		// // with hint (2)	
+		// with hint (2)	
 		iterator insert (iterator position, const value_type& val)
 		{
 			while (position != end()){
@@ -232,6 +234,7 @@ namespace ft
 				// change list pointer to close the list
 				Cpos->prev->next = nod;
 				Cpos->prev = nod;
+				
 
 				nod->content = val;
 				_size++;

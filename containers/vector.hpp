@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/04 12:58:14 by hherin            #+#    #+#             */
-/*   Updated: 2021/02/15 14:25:54 by hherin           ###   ########.fr       */
+/*   Updated: 2021/02/17 10:45:14 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 # include "../utils/traits.hpp"
 # include "../utils/iterator/random_iter.hpp"
 # include "../utils/algo.hpp"
-
+# include "../utils/allocator.hpp"
 
 namespace ft
 {
@@ -33,7 +33,7 @@ namespace ft
 
 namespace ft
 {
-	template <class T, class Alloc = std::allocator<T> >
+	template <class T, class Alloc = ft::myAlloc<T> >
 	class vector
 	{
 		public:
