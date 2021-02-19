@@ -30,3 +30,8 @@ http://carl.seleborg.free.fr/cpp/cours/chap2/arbres.html
 https://www.youtube.com/watch?v=h1Z8_ebEqao
 
 http://ressources.unisciel.fr/algoprog/s46bst/emodules/rn00macours1/res/rn00cours-texte-xxx.pdf
+
+
+*iterate in binary trees*
+
+https://www.cs.odu.edu/~zeil/cs361/latest/Public/treetraversal/index.html
