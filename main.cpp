@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/13 14:28:27 by hherin            #+#    #+#             */
-/*   Updated: 2021/02/17 15:03:15 by hherin           ###   ########.fr       */
+/*   Updated: 2021/02/19 16:12:51 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,8 @@
 #include <iostream>
 #include "containers/map.hpp"
 #include <map>
-// #include "utils/ABR/AVLtree.hpp"
+#include "utils/ABR/AVLtree.hpp"
+#include "utils/ABR/utilsTree.hpp"
 
 
 int main(void)
@@ -36,18 +37,30 @@ int main(void)
 	// m0.clear();
 
 	{
+		// s_abr<int, int> *root;
+		// insertNewNode(&root, ft::pair<int, int>(1,1));
+		// insertNewNode(&root, ft::pair<int, int>(2,1));
+		// insertNewNode(&root, ft::pair<int, int>(13,1));
+		// insertNewNode(&root, ft::pair<int, int>(4,1));
+		// printTree(root);
 		{
 			std::cout << "\n====================HOME================\n";
 			ft::pair<int, std::string>pa1(58966, "hello coco");
 			ft::pair<int, std::string>pa2(2147483647, "j'arrive");
 			ft::pair<int, std::string>pa3(12, "j'12");
 			ft::map<int, std::string> x;
+			std::cout << x.end().getCurrent() << "\n\n";
 			x.insert(pa1);
 			x.insert(pa2);
 			x.insert(x.end(), pa3);
+			// ft::map<int, std::string>::iterator it = x.begin();
 			
 			for (ft::map<int, std::string>::iterator it = x.begin(); it != x.end(); it++)
 				std::cout << (*it).first << "\n";
+			for (ft::map<int, std::string>::iterator it = x.end(); it != x.begin(); ){
+			it++;
+			std::cout << (*it).first << "\n";
+			}
 		}
 
 		// x.insert(x.begin(), ft::pair<int, std::string>(535, "jojo"));
@@ -63,6 +76,10 @@ int main(void)
 		
 		for (std::map<int, std::string>::iterator it = x.begin(); it != x.end(); it++)
 			std::cout << (*it).first << "\n";
+		for (std::map<int, std::string>::iterator it = x.end(); it != x.begin(); ){
+			it++;
+			std::cout << (*it).first << "\n";
+		}
 		}
 	}
 }

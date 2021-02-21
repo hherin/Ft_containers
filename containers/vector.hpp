@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/04 12:58:14 by hherin            #+#    #+#             */
-/*   Updated: 2021/02/17 10:45:14 by hherin           ###   ########.fr       */
+/*   Updated: 2021/02/19 16:07:20 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,7 +102,7 @@ namespace ft
 				:_size(0), _capacity(x._size), _alloc(x._alloc)
 			{
 				_vector = _alloc.allocate(_capacity);
-				for (iterator xIt(x.begin()); xIt != x.end(); xIt++)
+				for (const_iterator xIt(x.begin()); xIt != x.end(); xIt++)
 					push_back(*xIt);
 			}
 
@@ -290,7 +290,7 @@ namespace ft
 			** @param x Value to be copied
 			** @param first/last Copies of elements in this range are inserted at pos
 			*/
-			iterator	insert(const_iterator pos, const value_type& x) 
+			iterator	insert(iterator pos, const value_type& x) 
 			{
 				difference_type posIdx = pos - begin();			// save the index position in case reserve is called				
 				insert(pos, 1, x);
@@ -311,7 +311,7 @@ namespace ft
 			}
 
 			template <class InputIter>
-			iterator	insert(const_iterator pos, InputIter first, InputIter last, typename ft::enable_if<!ft::is_integral<InputIter>::value, InputIter >::type* = 0)
+			iterator	insert(iterator pos, InputIter first, InputIter last, typename ft::enable_if<!ft::is_integral<InputIter>::value, InputIter >::type* = 0)
 			{
 				int diff = -1;
 				iterator retInsert(pos - 1);
@@ -328,9 +328,9 @@ namespace ft
 			** element erased by the function call
 			** Container end if it's empty
 			*/
-			iterator	erase(const_iterator position) { return erase(position, position + 1); }
+			iterator	erase(iterator position) { return erase(position, position + 1); }
 
-			iterator	erase(const_iterator first, const_iterator last)
+			iterator	erase(iterator first, iterator last)
 			{
 				if (first == last)
 					return iterator(first);
@@ -425,7 +425,7 @@ namespace ft
 				return true;
 			}
 			friend bool operator!=(const vector<T, Alloc> &lhs, const vector<T, Alloc> &rhs ) { return !(operator==(lhs, rhs)); }
-			friend bool operator<(const vector<T, Alloc> &lhs, const vector<T, Alloc> &rhs ) { return ft::lexicographical_compare<typename ft::vector<T, Alloc>::iterator, typename ft::vector<T, Alloc>::iterator>(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()); }
+			friend bool operator<(const vector<T, Alloc> &lhs, const vector<T, Alloc> &rhs ) { return ft::lexicographical_compare<typename ft::vector<T, Alloc>::const_iterator, typename ft::vector<T, Alloc>::const_iterator>(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()); }
 			friend bool operator<=(const vector<T, Alloc> &lhs, const vector<T, Alloc> &rhs ) { if (lhs == rhs || lhs < rhs) return true; return false; }
 			friend bool operator>( const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs ) { if (!operator==(lhs, rhs) && !operator<(lhs, rhs)) return true; return false; }
 			friend bool operator>=( const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs ) { if (lhs == rhs || lhs > rhs) return true; return false;}

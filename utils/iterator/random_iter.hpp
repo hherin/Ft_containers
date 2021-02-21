@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/08 16:30:56 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/22 12:11:50 by hherin           ###   ########.fr       */
+/*   Updated: 2021/02/19 16:05:17 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ namespace ft
 
 			random_iter(nonConst_pointer val = 0) : ft::vect_bidirect_iter<T, B>(val){}
 			random_iter(random_iter<T, true> const &cp) : ft::vect_bidirect_iter<T, B>(cp) {}
-			random_iter(random_iter<T, false> const &cp) : ft::vect_bidirect_iter<T, B>(cp) {}
+			// random_iter(random_iter<T, false> const &cp) : ft::vect_bidirect_iter<T, B>(cp) {}
 
 
 			random_iter operator=(random_iter const &cp)

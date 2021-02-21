@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/13 16:00:14 by hherin            #+#    #+#             */
-/*   Updated: 2021/02/16 14:14:24 by hherin           ###   ########.fr       */
+/*   Updated: 2021/02/19 15:01:49 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 #include "../../containers/vector.hpp"
 # include <iomanip>
+#include <cmath>
 
 template <class T, class M> struct s_abr;
 template <class T, class M> int getHeightTree(s_abr<T, M> const *a);
@@ -44,6 +45,8 @@ ft::vector<s_abr<T, M>*> save_key(s_abr<T, M> *bst)
 template <class T, class M>
 void printTree(s_abr<T, M> *bst)
 {
+	if (!bst)
+		return;
 	ft::vector<s_abr<T, M> *> treeArray = save_key(bst);
 	int level = 1;
 	size_t i = 1;
@@ -142,5 +145,70 @@ template <class T, class M>
 		}
 		return bst;
 	}
+
+template <class T, class M>
+void	rightRotation(s_abr<T, M> *node, s_abr<T, M> **root)
+{
+	if (!node)
+		return ;
+	
+	s_abr<T, M> *pivot = node->left;
+
+	node->left = pivot->right;
+	(pivot->right) ? pivot->right->parent = node : 0;
+	
+	pivot->right = node;
+	pivot->parent = node->parent;
+
+	if (node->parent){
+		s_abr<T, M> *parent = node->parent;
+		
+		(parent->left == node) ? parent->left = pivot : parent->right = pivot; 
+	}
+	node->parent = pivot;
+	if (!pivot->parent)
+		*root = pivot;
+}
+
+template <class T, class M>
+void	leftRotation(s_abr<T, M> *node, s_abr<T, M> **root)
+{
+	if (!node || !node->right)
+		return ;
+	
+	s_abr<T, M> *pivot = node->right;	
+
+	node->right = pivot->left;
+	(pivot->left) ? pivot->left->parent = node : 0;
+		
+	pivot->left = node;
+	pivot->parent = node->parent;
+	
+	if (node->parent){
+		s_abr<T, M> *parent = node->parent;
+
+		(parent->left == node) ? parent->left = pivot : parent->right = pivot;
+	}
+		
+	node->parent = pivot;
+	if (!pivot->parent)
+		*root = pivot;
+}
+
+template <class T, class M>
+void	BalancedTree(s_abr<T, M> *node, s_abr<T, M> **root)
+{
+	if (!node)
+		return ;
+	while (node){
+		int bl = getHeightTree(node->left);
+		int br = getHeightTree(node->right);
+		if (bl - br > 1)
+			rightRotation(node, root);
+		else if (bl - br < -1)
+			leftRotation(node, root);
+		node = node->parent;
+	}
+}
 
 #endif

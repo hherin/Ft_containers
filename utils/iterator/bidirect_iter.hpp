@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/08 16:31:57 by hherin            #+#    #+#             */
-/*   Updated: 2021/01/22 11:46:30 by hherin           ###   ########.fr       */
+/*   Updated: 2021/02/19 16:02:44 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ namespace ft
 
 			vect_bidirect_iter(nonConst_pointer val = 0) : _current(val){}
 			vect_bidirect_iter(vect_bidirect_iter<T, true> const &cp) { _current = cp.getCurrent(); }
-			vect_bidirect_iter(vect_bidirect_iter<T, false> const &cp) { _current = cp.getCurrent(); }
+			// vect_bidirect_iter(vect_bidirect_iter<T, false> const &cp) { _current = cp.getCurrent(); }
 			vect_bidirect_iter operator=(vect_bidirect_iter const &cp)
 			{
 				if (this != &cp)
