@@ -18,18 +18,16 @@
 # include "../utils/algo.hpp"
 # include "../utils/iterator/mapIterators.hpp"
 # include "../utils/allocator.hpp"
-// # include "../utils/ABR/AVLtree.hpp"
-# include "../utils/ABR/utilsTree.hpp"
 
-template <class T, class M>
-struct s_abr
+template <class K, class M>
+struct node
 {
-	ft::pair<T, M> p;
-	
-	s_abr *parent;
-	s_abr *neutral;
-	s_abr *left;
-	s_abr *right;
+	ft::pair<K, M> data;
+
+	node *neutral;
+	node *parent;
+	node *left;
+	node *right;
 };
 
 namespace ft
@@ -37,7 +35,7 @@ namespace ft
 	template < class Key,												// map::key_type
 			class T,													// map::mapped_type
 			class Compare = ft::less<Key>,								// map::key_compare
-			class Alloc = std::allocator<ft::pair<const Key,T> >			// map::allocator_type
+			class Alloc = ft::myAlloc<ft::pair<const Key,T> >			// map::allocator_type
 			> 
 	class map
 	{
@@ -47,7 +45,7 @@ namespace ft
 			typedef ft::pair<const key_type, mapped_type>			value_type;
 			typedef Compare											key_compare;
 			typedef Alloc											allocator_type;
-			typedef s_abr<const Key, T>									Node;
+			typedef node<const key_type, mapped_type>				Node;
 			typedef typename allocator_type::reference				reference;
 			typedef typename allocator_type::const_reference		const_reference;
 			typedef typename allocator_type::size_type				size_type;
@@ -65,7 +63,7 @@ namespace ft
 			size_type _size;
 			key_compare _comp;
 			allocator_type _alloc;
-			std::allocator<Node> _nodAlloc;
+			ft::myAlloc<Node> _nodAlloc;
 		
 		public:
 		/*
@@ -151,16 +149,19 @@ namespace ft
 		iterator insert (iterator position, const value_type& val)
 		{
 			Node *pos = position.getCurrent();
-			Node *ret = (pos != neutral) ? insertNewNode(&pos, val) : insertNewNode(&_root, val);
+			Node *rootSave = _root;
+			(pos != neutral) ? _root = pos : 0;
+			Node *ret = (pos != neutral) ? insertNewNode(val) : insertNewNode(val);
+			_root = rootSave;
 			if (ret){
 				ret->neutral = neutral;
 				_size++;
 				if (_size == 1){
 					neutral->left = ret; neutral->right = ret;
 				}
-				else if (neutral->left && ret->p.first < neutral->left->p.first)
+				else if (neutral->left && ret->data.first < neutral->left->data.first)
 					neutral->left = ret;
-				else if (neutral->right && ret->p.second > neutral->right->p.second)
+				else if (neutral->right && ret->data.second > neutral->right->data.second)
 					neutral->right = ret;
 			}
 			return ret ? iterator(ret) : iterator(isKeyInBinTree(val.first, pos));
@@ -175,6 +176,11 @@ namespace ft
 				first++;
 			}
 		}
+
+		// void printMap()
+		// {
+		// 	printTree<const Key, T>(_root);
+		// }
 
 		void erase (iterator position)
 		{
@@ -225,50 +231,177 @@ namespace ft
 		// pair<iterator,iterator>             equal_range (const key_type& k);
 		
 		private:
-		Node *createNewTree(Node *ls, Node *rs, Node *parent, value_type const &content)
+
+		Node *createNode(value_type const &data, Node *p)
 		{
-			Node *newNode = _nodAlloc.allocate(1); //new Node;
+			Node *newNode = _nodAlloc.allocate(1);
 			if (!newNode){
-				std::cout << "Malloc failed\n";
+				std::cout << "Allocation failed\n";
 				return NULL;
 			}
 
-			_alloc.construct(&newNode->p, content);
-			newNode->parent = parent;
-			newNode->left = ls;
-			newNode->right = rs;
+			_alloc.construct(&newNode->data, data);
+			newNode->parent = p;
+			newNode->right = NULL;
+			newNode->left = NULL;
+
 			return newNode;
+		}
+
+		int getHeightTree(Node const *a)
+		{
+			if (!a)
+				return 0;
+			
+			int left = 0;
+			int right = 0;
+
+			left = getHeightTree(a->left);
+			right = getHeightTree(a->right);
+			return (left > right) ? left + 1 : right + 1;
+		} 
+
+		void	right_right_Rotation(Node *insertNode)
+		{
+			if (!insertNode)
+				return ;
+			
+			Node *pivot = insertNode->left;
+
+			insertNode->left = pivot->right;
+			(pivot->right) ? pivot->right->parent = insertNode : 0;
+			
+			pivot->right = insertNode;
+			pivot->parent = insertNode->parent;
+
+			if (insertNode->parent){
+				Node *parent = insertNode->parent;
+				
+				(parent->left == insertNode) ? parent->left = pivot : parent->right = pivot; 
+			}
+			insertNode->parent = pivot;
+			if (!pivot->parent)
+				_root = pivot;
+		}
+
+		void	left_left_Rotation(Node *insertNode)
+		{
+			if (!insertNode || !insertNode->right)
+				return ;
+			
+			Node *pivot = insertNode->right;	
+
+			insertNode->right = pivot->left;
+			(pivot->left) ? pivot->left->parent = insertNode : 0;
+				
+			pivot->left = insertNode;
+			pivot->parent = insertNode->parent;
+			
+			if (insertNode->parent){
+				Node *parent = insertNode->parent;
+				(parent->left == insertNode) ? parent->left = pivot : parent->right = pivot;
+			}
+				
+			insertNode->parent = pivot;
+			if (!pivot->parent)
+				_root = pivot;
+		}
+
+		void left_right_Rotation(Node *insertNode)
+		{
+			//left rotation 
+			Node *left = insertNode->left;
+			insertNode->left = left->right;
+			insertNode->left->parent = insertNode;
+			insertNode->left->left = left;
+			insertNode->left->left->parent = insertNode->left;
+
+			//right rotation
+			Node *tmp = insertNode;
+			insertNode = insertNode->left;
+			insertNode->parent = tmp->parent;
+			insertNode->right = tmp;
+			tmp->parent = insertNode;
+			if (!tmp->parent)
+				_root = insertNode;
+		}
+
+		void right_left_Rotation(Node *insertNode)
+		{
+			//right rotation
+			Node *right = insertNode->right;
+			insertNode->right = right->left;
+			insertNode->right->parent = insertNode;
+			insertNode->right->right = right;
+			insertNode->right->right->parent = insertNode->right;
+
+			//left rotation
+			Node *tmp = insertNode;
+			insertNode = insertNode->right;
+			insertNode->parent = tmp->parent;
+			insertNode->left = tmp;
+			tmp->parent = insertNode;
+			if (!tmp->parent)
+				_root = insertNode;
+		}
+
+		
+		void	BalancedTree(Node *insertNode)
+		{
+			if (!insertNode)
+				return ;
+			while (insertNode){
+				int bl = getHeightTree(insertNode->left);
+				int br = getHeightTree(insertNode->right);
+				if (bl - br > 1){
+					Node *tmp = insertNode->left;
+					if (getHeightTree(tmp->left) - getHeightTree(tmp->right) < -1)
+					right_left_Rotation(insertNode);
+					else
+						right_right_Rotation(insertNode);
+				}
+				else if (bl - br < -1){
+					Node *tmp = insertNode->right;
+					if (getHeightTree(tmp->left) - getHeightTree(tmp->right) > 1)
+						left_right_Rotation(insertNode);
+					else
+						left_left_Rotation(insertNode);
+				}
+				insertNode = insertNode->parent;
+			}
 		}
 
 		/*
 		** Recursive insert function that returns the new created node
 		*/
+
 		Node *recInsertNode(Node **bst, Node *parent, value_type const &content)
 		{
 			if (isKeyInBinTree(content.first, *bst))						// IS the key already present
 				return NULL;
 			else if (!*bst){
-				if (!(*bst = createNewTree(NULL, NULL, parent, content)))	// case empty tree
+				if (!(*bst = createNode(content, parent)))	// case empty tree
 					return *bst;
 			}
 			else{										// check which side the leave should be added
 				parent = *bst;
-				if (content.first > (*bst)->p.first)
+				if (content.first > (*bst)->data.first)
 					return recInsertNode(&(*bst)->right, parent, content);
-				else if (content.first < (*bst)->p.first)
+				else if (content.first < (*bst)->data.first)
 					return recInsertNode(&(*bst)->left, parent, content);
 			}
 			return *bst;
 		}
-		
+
 		// returns 1 if element has been inserted are 0 if already in tree
-		Node *insertNewNode(Node **bst, value_type const &content)
+		Node *insertNewNode(value_type const &content)
 		{
 			Node *newNode = NULL;
-			newNode = (*bst) ? recInsertNode(bst, newNode, content) : recInsertNode(&_root, newNode, content);
+			Node *recRoot = _root;
+			newNode = recInsertNode(&recRoot, newNode, content);
+			BalancedTree(newNode);
 			return newNode;
 		}
-
 
 		Node *isKeyInBinTree(key_type const &key, Node *bst)
 		{	
@@ -276,11 +409,11 @@ namespace ft
 				return NULL;
 			else
 			{
-				if (key == bst->p.first)
+				if (key == bst->data.first)
 					return bst;
 				else
 				{
-					if (key < bst->p.first)
+					if (key < bst->data.first)
 						return isKeyInBinTree(key, bst->left);
 					else
 						return isKeyInBinTree(key, bst->right);
@@ -288,50 +421,51 @@ namespace ft
 			}
 		}
 
-		Node	*recDeleteNode(Node **bst, Node **root, key_type const& key)
+		void deleteNode(Node **root, key_type const data)
 		{
-			if (!*bst)
-				return *bst;
-			if ((*bst)->p.first > key){										// the deletenode is in left side
-				(*bst)->left = recDeleteNode(&((*bst)->left), root, key);
-				((*bst)->left) ?  (*bst)->left->parent = *bst : 0;
+			if (!*root)
+				return;
+			Node *del = isKeyInBinTree(data, *root);
+			
+			if (!del)
+				return;
+			if (del->right && !del->left){
+				Node *right = del->right;
+				right->parent = del->parent;
+				if (del->parent)
+					(del->parent->right == del) ? del->parent->right = right : del->parent->left = right;
+				else
+					*root = del->right;
+				delete del;
+				BalancedTree(right, root);
 			}
-			else if ((*bst)->p.first < key)	{									// ... right side
-				(*bst)->right = recDeleteNode(&((*bst)->right), root, key);
-				((*bst)->right) ? (*bst)->right->parent = *bst : 0;
+			else if (del->left && !del->right){
+				Node *left = del->left;
+				left->parent = del->parent;
+				if (del->parent)
+					(del->parent->right == del) ? del->parent->right = left : del->parent->left = left;
+				else
+					*root = del->left;
+				delete del;
+				BalancedTree(left, root);
 			}
-			else if (key == (*root)->p.first){
-				Node *tmp2 = ((*root)->right) ? ::Min<key_type, T>((*root)->right) : Max<key_type, T>((*root)->left);
-				(*bst)->p.first = tmp2->p.first;
-				(*bst)->right = recDeleteNode(&((*bst)->right), root, tmp2->p.first);
-				return *bst;
+			else if (!del->left && !del->right){
+				Node *parent = del->parent;
+				if (del->parent)
+					(del->parent->right == del) ? del->parent->right = NULL : del->parent->left = NULL;
+				else
+					*root = NULL;
+				delete del;
+				if (parent)
+					BalancedTree(parent, root);
 			}
-			else {
-				Node *tmp = NULL;
-				if (!(*bst)->left && !(*bst)->right)
-					;
-				else if ((*bst)->right && !(*bst)->left)
-					tmp = (*bst)->right;
-				else if ((*bst)->left && !(*bst)->right)
-					tmp = (*bst)->left;
-				else{
-					Node *tmp2 = ::Min<key_type, T>((*bst)->right);
-					(*bst)->p.first = tmp2->p.first;
-					(*bst)->right = recDeleteNode(&((*bst)->right), root, tmp2->p.first);
-					return *bst;
-				}
-				delete *bst;
-				*bst = NULL;
-				return tmp;
+			else{
+				Node *right = del->right;
+				while (right->left)
+					right = right->left;
+				del->data.first = right->data.first;
+				deleteNode(&right, right->data.first);
 			}
-			return *bst;
-		}
-
-		int	deleteNode(Node **node, key_type const &content)
-		{
-			bool ret = isKeyInBinTree(content, _root);
-			recDeleteNode(node, &_root, content);
-			return ret;
 		}
 	};
 }

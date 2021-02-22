@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   mapIterators.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: heleneherin <heleneherin@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/15 14:51:35 by hherin            #+#    #+#             */
-/*   Updated: 2021/02/19 16:10:54 by hherin           ###   ########.fr       */
+/*   Updated: 2021/02/21 21:22:59 by heleneherin      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,9 +32,7 @@ namespace ft
 			typedef typename ft::chooseIf<B, const valueT&, valueT&>::type	reference;
 			typedef typename ft::chooseIf<B, const valueT*, valueT*>::type	pointer;
 
-			map_bidirect_iter(map_pointer val = 0, map_pointer neutral = 0) : _current(val), _neutral(neutral)
-			{
-			}
+			map_bidirect_iter(map_pointer val = 0, map_pointer neutral = 0) : _current(val), _neutral(neutral) { }
 			map_bidirect_iter(map_bidirect_iter<true, D, value_type> const &cp) { _current = cp.getCurrent(); _neutral = cp._neutral; }
 			// map_bidirect_iter(map_bidirect_iter<false, D, value_type> const &cp) { _current = cp.getCurrent(); }
 			map_bidirect_iter operator=(map_bidirect_iter const &cp)
@@ -85,7 +83,8 @@ namespace ft
 							_current = _current->parent;
 					}
 				}
-				return *this; }
+				return *this; 
+			}
 			map_bidirect_iter	operator--(int) { map_bidirect_iter tmp = *this; --(*this); return tmp; }
 			reference			operator*() const { return _current->p; }
 			pointer				operator->() { return &_current->p; }
