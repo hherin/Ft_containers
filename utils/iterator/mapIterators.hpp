@@ -6,7 +6,7 @@
 /*   By: heleneherin <heleneherin@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/15 14:51:35 by hherin            #+#    #+#             */
-/*   Updated: 2021/02/21 21:22:59 by heleneherin      ###   ########.fr       */
+/*   Updated: 2021/02/24 12:09:41 by heleneherin      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,8 +58,11 @@ namespace ft
 							_current = _current->left;
 					}
 					else{
-						if (_current->parent)
+						map_pointer currSave = _current;
+						do 
 							_current = _current->parent;
+						while (_current->parent && _current->data.first < currSave->data.first);
+						
 					}
 				}
 				return *this;
@@ -79,16 +82,18 @@ namespace ft
 							_current = _current->right;
 					}
 					else{
-						if (_current->parent)
+						map_pointer currSave = _current;
+						do 
 							_current = _current->parent;
+						while (_current->parent && _current->data.first > currSave->data.first);
 					}
 				}
 				return *this; 
 			}
 			map_bidirect_iter	operator--(int) { map_bidirect_iter tmp = *this; --(*this); return tmp; }
-			reference			operator*() const { return _current->p; }
-			pointer				operator->() { return &_current->p; }
-			bool				operator==(const map_bidirect_iter& b) { return (this->_current->p.first == b._current->p.first && this->_current->p.second == b._current->p.second); }
+			reference			operator*() const { return _current->data; }
+			pointer				operator->() { return &_current->data; }
+			bool				operator==(const map_bidirect_iter& b) { return (this->_current->data.first == b._current->data.first && this->_current->data.second == b._current->data.second); }
 			bool				operator!=(const map_bidirect_iter& b) { return this->_current != b._current; }
 			map_pointer	getCurrent() const { return _current; }					// two types of iterators (const and non const)
 
