@@ -6,7 +6,7 @@
 /*   By: heleneherin <heleneherin@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 19:55:49 by heleneherin       #+#    #+#             */
-/*   Updated: 2021/03/01 22:04:37 by heleneherin      ###   ########.fr       */
+/*   Updated: 2021/03/01 22:24:20 by heleneherin      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,7 +128,7 @@ namespace ft
 			// Returns the maximum number of elements that the list container can hold
 			size_type max_size() const
 			{
-				return SIZE_T_MAX / sizeof(Node);
+				return ((size_type)-1) / sizeof(Node);
 			}
 
 			// ===================== Element access ===================
