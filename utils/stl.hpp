@@ -13,7 +13,6 @@
 #ifndef STL_HPP
 # define STL_HPP
 
-
 namespace ft
 {
 	template <class T1, class T2>
@@ -60,33 +59,6 @@ namespace ft
 		bool operator() (const T& x, const T& y) const { return x < y; }
 	};
 
-	// template <typename T>
-	// bool is_max(T obj1, T obj2)
-	// {
-	// 	return obj1.size() > obj2.size();
-	// }
-
-	// template <typename T>
-	// T& max(T& obj1, T& obj2)
-	// {
-	// 	if (obj1.size() > obj2.size())
-	// 		return obj1;
-	// 	return obj2;
-	// }
-
-	// template <typename T>
-	// T& min(T& obj1, T& obj2)
-	// {
-	// 	if (obj1.size() < obj2.size())
-	// 		return obj1;
-	// 	return obj2;
-	// }
-
-	// template<class T>
-	// bool is_less(const T& a, const T& b)
-	// {
-	// 	return a < b;
-	// }
 
 	template <class H>
 	void	mySwap(H& a, H&b)

@@ -6,7 +6,7 @@
 /*   By: heleneherin <heleneherin@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/04 12:58:14 by hherin            #+#    #+#             */
-/*   Updated: 2021/03/01 16:34:15 by heleneherin      ###   ########.fr       */
+/*   Updated: 2021/03/01 22:06:07 by heleneherin      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,7 +137,7 @@ namespace ft
 			size_type	size() const { return _size; }
 
 			// Returns the maximum number of elements the vector can hold (depend of OS or library implementation limitations)
-	// size_type	max_size() const { return _myAlloc.max_size(); }
+			size_type	max_size() const { return SIZE_T_MAX / sizeof(T); }
 
 			/*
 			** Resize a container with n elements

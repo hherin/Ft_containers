@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   list.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
+/*   By: heleneherin <heleneherin@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 19:55:49 by heleneherin       #+#    #+#             */
-/*   Updated: 2021/03/01 21:47:57 by user42           ###   ########.fr       */
+/*   Updated: 2021/03/01 22:04:37 by heleneherin      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,7 +126,10 @@ namespace ft
 			size_type size() const { return _size; }
 
 			// Returns the maximum number of elements that the list container can hold
-			size_type max_size() const;
+			size_type max_size() const
+			{
+				return SIZE_T_MAX / sizeof(Node);
+			}
 
 			// ===================== Element access ===================
 			// front() Returns a reference to the first data element in the list container.

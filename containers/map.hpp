@@ -137,7 +137,7 @@ namespace ft
 		// */ 
 		bool empty() const { return !_size; }
 		size_type size() const { return _size; }
-		// size_type max_size() const;
+		size_type max_size() const { return SIZE_T_MAX / sizeof(Node); }
 
 		// /*
 		// ** ================================== Element Access ============================
