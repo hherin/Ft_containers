@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   vector.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: heleneherin <heleneherin@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/04 12:58:14 by hherin            #+#    #+#             */
-/*   Updated: 2021/02/19 16:07:20 by hherin           ###   ########.fr       */
+/*   Updated: 2021/03/01 16:34:15 by heleneherin      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 # include <exception>
 # include "../utils/traits.hpp"
 # include "../utils/iterator/random_iter.hpp"
-# include "../utils/algo.hpp"
+# include "../utils/stl.hpp"
 # include "../utils/allocator.hpp"
 
 namespace ft

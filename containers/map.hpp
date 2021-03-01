@@ -15,9 +15,10 @@
 
 # include <memory>
 # include <iostream>
-# include "../utils/algo.hpp"
+# include "../utils/stl.hpp"
 # include "../utils/iterator/mapIterators.hpp"
 # include "../utils/allocator.hpp"
+# include "list.hpp"
 
 template <class K, class M>
 struct node
@@ -54,8 +55,8 @@ namespace ft
 			typedef const Node*										const_pointer;
 			typedef typename ft::map_bidirect_iter<true, Node, value_type>	iterator;
 			typedef typename ft::map_bidirect_iter<false, Node, value_type>	const_iterator;
-			// typedef typename ft::map_reverse_bidirect_iter<T, true, Node>	reverse_iterator;
-			// typedef typename ft::map_reverse_bidirect_iter<T, false, Node>	const_reverse_iterator;
+			typedef typename ft::map_rev_bidirect_iter<true, Node, value_type>	reverse_iterator;
+			typedef typename ft::map_rev_bidirect_iter<false, Node, value_type>	const_reverse_iterator;
 
 		private :
 			Node *_root;
@@ -81,11 +82,12 @@ namespace ft
 		// range (2)	
 		template <class InputIterator>
 		map (InputIterator first, InputIterator last, const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type(), typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator >::type* = 0) :
-			_size(0), _comp(comp), _alloc(alloc)
+			_root(0), _size(0), _comp(comp), _alloc(alloc)
 		{
 			neutral = new Node;
 			neutral->left = neutral;
 			neutral->right = neutral;
+
 			while (first != last){
 				insert(*first);
 				first++;
@@ -93,16 +95,21 @@ namespace ft
 		}
 		// copy (3)	
 		map (const map& x)
-		: _size(0), _comp(x._comp), _alloc(x._alloc)
+		: _root(0), _size(0), _comp(x._comp), _alloc(x._alloc)
 		{
 			neutral = new Node;
 			neutral->left = neutral;
 			neutral->right = neutral;
+
+			if (x.size())
+				for (const_iterator it = x.begin(); it != x.end(); it++)
+					insert((*it));
 		}
 
 		~map()
 		{
-
+			clear();
+			delete neutral;
 		}
 
 		map& operator= (const map& x)
@@ -116,13 +123,13 @@ namespace ft
 		// ** ================================== Iterators ==============================
 		// */
 		iterator begin() {return iterator(neutral->left, neutral); }
-		const_iterator begin() const {return iterator(neutral->left, neutral); }
+		const_iterator begin() const {return const_iterator(neutral->left, neutral); }
 		iterator end() { return iterator(neutral, neutral); }
-		const_iterator end() const { return iterator(neutral, neutral); }
-		// reverse_iterator rbegin();
-		// const_reverse_iterator rbegin() const;
-		// reverse_iterator rend();
-		// const_reverse_iterator rend() const;
+		const_iterator end() const { return const_iterator(neutral, neutral); }
+		reverse_iterator rbegin() { return reverse_iterator(neutral->right, neutral); }
+		const_reverse_iterator rbegin() const { return const_reverse_iterator(neutral->right, neutral); }
+		reverse_iterator rend() { return reverse_iterator(neutral, neutral); }
+		const_reverse_iterator rend() const  { return const_reverse_iterator(neutral, neutral); }
 
 		// /*
 		// ** ================================== Capacity =================================
@@ -134,7 +141,13 @@ namespace ft
 		// /*
 		// ** ================================== Element Access ============================
 		// */
-		// mapped_type& operator[] (const key_type& k);
+		mapped_type& operator[] (const key_type& k)
+		{
+			value_type val(k, mapped_type());
+			ft::pair<iterator,bool> ret = insert(val);
+			return ret.first->second;
+
+		}
 
 		// /*
 		// ** ================================== Modifiers ==================================
@@ -142,29 +155,27 @@ namespace ft
 		// single element (1)	
 		ft::pair<iterator,bool> insert (const value_type& val)
 		{
-			return ft::pair<iterator, bool>(insert(iterator(_root), val), isKeyInBinTree(val.first, _root) ? 0 : 1);
+			bool ishere = (_root) ? !isKeyInBinTree(val.first, _root) : 1;
+			return ft::pair<iterator, bool>(insert(iterator(_root, neutral), val), ishere);
 		}
 
 		// with hint (2)	
 		iterator insert (iterator position, const value_type& val)
 		{
 			Node *pos = position.getCurrent();
-			Node *rootSave = _root;
-			(pos != neutral) ? _root = pos : 0;
-			Node *ret = (pos != neutral) ? insertNewNode(val) : insertNewNode(val);
-			_root = rootSave;
+			Node *ret = insertNewNode(&_root, val);
 			if (ret){
 				ret->neutral = neutral;
 				_size++;
 				if (_size == 1){
 					neutral->left = ret; neutral->right = ret;
 				}
-				else if (neutral->left && ret->data.first < neutral->left->data.first)
-					neutral->left = ret;
-				else if (neutral->right && ret->data.second > neutral->right->data.second)
-					neutral->right = ret;
+				else{
+					neutral->left = getMin();
+					neutral->right = getMax();
+				}
 			}
-			return ret ? iterator(ret) : iterator(isKeyInBinTree(val.first, pos));
+			return ret ? iterator(ret, neutral) : iterator(isKeyInBinTree(val.first, pos), neutral);
 		}
 
 		// range (3)	
@@ -177,25 +188,40 @@ namespace ft
 			}
 		}
 
-		// void printMap()
-		// {
-		// 	printTree<const Key, T>(_root);
-		// }
+		void printMap() { printTree(_root); }
 
 		void erase (iterator position)
 		{
-			deleteNode(position.getCurrent(), (*position).first);
+			_size -= deleteNode(&_root, position->first);
+
+			neutral->right = (!_size) ? neutral : getMax();
+			neutral->left = (!_size) ? neutral : getMin();
 		}
 
 		size_type erase (const key_type& k)
 		{
-			return reinterpret_cast<size_type>(deleteNode(&_root, k));
+			Node *del = isKeyInBinTree(k, _root);
+			if (del){
+				erase(iterator(del, neutral));
+				return 1;
+			}
+			return 0;
 		}
 
     	void erase (iterator first, iterator last)
 		{
+			ft::list<Key> delKey;
+
 			while (first != last){
-				deleteNode(&_root, (*first).first);
+				delKey.push_back(first->first);
+				first++;
+			}
+
+			while (delKey.size()){
+				_size -= deleteNode(&_root, delKey.front());
+				delKey.pop_front();
+				neutral->right = (!_size) ? neutral : getMax();
+				neutral->left = (!_size) ? neutral : getMin();
 			}
 		}
 
@@ -203,6 +229,7 @@ namespace ft
 		{
 			ft::mySwap(_size, x._size);
 			ft::mySwap(_root, x._root);
+			ft::mySwap(neutral, x.neutral);
 			ft::mySwap(_comp, x._comp);
 			ft::mySwap(_alloc, x._alloc);
 			ft::mySwap(_nodAlloc, x._nodAlloc);
@@ -215,20 +242,91 @@ namespace ft
 		// */
 
 		key_compare key_comp() const { return _comp; }
-		// value_compare value_comp() const;
+		value_type value_comp() const { return value_type(_comp); }
 
 		// /*
 		// ** ===================================== Operations =================================
 		// */
-		// iterator find (const key_type& k);
-		// const_iterator find (const key_type& k) const;
-		// size_type count (const key_type& k) const;
-		// iterator lower_bound (const key_type& k);
-		// const_iterator lower_bound (const key_type& k) const;
-		// iterator upper_bound (const key_type& k);
-		// const_iterator upper_bound (const key_type& k) const;
-		// pair<const_iterator,const_iterator> equal_range (const key_type& k) const;
-		// pair<iterator,iterator>             equal_range (const key_type& k);
+
+		iterator find (const key_type& k)
+		{
+			Node *ret = isKeyInBinTree(k, _root);
+			return (ret) ? iterator(ret, neutral) : end();
+		}
+
+		const_iterator find (const key_type& k) const
+		{
+			Node *ret = isKeyInBinTree(k, _root);
+			return (ret) ? const_iterator(ret, neutral) : end();
+		}
+
+		size_type count (const key_type& k) const
+		{
+			return isKeyInBinTree(k, _root) ? 1 : 0;
+		}
+
+		iterator lower_bound (const key_type& k)
+		{
+			for (iterator it = begin(); it != end(); it++){
+				if (_comp(k, it->first) || (!_comp(it->first, k) && !_comp(k, it->first)))
+					return it;
+			}
+			return end();
+		}
+
+		const_iterator lower_bound (const key_type& k) const
+		{
+			for (const_iterator it = begin(); it != end(); it++)
+				if (_comp(k, it->first) || (!_comp(it->first, k) && !_comp(k, it->first)))
+					return it;
+			return end();
+		}
+
+		iterator upper_bound (const key_type& k)
+		{
+			for (iterator it = begin(); it != end(); it++)
+				if (it->first > k)
+					return it;
+			return end();
+		}
+
+
+		const_iterator upper_bound (const key_type& k) const
+		{
+			for (const_iterator it = begin(); it != end(); it++)
+				// if (it->first > k)
+				if (_comp(k, it->first))
+					return it;
+			return end();
+		}
+
+		ft::pair<const_iterator,const_iterator> equal_range (const key_type& k) const
+		{
+			for (const_iterator it = begin(); it != end(); it++){
+				if (!_comp(it->first, k) && !_comp(k, it->first)){
+					const_iterator next(it);
+					next++;
+					return ft::pair<const_iterator,const_iterator>(it, next);
+				}
+				else if (_comp(k, it->first))
+					return ft::pair<const_iterator,const_iterator>(it, it);
+			}
+			return ft::pair<const_iterator,const_iterator>(end(), end());
+		}		
+
+		ft::pair<iterator,iterator>    equal_range (const key_type& k)
+		{
+			for (iterator it = begin(); it != end(); it++){
+				if (!_comp(it->first, k) && !_comp(k, it->first)){
+					iterator next(it);
+					next++;
+					return ft::pair<iterator,iterator>(it, next);
+				}
+				else if (_comp(k, it->first))
+					return ft::pair<iterator,iterator>(it, it);
+			}
+			return ft::pair<iterator,iterator>(end(), end());
+		}
 		
 		private:
 
@@ -239,7 +337,6 @@ namespace ft
 				std::cout << "Allocation failed\n";
 				return NULL;
 			}
-
 			_alloc.construct(&newNode->data, data);
 			newNode->parent = p;
 			newNode->right = NULL;
@@ -248,6 +345,12 @@ namespace ft
 			return newNode;
 		}
 
+		void destroyNode(Node **del)
+		{
+			_alloc.destroy(&(*del)->data);
+			_nodAlloc.deallocate(*del, 1);
+			*del = NULL;
+		}
 		int getHeightTree(Node const *a)
 		{
 			if (!a)
@@ -261,7 +364,7 @@ namespace ft
 			return (left > right) ? left + 1 : right + 1;
 		} 
 
-		void	right_right_Rotation(Node *insertNode)
+		void	right_Rotation(Node *insertNode)
 		{
 			if (!insertNode)
 				return ;
@@ -284,7 +387,7 @@ namespace ft
 				_root = pivot;
 		}
 
-		void	left_left_Rotation(Node *insertNode)
+		void	left_Rotation(Node *insertNode)
 		{
 			if (!insertNode || !insertNode->right)
 				return ;
@@ -306,66 +409,31 @@ namespace ft
 			if (!pivot->parent)
 				_root = pivot;
 		}
-
-		void left_right_Rotation(Node *insertNode)
-		{
-			//left rotation 
-			Node *left = insertNode->left;
-			insertNode->left = left->right;
-			insertNode->left->parent = insertNode;
-			insertNode->left->left = left;
-			insertNode->left->left->parent = insertNode->left;
-
-			//right rotation
-			Node *tmp = insertNode;
-			insertNode = insertNode->left;
-			insertNode->parent = tmp->parent;
-			insertNode->right = tmp;
-			tmp->parent = insertNode;
-			if (!tmp->parent)
-				_root = insertNode;
-		}
-
-		void right_left_Rotation(Node *insertNode)
-		{
-			//right rotation
-			Node *right = insertNode->right;
-			insertNode->right = right->left;
-			insertNode->right->parent = insertNode;
-			insertNode->right->right = right;
-			insertNode->right->right->parent = insertNode->right;
-
-			//left rotation
-			Node *tmp = insertNode;
-			insertNode = insertNode->right;
-			insertNode->parent = tmp->parent;
-			insertNode->left = tmp;
-			tmp->parent = insertNode;
-			if (!tmp->parent)
-				_root = insertNode;
-		}
-
 		
 		void	BalancedTree(Node *insertNode)
 		{
-			if (!insertNode)
-				return ;
 			while (insertNode){
 				int bl = getHeightTree(insertNode->left);
 				int br = getHeightTree(insertNode->right);
-				if (bl - br > 1){
+				if (bl - br >= 2){
 					Node *tmp = insertNode->left;
-					if (getHeightTree(tmp->left) - getHeightTree(tmp->right) < -1)
-					right_left_Rotation(insertNode);
+					if (getHeightTree(tmp->left) - getHeightTree(tmp->right) <= 0)
+					{
+						left_Rotation(insertNode->left);
+						right_Rotation(insertNode);
+					}
 					else
-						right_right_Rotation(insertNode);
+						right_Rotation(insertNode);
 				}
-				else if (bl - br < -1){
+				else if (bl - br <= -2){
 					Node *tmp = insertNode->right;
-					if (getHeightTree(tmp->left) - getHeightTree(tmp->right) > 1)
-						left_right_Rotation(insertNode);
+					if (getHeightTree(tmp->left) - getHeightTree(tmp->right) >= 0)
+					{
+						right_Rotation(insertNode->right);
+						left_Rotation(insertNode);
+					}
 					else
-						left_left_Rotation(insertNode);
+						left_Rotation(insertNode);
 				}
 				insertNode = insertNode->parent;
 			}
@@ -380,30 +448,29 @@ namespace ft
 			if (isKeyInBinTree(content.first, *bst))						// IS the key already present
 				return NULL;
 			else if (!*bst){
-				if (!(*bst = createNode(content, parent)))	// case empty tree
-					return *bst;
+				*bst = createNode(content, parent);	// case empty tree
+				return *bst;
 			}
 			else{										// check which side the leave should be added
 				parent = *bst;
-				if (content.first > (*bst)->data.first)
+				if (!_comp(content.first, (*bst)->data.first))
 					return recInsertNode(&(*bst)->right, parent, content);
-				else if (content.first < (*bst)->data.first)
+				else if (_comp(content.first, (*bst)->data.first))
 					return recInsertNode(&(*bst)->left, parent, content);
 			}
 			return *bst;
 		}
 
 		// returns 1 if element has been inserted are 0 if already in tree
-		Node *insertNewNode(value_type const &content)
+		Node *insertNewNode(Node **bst, value_type const &content)
 		{
 			Node *newNode = NULL;
-			Node *recRoot = _root;
-			newNode = recInsertNode(&recRoot, newNode, content);
+			newNode = (*bst) ? recInsertNode(bst, newNode, content) : recInsertNode(&_root, newNode, content);
 			BalancedTree(newNode);
 			return newNode;
 		}
 
-		Node *isKeyInBinTree(key_type const &key, Node *bst)
+		Node *isKeyInBinTree(key_type const &key, Node *bst) const
 		{	
 			if (!bst)
 				return NULL;
@@ -413,7 +480,7 @@ namespace ft
 					return bst;
 				else
 				{
-					if (key < bst->data.first)
+					if (_comp(key, bst->data.first))
 						return isKeyInBinTree(key, bst->left);
 					else
 						return isKeyInBinTree(key, bst->right);
@@ -421,23 +488,23 @@ namespace ft
 			}
 		}
 
-		void deleteNode(Node **root, key_type const data)
+		int deleteNode(Node **root, key_type const data)
 		{
 			if (!*root)
-				return;
+				return false;
 			Node *del = isKeyInBinTree(data, *root);
 			
 			if (!del)
-				return;
-			if (del->right && !del->left){
+				return false;
+			else if (del->right && !del->left){
 				Node *right = del->right;
 				right->parent = del->parent;
 				if (del->parent)
 					(del->parent->right == del) ? del->parent->right = right : del->parent->left = right;
 				else
 					*root = del->right;
-				delete del;
-				BalancedTree(right, root);
+				destroyNode(&del);
+				BalancedTree(right);
 			}
 			else if (del->left && !del->right){
 				Node *left = del->left;
@@ -446,8 +513,8 @@ namespace ft
 					(del->parent->right == del) ? del->parent->right = left : del->parent->left = left;
 				else
 					*root = del->left;
-				delete del;
-				BalancedTree(left, root);
+				destroyNode(&del);
+				BalancedTree(left);
 			}
 			else if (!del->left && !del->right){
 				Node *parent = del->parent;
@@ -455,17 +522,88 @@ namespace ft
 					(del->parent->right == del) ? del->parent->right = NULL : del->parent->left = NULL;
 				else
 					*root = NULL;
-				delete del;
+				destroyNode(&del);
 				if (parent)
-					BalancedTree(parent, root);
+					BalancedTree(parent);
 			}
 			else{
 				Node *right = del->right;
 				while (right->left)
 					right = right->left;
-				del->data.first = right->data.first;
+				_alloc.destroy(&del->data);
+				_alloc.construct(&del->data, right->data);
 				deleteNode(&right, right->data.first);
 			}
+			return true;
+		}
+
+		Node *getMax()
+		{
+			Node *ret = _root;
+			while (ret && ret->right)
+				ret = ret->right;
+			return ret;
+		}
+
+		Node *getMin() 
+		{
+			Node *ret = _root;
+			while (ret && ret->left)
+				ret = ret->left;
+			return ret;
+		}
+
+		ft::vector<Node*> save_key(Node *bst)
+		{
+			ft::vector<Node*> TreeArray;
+			if (!bst)
+				return TreeArray;
+				
+			Node *current = bst;
+			TreeArray.push_back(current);
+			
+			int i = 1;
+			while (i <= pow(2, (getHeightTree(bst) - 1)) - 1)
+			{
+				(TreeArray[i - 1]) ? TreeArray.push_back(current->left) : TreeArray.push_back(0);
+				(TreeArray[i - 1]) ? TreeArray.push_back(current->right) : TreeArray.push_back(0);
+
+				current = TreeArray[i];
+				i++;
+			}
+			return TreeArray;
+		}
+
+		void printTree(Node *bst)
+		{
+			if (!bst)
+				return;
+			ft::vector<Node *> treeArray = save_key(bst);
+			int level = 1;
+			size_t i = 1;
+			int index = 1;
+			int width =  pow(2, getHeightTree(bst)) * 3;  // =>   * spaces
+			
+			std::cout.width((width - 3) / 2);
+			std::cout << "[ " << treeArray[0]->data.first << " ]" << "\n";
+			
+			while (i < treeArray.size()){
+				std::cout.width( (width - 3) / (pow(2, level) + 1) );
+				(treeArray[i]) ? 
+					std::cout << "[ " << treeArray[i]->data.first << " ]" : std::cout << "[NIL]";
+				
+				if (index == pow(2, level)) {
+					std::cout << "\n";
+					level++;
+					index = 1;
+				}
+				else{
+					std::cout << " ";
+					index++;
+				}
+				i++;
+			}
+			treeArray.clear();
 		}
 	};
 }

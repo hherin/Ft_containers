@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   traits.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: heleneherin <heleneherin@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/06 15:35:44 by hherin            #+#    #+#             */
-/*   Updated: 2021/02/04 12:33:53 by hherin           ###   ########.fr       */
+/*   Updated: 2021/03/01 16:36:44 by heleneherin      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,14 +30,6 @@ namespace ft
 	{
 		typedef T type;
 	};
-
-
-	// ========================= isABR ========================
-	// template <class, class = void>
-	// struct isABR { static const bool value = false; };
-	
-	// template<>
-	// struct isABR<s_abr> { static const bool value = true; };
 	
 	// ================== IsInterger type =====================
 	template <class, class = void>
@@ -81,5 +73,6 @@ namespace ft
 		typedef const isConst type;
 	};
 
-} // namespace ft
+}
+
 #endif

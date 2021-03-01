@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   list.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: heleneherin <heleneherin@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 19:55:49 by heleneherin       #+#    #+#             */
-/*   Updated: 2021/02/17 11:36:07 by hherin           ###   ########.fr       */
+/*   Updated: 2021/03/01 20:04:20 by heleneherin      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 # include <memory>
 # include "../utils/iterator/bidirect_iter.hpp"
 # include "../utils/iterator/reverse_bidirect_iter.hpp"
-# include "../utils/algo.hpp"
+# include "../utils/stl.hpp"
 # include "../utils/allocator.hpp"
 
 namespace ft
@@ -41,9 +41,10 @@ namespace ft
 				Node *next;
 				Node *prev;
 			};
-			Node			*_head;
-			size_type		_size;
-			allocator_type	_alloc;
+			Node				*_head;
+			size_type			_size;
+			allocator_type		_alloc;
+			ft::myAlloc<Node>	_nodeAlloc;
 
 		public:
 			typedef typename ft::list_bidirect_iter<T, true, Node>			iterator;
@@ -54,14 +55,14 @@ namespace ft
 			// =================== Member Functions ===================
 			// Default constructor
 			explicit list (const allocator_type& alloc = allocator_type())
-				: _head(NULL), _size(0), _alloc(alloc) { createNewList(); }
+				: _size(0), _alloc(alloc) { _head = createNewNode(); }
 
 			// Fill constructor
 			// remind : value_type() appelle le constructeur par defaut de T
 			explicit list (size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type())
-				: _head(NULL), _size(0), _alloc(alloc)
+				: _size(0), _alloc(alloc)
 			{
-				createNewList();
+				_head = createNewNode();
 				for (size_type i = 0; i < n; i++)
 					push_back(val);
 			}
@@ -71,16 +72,16 @@ namespace ft
 			list (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type(), typename ft::enable_if<!ft::is_integral<InputIterator>::value>::type * = 0)
 				: _size(0), _alloc(alloc)
 			{
-				createNewList();
+				_head = createNewNode();
 				while (first != last)
 					push_back(*first++);
 			}
 
 			// Copy constructor
 			list (const list& x)
-				: _size(0)
+				: _size(0), _alloc(x._alloc)
 			{
-				createNewList();
+				_head = createNewNode();
 				for (iterator it(x.begin()); it != iterator(x.end()); it++)
 					push_back(*it);
 			}
@@ -89,7 +90,6 @@ namespace ft
 			{ 
 				while (_size)
 					pop_back();
-				// delete _head;
 			}
 
 			list& operator= (const list& x)
@@ -147,7 +147,7 @@ namespace ft
 			void assign (InputIterator first, InputIterator last, typename ft::enable_if<!ft::is_integral<InputIterator>::value>::type * = 0)
 			{
 				clear();
-				createNewList();
+				_head = createNewNode();
 				while (first != last)
 					push_back(*first++);
 			}
@@ -155,7 +155,7 @@ namespace ft
 			void assign (size_type n, const value_type& val)
 			{
 				clear();
-				createNewList();
+				_head = createNewNode();
 				for (size_type i = 0; i < n; i++)
 					push_back(val);
 			}
@@ -163,8 +163,8 @@ namespace ft
 			// Inserts a new element at the beginning of the list with the copy of val
 			void push_front (const value_type& val)
 			{
-				Node *node = new Node;
-				node->data = val;
+				Node *node = createNewNode(val);
+
 				node->next = _head->next;
 				node->prev = _head;
 				
@@ -176,8 +176,8 @@ namespace ft
 			// nserts a new element at the end of the list with the copy of val
 			void push_back (const value_type& val)
 			{
-				Node *node = new Node;
-				node->data = val;
+				Node *node = createNewNode(val);
+
 				node->next = _head;
 				node->prev = _head->prev;
 
@@ -194,7 +194,9 @@ namespace ft
 				Node *destr = _head->next;				// save elem to be destroyed
 				_head->next = destr->next;				// _head point to second elem => becomes first of the list
 				destr->next->next->prev = _head;		// first elem point to _head
-				delete destr;
+				_alloc.destroy(&destr->data);
+				_nodeAlloc.deallocate(destr, 1);
+
 				_size--;
 			}
 
@@ -206,7 +208,9 @@ namespace ft
 				Node *destr = _head->prev;				// save elem to be destroyed
 				_head->prev = destr->prev;				// end of the list changed
 				destr->prev->next = _head;		// new last elem point to _head
-				delete destr;
+				_alloc.destroy(&destr->data);
+				_nodeAlloc.deallocate(destr, 1);
+
 				_size--;
 			}
 
@@ -253,7 +257,10 @@ namespace ft
 				pos->prev->next = pos->next;
 				pos->next->prev = pos->prev;
 				ret = iterator(pos->next);
-				delete pos.getCurrent();
+
+				Node *destr = pos.getCurrent();
+				_alloc.destroy(&destr->data);
+				_nodeAlloc.deallocate(destr, 1);
 				_size--;
 				return ret;
 			}
@@ -335,7 +342,9 @@ namespace ft
 					if (*it == val){
 						it->prev->next = it->next;
 						it->next->prev = it->prev;
-						delete it.getCurrent();
+						Node *destr = it.getCurrent();
+						_alloc.destroy(&destr->data);
+						_nodeAlloc.deallocate(destr, 1);
 						_size--;
 					}
 					it = next;
@@ -356,7 +365,9 @@ namespace ft
 					if (pred(*it)){
 						it->prev->next = it->next;
 						it->next->prev = it->prev;
-						delete it.getCurrent();
+						Node *destr = it.getCurrent();
+						_alloc.destroy(&destr->data);
+						_nodeAlloc.deallocate(destr, 1);
 						_size--;
 					}
 					it = next;
@@ -527,19 +538,21 @@ namespace ft
 
 		protected:
 			// create the neutral elem for the linked list
-			void createNewList()
+			Node *createNewNode(value_type val = value_type())
 			{
-				_head = new Node;
-				_head->data = value_type();
-				_head->next = _head;
-				_head->prev = _head;
+				Node *node = _nodeAlloc.allocate(1);
+				_alloc.construct(&node->data, val);
+				node->next = node;
+				node->prev = node;
+				return node;
 			}
 
 			// create new link before pos with a copy of val
 			void addLink(iterator pos, const value_type &val)
 			{
 				Node *Cpos = pos.getCurrent();	// get pointer of pos
-				Node *nod = new Node();
+				Node *nod = createNewNode(val);
+				
 				// insert nod in the list
 				nod->next = Cpos;
 				nod->prev = pos->prev;
@@ -548,7 +561,7 @@ namespace ft
 				pos->prev->next = nod;
 				pos->prev = nod;
 
-				nod->data = val;
+				// nod->data = val;
 				_size++;
 			}
 

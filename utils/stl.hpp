@@ -10,8 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef ALGO_HPP
-# define ALGO_HPP
+#ifndef STL_HPP
+# define STL_HPP
 
 
 namespace ft
@@ -45,59 +45,48 @@ namespace ft
 			return *this;
 		}
 
-		friend bool operator== (const pair<T1,T2>& lhs, const pair<T1,T2>& rhs)
-		{ return lhs.first == rhs.first && lhs.second == rhs.second; }
-
-		friend bool operator!= (const pair<T1,T2>& lhs, const pair<T1,T2>& rhs)
-		{ return !(lhs==rhs); }
-
-		friend bool operator<  (const pair<T1,T2>& lhs, const pair<T1,T2>& rhs)
-		{ return lhs.first<rhs.first || (!(rhs.first<lhs.first) && lhs.second<rhs.second); }
-
-		friend bool operator<= (const pair<T1,T2>& lhs, const pair<T1,T2>& rhs)
-		{ return !(rhs<lhs); }
-
-		friend bool operator>  (const pair<T1,T2>& lhs, const pair<T1,T2>& rhs)
-		{ return rhs<lhs; }
-
-		friend bool operator>= (const pair<T1,T2>& lhs, const pair<T1,T2>& rhs)
-		{ return !(lhs<rhs); }
+		friend bool operator== (const pair<T1,T2>& lhs, const pair<T1,T2>& rhs) { return lhs.first == rhs.first && lhs.second == rhs.second; }
+		friend bool operator!= (const pair<T1,T2>& lhs, const pair<T1,T2>& rhs) { return !(lhs==rhs); }
+		friend bool operator<  (const pair<T1,T2>& lhs, const pair<T1,T2>& rhs) { return lhs.first<rhs.first || (!(rhs.first<lhs.first) && lhs.second<rhs.second); }
+		friend bool operator<= (const pair<T1,T2>& lhs, const pair<T1,T2>& rhs) { return !(rhs<lhs); }
+		friend bool operator>  (const pair<T1,T2>& lhs, const pair<T1,T2>& rhs) { return rhs<lhs; }
+		friend bool operator>= (const pair<T1,T2>& lhs, const pair<T1,T2>& rhs) { return !(lhs<rhs); }
 
 	};
 
 	template <class T> 
 	struct less
 	{
-		bool operator() (const T& x, const T& y) const { return x<y; }
+		bool operator() (const T& x, const T& y) const { return x < y; }
 	};
 
-	template <typename T>
-	bool is_max(T obj1, T obj2)
-	{
-		return obj1.size() > obj2.size();
-	}
+	// template <typename T>
+	// bool is_max(T obj1, T obj2)
+	// {
+	// 	return obj1.size() > obj2.size();
+	// }
 
-	template <typename T>
-	T& max(T& obj1, T& obj2)
-	{
-		if (obj1.size() > obj2.size())
-			return obj1;
-		return obj2;
-	}
+	// template <typename T>
+	// T& max(T& obj1, T& obj2)
+	// {
+	// 	if (obj1.size() > obj2.size())
+	// 		return obj1;
+	// 	return obj2;
+	// }
 
-	template <typename T>
-	T& min(T& obj1, T& obj2)
-	{
-		if (obj1.size() < obj2.size())
-			return obj1;
-		return obj2;
-	}
+	// template <typename T>
+	// T& min(T& obj1, T& obj2)
+	// {
+	// 	if (obj1.size() < obj2.size())
+	// 		return obj1;
+	// 	return obj2;
+	// }
 
-	template<class T>
-	bool is_less(const T& a, const T& b)
-	{
-		return a < b;
-	}
+	// template<class T>
+	// bool is_less(const T& a, const T& b)
+	// {
+	// 	return a < b;
+	// }
 
 	template <class H>
 	void	mySwap(H& a, H&b)
