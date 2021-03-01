@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   list.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: heleneherin <heleneherin@student.42.fr>    +#+  +:+       +#+        */
+/*   By: user42 <user42@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 19:55:49 by heleneherin       #+#    #+#             */
-/*   Updated: 2021/03/01 20:04:20 by heleneherin      ###   ########.fr       */
+/*   Updated: 2021/03/01 21:47:57 by user42           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,6 +90,8 @@ namespace ft
 			{ 
 				while (_size)
 					pop_back();
+				_alloc.destroy(&_head->data);
+				_nodeAlloc.deallocate(_head, 1);
 			}
 
 			list& operator= (const list& x)
@@ -147,7 +149,6 @@ namespace ft
 			void assign (InputIterator first, InputIterator last, typename ft::enable_if<!ft::is_integral<InputIterator>::value>::type * = 0)
 			{
 				clear();
-				_head = createNewNode();
 				while (first != last)
 					push_back(*first++);
 			}
@@ -155,7 +156,6 @@ namespace ft
 			void assign (size_type n, const value_type& val)
 			{
 				clear();
-				_head = createNewNode();
 				for (size_type i = 0; i < n; i++)
 					push_back(val);
 			}
@@ -193,7 +193,7 @@ namespace ft
 					return ;
 				Node *destr = _head->next;				// save elem to be destroyed
 				_head->next = destr->next;				// _head point to second elem => becomes first of the list
-				destr->next->next->prev = _head;		// first elem point to _head
+				destr->next->prev = _head;		// first elem point to _head
 				_alloc.destroy(&destr->data);
 				_nodeAlloc.deallocate(destr, 1);
 

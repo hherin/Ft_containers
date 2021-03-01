@@ -15,6 +15,7 @@
 
 # include <memory>
 # include <iostream>
+# include <cmath>
 # include "../utils/stl.hpp"
 # include "../utils/iterator/mapIterators.hpp"
 # include "../utils/allocator.hpp"
