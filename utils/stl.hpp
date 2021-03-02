@@ -15,6 +15,10 @@
 
 namespace ft
 {
+
+	// =============================================== ft::pair ===========================================
+	// std::pair is a class template that provides a way to store two heterogeneous objects as a single unit.
+	// A pair is a specific case of a std::tuple with two elements.
 	template <class T1, class T2>
 	class pair
 	{	
@@ -53,6 +57,8 @@ namespace ft
 
 	};
 
+	// ============================================================ ft::less =========================================
+	// Binary function object class whose call returns whether the its first argument compares less than the second (as returned by operator <).
 	template <class T> 
 	struct less
 	{
@@ -60,6 +66,8 @@ namespace ft
 	};
 
 
+	// ============================================================ ft::mySwap ==========================================
+	// SWap the content of two objects
 	template <class H>
 	void	mySwap(H& a, H&b)
 	{
@@ -68,6 +76,8 @@ namespace ft
 		b = tmp;
 	}
 
+	// =============================================== ft::lexicographical_compare =========================================
+	// Returns true if the range [first1,last1) compares lexicographically less than the range [first2,last2).
 	template <class InputIterator1, class InputIterator2>
 	bool lexicographical_compare (InputIterator1 first1, InputIterator1 last1, InputIterator2 first2, InputIterator2 last2)
 	{
