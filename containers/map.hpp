@@ -17,7 +17,6 @@
 # include <iostream>
 # include <cmath>
 # include "../utils/stl.hpp"
-# include "../utils/iterator/mapIterators.hpp"
 # include "../utils/allocator.hpp"
 # include "list.hpp"
 
@@ -54,10 +53,18 @@ namespace ft
 			typedef typename allocator_type::difference_type		difference_type;
 			typedef typename allocator_type::pointer				pointer;
 			typedef const Node*										const_pointer;
-			typedef typename ft::map_bidirect_iter<true, Node, value_type>	iterator;
-			typedef typename ft::map_bidirect_iter<false, Node, value_type>	const_iterator;
-			typedef typename ft::map_rev_bidirect_iter<true, Node, value_type>	reverse_iterator;
-			typedef typename ft::map_rev_bidirect_iter<false, Node, value_type>	const_reverse_iterator;
+
+
+			private:
+			template <bool B> class map_bidirect_iter;
+			template <bool B> class map_rev_bidirect_iter;
+
+			public:
+			typedef map_bidirect_iter<true>	iterator;
+			typedef map_bidirect_iter<false>	const_iterator;
+			typedef map_rev_bidirect_iter<true>	reverse_iterator;
+			typedef map_rev_bidirect_iter<false>	const_reverse_iterator;
+
 
 		private :
 			Node *_root;
@@ -66,6 +73,169 @@ namespace ft
 			key_compare _comp;
 			allocator_type _alloc;
 			ft::myAlloc<Node> _nodAlloc;
+
+			template <bool B> class map_bidirect_iter
+			{
+				public:
+					typedef typename std::ptrdiff_t							difference_type;
+					typedef Node* 												map_pointer;
+					typedef typename ft::chooseIf<B, const value_type&, value_type&>::type	reference;
+					typedef typename ft::chooseIf<B, const value_type*, value_type*>::type	pointer;
+
+					map_bidirect_iter(map_pointer val = 0, map_pointer neutral = 0, key_compare comp = ft::less<key_type>() ) : _current(val), _neutral(neutral), comp(comp) { }
+					map_bidirect_iter(map_bidirect_iter<true> const &cp) { _current = cp.getCurrent(); _neutral = cp.getNeutral(); comp = getComp(); }
+					map_bidirect_iter operator=(map_bidirect_iter const &cp)
+					{
+						if (this != &cp){
+							_current = cp._current;
+							_neutral = cp._neutral;
+							comp = cp.comp;
+						}
+						return *this;
+					}
+					~map_bidirect_iter(){}
+
+					map_bidirect_iter&	operator++() 
+					{
+						if (_current->data.first == _neutral->right->data.first)
+							_current = _neutral;
+						else if (_current == _neutral)
+							_current = _current->left;
+						else{
+							if (_current->right){
+								_current = _current->right;
+								while (_current->left)
+									_current = _current->left;
+							}
+							else{
+								map_pointer currSave = _current;
+								do 
+									(_current->parent) ? _current = _current->parent : 0;
+								while (_current->parent && comp(_current->data.first, currSave->data.first));
+							}
+						}
+						return *this;
+					}
+					map_bidirect_iter	operator++(int) { map_bidirect_iter tmp = *this; ++(*this); return tmp; } //post incrementation
+					
+					map_bidirect_iter	operator--() 
+					{ 
+						if (_current->data.first == _neutral->left->data.first)
+							_current = _neutral;
+						else if (_current == _neutral)
+							_current = _current->right;
+						else{
+							if (_current->left){
+								_current = _current->left;
+								while (_current->right)
+									_current = _current->right;
+							}
+							else{
+								map_pointer currSave = _current;
+								do 
+									_current = _current->parent;
+								while (_current->parent && !comp(_current->data.first, currSave->data.first));
+							}
+						}
+						return *this; 
+					}
+					map_bidirect_iter	operator--(int) { map_bidirect_iter tmp = *this; --(*this); return tmp; }
+					reference			operator*() const { return _current->data; }
+					pointer				operator->() { return &(_current->data); }
+					bool				operator==(const map_bidirect_iter& b) { return (this->_current->data.first == b._current->data.first && this->_current->data.second == b._current->data.second); }
+					bool				operator!=(const map_bidirect_iter& b) { return this->_current != b._current; }
+					map_pointer	getCurrent() const { return _current; }		// two types of iterators (const and non const)
+					map_pointer getNeutral() const { return _neutral; }
+					key_compare getComp() const { return comp; }
+
+				private:
+					map_pointer _current;
+					map_pointer _neutral;
+					key_compare comp;
+					
+			};
+
+			template < bool B> class map_rev_bidirect_iter
+			{
+				public:
+					typedef typename std::ptrdiff_t							difference_type;
+					typedef Node* 												map_pointer;
+					typedef typename ft::chooseIf<B, const value_type&, value_type&>::type	reference;
+					typedef typename ft::chooseIf<B, const value_type*, value_type*>::type	pointer;
+
+					map_rev_bidirect_iter(map_pointer val = 0, map_pointer neutral = 0, key_compare comp = ft::less<key_type>()) : _current(val), _neutral(neutral), comp(comp) { }
+					map_rev_bidirect_iter(map_rev_bidirect_iter<true> const &cp) { _current = cp.getCurrent(); _neutral = cp.getNeutral(); comp = getComp(); }
+					map_rev_bidirect_iter operator=(map_rev_bidirect_iter const &cp)
+					{
+						if (this != &cp){
+							_current = cp._current;
+							_neutral = cp._neutral;
+							comp = cp.comp;
+						}
+						return *this;
+					}
+					~map_rev_bidirect_iter(){}
+
+					map_rev_bidirect_iter&	operator++() 
+					{
+						if (_current->data.first == _neutral->left->data.first)
+							_current = _neutral;
+						else if (_current == _neutral)
+							_current = _current->right;
+						else{
+							if (_current->left){
+								_current = _current->left;
+								while (_current->right)
+									_current = _current->right;
+							}
+							else{
+								map_pointer currSave = _current;
+								do 
+									_current = _current->parent;
+								while (_current->parent && comp(currSave->data.first, _current->data.first));
+							}
+						}
+						return *this;
+					}
+					map_rev_bidirect_iter	operator++(int) { map_rev_bidirect_iter tmp = *this; ++(*this); return tmp; } //post incrementation
+					
+					map_rev_bidirect_iter	operator--() 
+					{ 
+						if (_current->data.first == _neutral->right->data.first)
+							_current = _neutral;
+						else if (_current == _neutral)
+							_current = _current->left;
+						else{
+							if (_current->right){
+								_current = _current->right;
+								while (_current->left)
+									_current = _current->left;
+							}
+							else{
+								map_pointer currSave = _current;
+								do 
+									(_current->parent) ? _current = _current->parent : 0;
+								while (_current->parent && comp(_current->data.first, currSave->data.first));
+								
+							}
+						}
+						return *this; 
+					}
+					map_rev_bidirect_iter	operator--(int) { map_rev_bidirect_iter tmp = *this; --(*this); return tmp; }
+					reference			operator*() const { return _current->data; }
+					pointer				operator->() { return &(_current->data); }
+					bool				operator==(const map_rev_bidirect_iter& b) { return (this->_current->data.first == b._current->data.first && this->_current->data.second == b._current->data.second); }
+					bool				operator!=(const map_rev_bidirect_iter& b) { return this->_current != b._current; }
+					map_pointer	getCurrent() const { return _current; }		// two types of iterators (const and non const)
+					map_pointer getNeutral() const { return _neutral; }
+					key_compare getComp() const { return comp; }
+
+				private:
+					map_pointer _current;
+					map_pointer _neutral;
+					key_compare comp;
+					
+			};
 		
 		public:
 		/*
@@ -123,14 +293,14 @@ namespace ft
 		// /*
 		// ** ================================== Iterators ==============================
 		// */
-		iterator begin() {return iterator(neutral->left, neutral); }
-		const_iterator begin() const {return const_iterator(neutral->left, neutral); }
-		iterator end() { return iterator(neutral, neutral); }
-		const_iterator end() const { return const_iterator(neutral, neutral); }
-		reverse_iterator rbegin() { return reverse_iterator(neutral->right, neutral); }
-		const_reverse_iterator rbegin() const { return const_reverse_iterator(neutral->right, neutral); }
-		reverse_iterator rend() { return reverse_iterator(neutral, neutral); }
-		const_reverse_iterator rend() const  { return const_reverse_iterator(neutral, neutral); }
+		iterator begin() {return iterator(neutral->left, neutral, _comp); }
+		const_iterator begin() const {return const_iterator(neutral->left, neutral,_comp); }
+		iterator end() { return iterator(neutral, neutral, _comp); }
+		const_iterator end() const { return const_iterator(neutral, neutral, _comp); }
+		reverse_iterator rbegin() { return reverse_iterator(neutral->right, neutral, _comp); }
+		const_reverse_iterator rbegin() const { return const_reverse_iterator(neutral->right, neutral, _comp); }
+		reverse_iterator rend() { return reverse_iterator(neutral, neutral, _comp); }
+		const_reverse_iterator rend() const  { return const_reverse_iterator(neutral, neutral, _comp); }
 
 		// /*
 		// ** ================================== Capacity =================================
@@ -157,7 +327,7 @@ namespace ft
 		ft::pair<iterator,bool> insert (const value_type& val)
 		{
 			bool ishere = (_root) ? !isKeyInBinTree(val.first, _root) : 1;
-			return ft::pair<iterator, bool>(insert(iterator(_root, neutral), val), ishere);
+			return ft::pair<iterator, bool>(insert(iterator(_root, neutral, _comp), val), ishere);
 		}
 
 		// with hint (2)	
@@ -203,7 +373,7 @@ namespace ft
 		{
 			Node *del = isKeyInBinTree(k, _root);
 			if (del){
-				erase(iterator(del, neutral));
+				erase(iterator(del, neutral, _comp));
 				return 1;
 			}
 			return 0;
@@ -252,13 +422,13 @@ namespace ft
 		iterator find (const key_type& k)
 		{
 			Node *ret = isKeyInBinTree(k, _root);
-			return (ret) ? iterator(ret, neutral) : end();
+			return (ret) ? iterator(ret, neutral, _comp) : end();
 		}
 
 		const_iterator find (const key_type& k) const
 		{
 			Node *ret = isKeyInBinTree(k, _root);
-			return (ret) ? const_iterator(ret, neutral) : end();
+			return (ret) ? const_iterator(ret, neutral, _comp) : end();
 		}
 
 		size_type count (const key_type& k) const

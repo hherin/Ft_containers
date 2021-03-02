@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   list.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: heleneherin <heleneherin@student.42.fr>    +#+  +:+       +#+        */
+/*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 19:55:49 by heleneherin       #+#    #+#             */
-/*   Updated: 2021/03/01 22:24:20 by heleneherin      ###   ########.fr       */
+/*   Updated: 2021/03/02 11:46:59 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,8 @@
 # define LIST_HPP
 
 # include <memory>
-# include "../utils/iterator/bidirect_iter.hpp"
-# include "../utils/iterator/reverse_bidirect_iter.hpp"
+// # include "../utils/iterator/bidirect_iter.hpp"
+// # include "../utils/iterator/reverse_bidirect_iter.hpp"
 # include "../utils/stl.hpp"
 # include "../utils/allocator.hpp"
 
@@ -46,11 +46,78 @@ namespace ft
 			allocator_type		_alloc;
 			ft::myAlloc<Node>	_nodeAlloc;
 
+			template <bool B> class list_bidirect_iter
+			{
+				public:
+					typedef typename std::ptrdiff_t							difference_type;
+					typedef Node* 												listelem_pointer;
+					typedef typename ft::chooseIf<B, const T&, T&>::type	reference;
+					typedef typename ft::chooseIf<B, const T*, T*>::type	pointer;
+
+					list_bidirect_iter(listelem_pointer val = 0) : _current(val){}
+					list_bidirect_iter(list_bidirect_iter<true> const &cp) { _current = cp.getCurrent(); }
+					list_bidirect_iter(list_bidirect_iter<false> const &cp) { _current = cp.getCurrent(); }
+					list_bidirect_iter operator=(list_bidirect_iter const &cp)
+					{
+						if (this != &cp)
+							_current = cp._current;
+						return *this;
+					}
+					~list_bidirect_iter(){}
+
+					list_bidirect_iter	operator++() { _current = _current->next; return *this; }
+					list_bidirect_iter	operator++(int) { list_bidirect_iter tmp = *this; ++(*this); return tmp; } //post incrementation
+					list_bidirect_iter	operator--(){ _current = _current->prev; return *this; }
+					list_bidirect_iter	operator--(int) { list_bidirect_iter tmp = *this; --(*this); return tmp; }
+					reference			operator*() const { return _current->data; }
+					listelem_pointer	operator->() { return _current; }
+					bool				operator==(const list_bidirect_iter& b) { return this->_current == b._current; }
+					bool				operator!=(const list_bidirect_iter& b) { return this->_current != b._current; }
+					listelem_pointer	getCurrent() const { return _current; }					// two types of iterators (const and non const)
+
+				protected:
+					listelem_pointer _current;
+			};
+
+			template <bool B> class list_reverse_bidirect_iter
+			{
+				public:
+					typedef typename std::ptrdiff_t							difference_type;
+					typedef  Node*												listelem_pointer;
+					typedef typename ft::chooseIf<B, const T&, T&>::type	reference;
+					typedef typename ft::chooseIf<B, const T*, T*>::type	pointer;
+
+					list_reverse_bidirect_iter(listelem_pointer val = 0) : _current(val){}
+					list_reverse_bidirect_iter(list_reverse_bidirect_iter<true> const &cp) { _current = cp.getCurrent(); }
+					list_reverse_bidirect_iter(list_reverse_bidirect_iter<false> const &cp) { _current = cp.getCurrent(); }
+					list_reverse_bidirect_iter(list_bidirect_iter<false> const &cp) { _current = cp.getCurrent()->prev; }
+					list_reverse_bidirect_iter operator=(list_reverse_bidirect_iter const &cp)
+					{
+						if (this != &cp)
+							_current = cp._current;
+						return *this;
+					}
+					~list_reverse_bidirect_iter(){}
+
+					list_reverse_bidirect_iter		operator++() { _current = _current->prev; return *this; }
+					list_reverse_bidirect_iter		operator++(int) { list_reverse_bidirect_iter tmp = *this; ++(*this); return tmp; } //post incrementation
+					list_reverse_bidirect_iter		operator--() { _current = _current->next; return *this; }
+					list_reverse_bidirect_iter		operator--(int) { list_reverse_bidirect_iter tmp = *this; --(*this); return tmp; }
+					reference						operator*() const { return _current->data; }
+					listelem_pointer				operator->() { return _current; }
+					bool							operator==(const list_reverse_bidirect_iter& b) { return this->_current == b._current; }
+					bool							operator!=(const list_reverse_bidirect_iter& b) { return this->_current != b._current; }
+					listelem_pointer				getCurrent() const { return _current; }
+
+				protected:
+					listelem_pointer _current;
+			};
+
 		public:
-			typedef typename ft::list_bidirect_iter<T, true, Node>			iterator;
-			typedef typename ft::list_bidirect_iter<T, false, Node>			const_iterator;
-			typedef typename ft::list_reverse_bidirect_iter<T, true, Node>	reverse_iterator;
-			typedef typename ft::list_reverse_bidirect_iter<T, false, Node>	const_reverse_iterator;
+			typedef list_bidirect_iter<true>			iterator;
+			typedef list_bidirect_iter<false>			const_iterator;
+			typedef list_reverse_bidirect_iter<true>	reverse_iterator;
+			typedef list_reverse_bidirect_iter<false>	const_reverse_iterator;
 
 			// =================== Member Functions ===================
 			// Default constructor

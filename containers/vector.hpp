@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   vector.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: heleneherin <heleneherin@student.42.fr>    +#+  +:+       +#+        */
+/*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/04 12:58:14 by hherin            #+#    #+#             */
-/*   Updated: 2021/03/01 22:24:11 by heleneherin      ###   ########.fr       */
+/*   Updated: 2021/03/02 12:01:56 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,6 @@
 # include <memory>
 # include <exception>
 # include "../utils/traits.hpp"
-# include "../utils/iterator/random_iter.hpp"
 # include "../utils/stl.hpp"
 # include "../utils/allocator.hpp"
 
@@ -45,10 +44,162 @@ namespace ft
 			typedef typename allocator_type::difference_type	difference_type;
 			typedef typename allocator_type::pointer			pointer;
 			typedef typename allocator_type::const_pointer		const_pointer;
-			typedef typename ft::random_iter<T, true>			iterator;
-			typedef typename ft::random_iter<T, false>			const_iterator;
-			typedef typename ft::reverse_random_iter<T, true>	reverse_iterator;
-			typedef typename ft::reverse_random_iter<T, false>	const_reverse_iterator;
+
+		private:
+			template <bool B> class random_iter
+			{
+				public:
+					typedef T												value_type;
+					typedef T*												nonConst_pointer;
+					typedef std::ptrdiff_t									difference_type;
+					typedef typename ft::chooseIf<B, const T&, T&>::type	reference;
+					typedef typename ft::chooseIf<B, const T*, T*>::type	pointer;
+
+					random_iter(nonConst_pointer val = 0) :_current(val) {}
+					random_iter(random_iter<true> const &cp) { _current = cp.getCurrent(); }
+
+
+					random_iter operator=(random_iter const &cp)
+					{
+						if (this != &cp)
+							this->_current = cp._current;
+						return *this;
+					}
+
+					~random_iter(){}
+
+					// ---------------------------------- Operators overload ------------------------------------
+					difference_type	operator-(random_iter const &lhs) { return (this->_current - lhs._current); }
+
+					random_iter operator+(int n)
+					{
+						random_iter ret(*this);
+						return ret += n;
+					}
+						
+					random_iter operator-(int n)
+					{
+						random_iter ret(*this);
+						return ret -= n;
+					}
+						
+					// ------------------------------------ Compoud assignment ------------------------------------
+					random_iter operator+=(int n)
+					{
+						for (int i = 0; i < n; i++)
+							(n > 0) ? this->_current++ : this->_current--;
+						return *this;
+					}
+						
+					random_iter operator-=(int n)
+					{
+						for (int i = 0; i < n; i++)
+							(n > 0) ? this->_current-- : this->_current++;
+						return *this;
+					}
+						
+					value_type operator[](int n) { return *(*this + n); }
+						
+					random_iter	operator++(){ _current++; return *this; }
+					random_iter	operator++(int){ random_iter tmp = *this; ++(*this); return tmp; } //post incrementation
+					random_iter	operator--(){ _current--; return *this; }
+					random_iter	operator--(int){ random_iter tmp = *this; --(*this); return tmp; }
+					reference			operator*() const { return *_current; }
+					pointer				operator->() { return _current; }
+					bool				operator==(const random_iter& b) { return this->_current == b._current; }
+					bool				operator!=(const random_iter& b) { return this->_current != b._current; }
+					nonConst_pointer	getCurrent() const { return _current; }
+
+				private:
+					nonConst_pointer _current;
+					
+					// ------------------------------------ Inequality comparisons ------------------------------------
+					friend bool operator>(const random_iter &x, const random_iter &y) { return (*x > *y); }
+					friend bool operator>=(const random_iter &x, const random_iter &y) { return (*x >= *y); }
+					friend bool operator<(const random_iter &x, const random_iter &y) { return (*x < *y); }
+					friend bool operator<=(const random_iter &x, const random_iter &y) { return (*x <= *y); }
+			};
+
+			template <bool B> class reverse_random_iter
+			{
+				public:
+					typedef T												value_type;
+					typedef T*												nonConst_pointer;
+					typedef std::ptrdiff_t									difference_type;
+					typedef typename ft::chooseIf<B, const T&, T&>::type	reference;
+					typedef typename ft::chooseIf<B, const T*, T*>::type	pointer;
+
+					reverse_random_iter(nonConst_pointer val = 0) : _current(val){}
+					reverse_random_iter(reverse_random_iter<true> const &cp) { _current = cp.getCurrent(); }
+					explicit reverse_random_iter(random_iter<false> const &cp) { _current = cp.getCurrent() - 1; }
+
+					reverse_random_iter operator=(reverse_random_iter const &cp)
+					{
+						if (this != &cp)
+							_current = cp._current;
+						return *this;
+					}
+
+					~reverse_random_iter(){}
+
+					// ---------------------------------- Operators overload ------------------------------------
+					difference_type	operator-(reverse_random_iter const &lhs) { return (lhs._current - getCurrent()); }
+
+					reverse_random_iter operator+(int n)
+					{
+						reverse_random_iter ret(*this);
+						return ret += n;
+					}
+					
+					reverse_random_iter operator-(int n)
+					{
+						reverse_random_iter ret(*this);
+						return ret -= n;
+					}
+
+					// ------------------------------------ Compoud assignment ------------------------------------
+					reverse_random_iter operator+=(int n)
+					{
+						for (int i = 0; i < n; i++)
+							(n > 0) ? _current-- : _current++;
+						return *this;
+					}
+					
+					reverse_random_iter operator-=(int n)
+					{
+						for (int i = 0; i < n; i++)
+							(n > 0) ? _current++ : _current--;
+						return *this;
+					}
+					
+					value_type operator[](int n) { return *(*this + n); }
+					
+					reverse_random_iter		operator++() { _current--; return *this; }
+					reverse_random_iter		operator++(int) { reverse_random_iter tmp = *this; ++(*this); return tmp; } //post incrementation
+					reverse_random_iter		operator--() { _current++; return *this; }
+					reverse_random_iter		operator--(int) { reverse_random_iter tmp = *this; --(*this); return tmp; }
+					reference						operator*() const { return *_current; }
+					pointer							operator->() { return _current; }
+					bool							operator==(const reverse_random_iter& b) { return _current == b._current; }
+					bool							operator!=(const reverse_random_iter& b) { return _current != b._current; }
+					nonConst_pointer				getCurrent() const { return _current; }
+
+				protected:
+					nonConst_pointer _current;
+					
+					// ------------------------------------ Inequality comparisons ------------------------------------
+					friend bool operator>(const reverse_random_iter &x, const reverse_random_iter &y) { return (*x > *y); }
+					friend bool operator>=(const reverse_random_iter &x, const reverse_random_iter &y) { return (*x >= *y); }
+					friend bool operator<(const reverse_random_iter &x, const reverse_random_iter &y) { return (*x < *y); }
+					friend bool operator<=(const reverse_random_iter &x, const reverse_random_iter &y) { return (*x <= *y); }
+			};
+				
+		public:
+			typedef random_iter<true>			iterator;
+			typedef random_iter<false>			const_iterator;
+			typedef reverse_random_iter<true>	reverse_iterator;
+			typedef reverse_random_iter<false>	const_reverse_iterator;
+			
 			class exceptionOutOfRange : public std::exception
 			{
 				public:

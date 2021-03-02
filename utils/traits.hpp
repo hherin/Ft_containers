@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   traits.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: heleneherin <heleneherin@student.42.fr>    +#+  +:+       +#+        */
+/*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/06 15:35:44 by hherin            #+#    #+#             */
-/*   Updated: 2021/03/01 16:36:44 by heleneherin      ###   ########.fr       */
+/*   Updated: 2021/03/02 12:02:59 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,9 @@
 #define TRAITS_HPP
 
 #include <iostream>
-#include "iterator/bidirect_iter.hpp"
 
 namespace ft
-{
-	template <typename T, bool B, typename D> class list_bidirect_iter;
-	
+{	
 	// ================== Enableif =======================
 	template <bool B, class T = void>
 	struct enable_if
