@@ -6,7 +6,7 @@
 /*   By: hherin <hherin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/11 19:55:49 by heleneherin       #+#    #+#             */
-/*   Updated: 2021/03/03 11:41:31 by hherin           ###   ########.fr       */
+/*   Updated: 2021/03/03 11:43:40 by hherin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 # define LIST_HPP
 
 # include <memory>
-# include "../utils/traits.hp"
+# include "../utils/traits.hpp"
 # include "../utils/stl.hpp"
 # include "../utils/allocator.hpp"
 
