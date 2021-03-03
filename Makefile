@@ -8,7 +8,7 @@ FLAGS	=	-Werror -Wextra -Wall -std=c++98 -g -fsanitize=address
 
 OBJS	=	${SRCS:.cpp=.o}
 
-HDRS	=	containers/*.hpp utils/*.hpp utils/ABR/*.hpp utils/iterator/*.hpp
+HDRS	=	containers/*.hpp utils/*.hpp
 
 all		:	${NAME}
 
@@ -19,10 +19,6 @@ ${NAME}	:	${OBJS}
 			@${GCC} ${FLAGS} -o $@ -c $<
 
 ${OBJS}	:	${HDRS}
-
-test	:
-			${GCC} ${FLAGS} -o iterator.o -c iterator.cpp
-			${GCC} ${FLAGS} -o test iterator.o
 
 clean	:
 			rm -rf *.o
